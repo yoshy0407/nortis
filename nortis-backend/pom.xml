@@ -18,6 +18,7 @@
 		<testcontainers.version>1.17.6</testcontainers.version>
 		<jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
 		<spotbugs.version>4.7.3</spotbugs.version>
+		<pmd.version>6.52.0</pmd.version>
 	</properties>
 	<dependencies>
 		<!-- common -->
@@ -225,17 +226,17 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.11.0</version>
+				<version>3.19.0</version>
 				<dependencies>
 					<dependency>
 						<groupId>net.sourceforge.pmd</groupId>
 						<artifactId>pmd-core</artifactId>
-						<version>6.11.0</version>
+						<version>${pmd.version}</version>
 					</dependency>
 					<dependency>
 						<groupId>net.sourceforge.pmd</groupId>
 						<artifactId>pmd-java</artifactId>
-						<version>6.11.0</version>
+						<version>${pmd.version}</version>
 					</dependency>
 				</dependencies>
 				<configuration>
