@@ -28,7 +28,7 @@ jobs:
 
       - name: build
         working-directory: ./nortis-backend
-        run: mvn clean compile source:jar package
+        run: mvn clean compile source:jar verify
 
       - name: Test Reports
         uses: mikepenz/action-junit-report@v2
@@ -36,8 +36,24 @@ jobs:
         with:
           report_paths: "**/target/surefire-reports/TEST-*.xml"
 
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: jacoco-report
+          path: nortis-backend/target/site/jacoco
+
+      - uses: jwgmeligmeyling/spotbugs-github-action@master
+        if: always()
+        with:
+          path: "**/spotbugsXml.xml"
+
+      - uses: jwgmeligmeyling/checkstyle-github-action@master
+        if: always()
+        with:
+          path: "**/checkstyle-result.xml"
+
       - name: prepare package
-        run: mkdir staging && cp target/*.jar staging
+        run: mkdir staging && cp nortis-backend/target/*.jar staging
         if: always()
 
       - uses: actions/upload-artifact@v3
