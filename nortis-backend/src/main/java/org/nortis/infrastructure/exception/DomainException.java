@@ -17,7 +17,6 @@ public class DomainException extends RuntimeException {
 	@Getter
 	private final String messageId;
 	
-	@Getter
 	private final Object[] args;
 	
 	/**
@@ -39,6 +38,14 @@ public class DomainException extends RuntimeException {
 		super(MessageSourceAccessor.messageSource().getMessage(messageId, args, LocaleContextHolder.getLocale()), cause);
 		this.messageId = messageId;
 		this.args = args;
+	}
+
+	/**
+	 * 引数を返します
+	 * @return 引数
+	 */
+	public Object[] getArgs() {
+		return new Object[]{this.args};
 	}
 	
 }
