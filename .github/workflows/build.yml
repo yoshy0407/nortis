@@ -2,11 +2,7 @@ name: "build backend"
 
 on:
   push:
-    paths:
-      - nortis-backend/**
   pull_request:
-    paths:
-      - nortis-backend/**
   workflow_dispatch:
 
 jobs:
