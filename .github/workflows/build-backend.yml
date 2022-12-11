@@ -45,12 +45,20 @@ jobs:
       - uses: jwgmeligmeyling/spotbugs-github-action@master
         if: always()
         with:
+          name: spotbugs-report
           path: "**/spotbugsXml.xml"
 
       - uses: jwgmeligmeyling/checkstyle-github-action@master
         if: always()
         with:
+          name: checkstyle-report
           path: "**/checkstyle-result.xml"
+
+      - uses: jwgmeligmeyling/pmd-github-action@master
+        if: always()
+        with:
+          name: pmd-report
+          path: "**/pmd.xml"
 
       - name: prepare package
         run: mkdir staging && cp nortis-backend/target/*.jar staging
