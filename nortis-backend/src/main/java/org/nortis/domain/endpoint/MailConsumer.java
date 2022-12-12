@@ -24,29 +24,53 @@ import lombok.Setter;
 @Entity
 public class MailConsumer {
 
+	/**
+	 * UUID
+	 */
 	@Id
 	@Column(name = "UUID")
 	private UUID uuid;
 	
+	/**
+	 * No
+	 */
 	@Id
 	@Column(name = "NO")
 	private int no;
 	
+	/**
+	 * メールアドレス
+	 */
 	@Column(name = "MAIL_ADDRESS")
 	private MailAddress mailAddress;
 
+	/**
+	 * 作成者ID
+	 */
 	@Column(name = "CREATE_ID")
 	private String createId;
 	
+	/**
+	 * 作成日付
+	 */
 	@Column(name = "CREATE_DT")
 	private LocalDateTime createDt;
 
+	/**
+	 * 更新者ID
+	 */
 	@Column(name = "UPDATE_ID")
 	private String updateId;
 	
+	/**
+	 * 更新日付
+	 */
 	@Column(name = "UPDATE_DT")
 	private LocalDateTime updateDt;
 	
+	/**
+	 * バージョン
+	 */
 	@Setter
 	@Version
 	@Column(name = "VERSION")
