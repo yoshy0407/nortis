@@ -69,19 +69,12 @@ jobs:
           name: Package
           path: staging
 
-      - uses: snow-actions/line-notify@v1.0.0
+      - name: notification failure
         if: ${{ failure() }}
-        with:
-          access_token: ${{ secrets.LINE_ACCESS_TOKEN }}
-          message: |
-            ${{github.repository}} is build failure
-            check details
-            ${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}
+        working-directory: tools
+        run: bash ./sendMessage.sh ${{ secrets.LINE_ACCESS_TOKEN }} success ${{github.repository}} ${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}
 
-      - uses: snow-actions/line-notify@v1.0.0
+      - name: notification failure
         if: ${{ success() }}
-        with:
-          access_token: ${{ secrets.LINE_ACCESS_TOKEN }}
-          message: |
-            ${{github.repository}} is build success
-            ${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}
+        working-directory: tools
+        run: bash ./sendMessage.sh ${{ secrets.LINE_ACCESS_TOKEN }} failure ${{github.repository}} ${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}
