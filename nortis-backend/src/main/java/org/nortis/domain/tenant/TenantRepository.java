@@ -20,6 +20,6 @@ public interface TenantRepository extends JpaRepository<Tenant, UUID> {
 	 * @param tenantId テナントID
 	 * @return テナントのリスト
 	 */
-	public List<Tenant> findByTenantId(TenantId tenantId);
+	List<Tenant> findByTenantId(TenantId tenantId);
 
 }

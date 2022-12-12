@@ -7,9 +7,19 @@ import org.springframework.context.MessageSource;
  * @author yoshiokahiroshi
  * @since 1.0.0
  */
-public class MessageSourceAccessor {
+public final class MessageSourceAccessor {
 
+	/**
+	 * {@link MessageSource}
+	 */
 	private static MessageSource messageSource;
+	
+	/**
+	 * コンストラクター
+	 */
+	private MessageSourceAccessor() {
+		throw new IllegalStateException("インスタンス化できません");
+	}
 	
 	/**
 	 * {@link MessageSource}を設定します
@@ -23,7 +33,7 @@ public class MessageSourceAccessor {
 	 * {@link MessageSource}を返します
 	 * @return {@link MessageSource}
 	 */
-	public static MessageSource messageSource() {
+	public static MessageSource getMessageSource() {
 		return messageSource;
 	}
 	

@@ -9,23 +9,17 @@ import lombok.EqualsAndHashCode;
  * @version 1.0.0
  */
 @EqualsAndHashCode
-public class TenantId {
+public final class TenantId {
 
+	/**
+	 * 値
+	 */
 	private final String value;
 	
 	private TenantId(String value) {
 		Validations.hasText(value, "テナントID");
 		Validations.maxTextLength(value, 10, "テナントID");
 		this.value = value;
-	}
-	
-	/**
-	 * {@link TenantId}のファクトリメソッドです
-	 * @param value 値
-	 * @return {@link TenantId}
-	 */
-	public static TenantId of(String value) {
-		return new TenantId(value);
 	}
 	
 	/**
@@ -36,4 +30,14 @@ public class TenantId {
 		return this.value;
 	}
 	
+	/**
+	 * {@link TenantId}のファクトリメソッドです
+	 * @param value 値
+	 * @return {@link TenantId}
+	 */
+	public static TenantId create(String value) {
+		return new TenantId(value);
+	}
+	
+
 }

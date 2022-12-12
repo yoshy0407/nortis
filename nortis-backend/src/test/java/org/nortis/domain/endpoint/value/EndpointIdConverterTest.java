@@ -10,12 +10,12 @@ class EndpointIdConverterTest {
 	
 	@Test
 	void testConvertToDatabaseColumn() {
-		assertThat(converter.convertToDatabaseColumn(EndpointId.of("TEST"))).isEqualTo("TEST");
+		assertThat(converter.convertToDatabaseColumn(EndpointId.create("TEST"))).isEqualTo("TEST");
 	}
 
 	@Test
 	void testConvertToEntityAttribute() {
-		assertThat(converter.convertToEntityAttribute("TEST")).isEqualTo(EndpointId.of("TEST"));
+		assertThat(converter.convertToEntityAttribute("TEST")).isEqualTo(EndpointId.create("TEST"));
 	}
 
 }

@@ -25,39 +25,39 @@ class EndpointIdTest {
 	
 	@Test
 	void testHashCodeEqual() {
-		EndpointId endpointId1 = EndpointId.of("ENDPOINT");
-		EndpointId endpointId2 = EndpointId.of("ENDPOINT");
+		EndpointId endpointId1 = EndpointId.create("ENDPOINT");
+		EndpointId endpointId2 = EndpointId.create("ENDPOINT");
 		
 		assertThat(endpointId1.hashCode()).isEqualTo(endpointId2.hashCode());
 	}
 
 	@Test
 	void testHashCodeNotEqual() {
-		EndpointId endpointId1 = EndpointId.of("ENDPOINT");
-		EndpointId endpointId2 = EndpointId.of("ENDPOINT1");
+		EndpointId endpointId1 = EndpointId.create("ENDPOINT");
+		EndpointId endpointId2 = EndpointId.create("ENDPOINT1");
 		
 		assertThat(endpointId1.hashCode()).isNotEqualTo(endpointId2.hashCode());
 	}
 
 	@Test
 	void testToString() {
-		EndpointId endpointId1 = EndpointId.of("ENDPOINT");
+		EndpointId endpointId1 = EndpointId.create("ENDPOINT");
 		
 		assertThat(endpointId1.toString()).isEqualTo("ENDPOINT");
 	}
 
 	@Test
 	void testEquals() {
-		EndpointId endpointId1 = EndpointId.of("ENDPOINT");
-		EndpointId endpointId2 = EndpointId.of("ENDPOINT");
+		EndpointId endpointId1 = EndpointId.create("ENDPOINT");
+		EndpointId endpointId2 = EndpointId.create("ENDPOINT");
 		
 		assertThat(endpointId1.equals(endpointId2)).isTrue();
 	}
 
 	@Test
 	void testNotEquals() {
-		EndpointId endpointId1 = EndpointId.of("ENDPOINT");
-		EndpointId endpointId2 = EndpointId.of("ENDPOINT1");
+		EndpointId endpointId1 = EndpointId.create("ENDPOINT");
+		EndpointId endpointId2 = EndpointId.create("ENDPOINT1");
 		
 		assertThat(endpointId1.equals(endpointId2)).isFalse();
 	}
@@ -65,14 +65,14 @@ class EndpointIdTest {
 	@Test
 	void testEmptyError() {
 		assertThrows(DomainException.class, () -> {
-			EndpointId.of("");
+			EndpointId.create("");
 		}, "エンドポイントIDが未設定です");
 	}
 
 	@Test
 	void testNullError() {
 		assertThrows(DomainException.class, () -> {
-			EndpointId.of(null);
+			EndpointId.create(null);
 		}, "エンドポイントIDが未設定です");
 	}
 

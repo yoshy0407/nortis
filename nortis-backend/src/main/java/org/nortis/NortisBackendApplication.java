@@ -15,7 +15,7 @@ public class NortisBackendApplication {
 	 * アプリケーションのエントリメソッドです
 	 * @param args コマンドラインの引数
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		SpringApplication.run(NortisBackendApplication.class, args);
 	}
 

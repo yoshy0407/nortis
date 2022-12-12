@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -44,10 +43,10 @@ class TenantDomainServiceTest {
 	void testCreateTenant() {
 		when(this.repository.findAll(any(Example.class))).thenReturn(new ArrayList<>());
 		
-		Tenant tenant = this.domainService.createTenant(TenantId.of("TEST"), "テナント", "TEST_ID");
+		Tenant tenant = this.domainService.createTenant(TenantId.create("TEST"), "テナント", "TEST_ID");
 	
 		assertThat(tenant.getUuid()).isNotNull();
-		assertThat(tenant.getTenantId()).isEqualTo(TenantId.of("TEST"));
+		assertThat(tenant.getTenantId()).isEqualTo(TenantId.create("TEST"));
 		assertThat(tenant.getTenantName()).isEqualTo("テナント");
 		assertThat(tenant.getCreateDt()).isNotNull();
 		assertThat(tenant.getCreateId()).isEqualTo("TEST_ID");
@@ -61,29 +60,29 @@ class TenantDomainServiceTest {
 	@Test
 	void testCreateTenantError() {
 		List<Tenant> tenantList = new ArrayList<>();
-		tenantList.add(Tenant.create(TenantId.of("TEST"), "テナント", "TEST_ID"));
+		tenantList.add(Tenant.create(TenantId.create("TEST"), "テナント", "TEST_ID"));
 		
 		when(this.repository.findAll(any(Example.class))).thenReturn(tenantList);
 		
 		assertThrows(DomainException.class, () -> {
-			this.domainService.createTenant(TenantId.of("TEST"), "テナント", "TEST_ID");
+			this.domainService.createTenant(TenantId.create("TEST"), "テナント", "TEST_ID");
 		}, "指定されたテナントIDはすでに使われています");
 	}
 	
 	@Test
 	void testChangeTenantId() {
 
-		when(this.repository.findByTenantId(eq(TenantId.of("TEST_ID")))).thenReturn(new ArrayList<>());
+		when(this.repository.findByTenantId(eq(TenantId.create("TEST_ID")))).thenReturn(new ArrayList<>());
 
 		List<Tenant> tenantList = new ArrayList<>();
-		tenantList.add(Tenant.create(TenantId.of("TEST"), "テナント", "TEST_ID"));
+		tenantList.add(Tenant.create(TenantId.create("TEST"), "テナント", "TEST_ID"));
 
-		when(this.repository.findByTenantId(eq(TenantId.of("TEST")))).thenReturn(tenantList);
+		when(this.repository.findByTenantId(eq(TenantId.create("TEST")))).thenReturn(tenantList);
 
-		Tenant tenant = this.domainService.changeTenantId(TenantId.of("TEST"), TenantId.of("TESTID"), "TEST_ID");
+		Tenant tenant = this.domainService.changeTenantId(TenantId.create("TEST"), TenantId.create("TESTID"), "TEST_ID");
 	
 		assertThat(tenant.getUuid()).isNotNull();
-		assertThat(tenant.getTenantId()).isEqualTo(TenantId.of("TESTID"));
+		assertThat(tenant.getTenantId()).isEqualTo(TenantId.create("TESTID"));
 		assertThat(tenant.getTenantName()).isEqualTo("テナント");
 		assertThat(tenant.getCreateDt()).isNotNull();
 		assertThat(tenant.getCreateId()).isEqualTo("TEST_ID");
@@ -95,28 +94,28 @@ class TenantDomainServiceTest {
 	@Test
 	void testChangeTenantIdCheckError() {
 		List<Tenant> tenantList = new ArrayList<>();
-		tenantList.add(Tenant.create(TenantId.of("TESTID"), "テナント", "TEST_ID"));
+		tenantList.add(Tenant.create(TenantId.create("TESTID"), "テナント", "TEST_ID"));
 
-		when(this.repository.findByTenantId(eq(TenantId.of("TESTID")))).thenReturn(tenantList);
+		when(this.repository.findByTenantId(eq(TenantId.create("TESTID")))).thenReturn(tenantList);
 
 		assertThrows(DomainException.class, () -> {
-			this.domainService.changeTenantId(TenantId.of("TEST"), TenantId.of("TESTID"), "TEST_ID");
+			this.domainService.changeTenantId(TenantId.create("TEST"), TenantId.create("TESTID"), "TEST_ID");
 		}, "指定されたテナントIDはすでに使われています");
 	}
 
 	@Test
 	void testChangeTenantIdCurrentError() {
 
-		when(this.repository.findByTenantId(eq(TenantId.of("TEST_ID")))).thenReturn(new ArrayList<>());
+		when(this.repository.findByTenantId(eq(TenantId.create("TEST_ID")))).thenReturn(new ArrayList<>());
 
 		List<Tenant> tenantList = new ArrayList<>();
-		tenantList.add(Tenant.create(TenantId.of("TEST"), "テナント", "TEST_ID"));
-		tenantList.add(Tenant.create(TenantId.of("TEST"), "テナント", "TEST_ID"));
+		tenantList.add(Tenant.create(TenantId.create("TEST"), "テナント", "TEST_ID"));
+		tenantList.add(Tenant.create(TenantId.create("TEST"), "テナント", "TEST_ID"));
 
-		when(this.repository.findByTenantId(eq(TenantId.of("TEST")))).thenReturn(tenantList);
+		when(this.repository.findByTenantId(eq(TenantId.create("TEST")))).thenReturn(tenantList);
 
 		assertThrows(UnexpectedException.class, () -> {
-			this.domainService.changeTenantId(TenantId.of("TEST"), TenantId.of("TESTID"), "TEST_ID");
+			this.domainService.changeTenantId(TenantId.create("TEST"), TenantId.create("TESTID"), "TEST_ID");
 		});
 	}
 

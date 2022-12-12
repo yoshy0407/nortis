@@ -19,6 +19,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class TenantDomainService {
 
+	/**
+	 * テナントリポジトリ
+	 */
 	private final TenantRepository tenantRepository;
 
 	/**

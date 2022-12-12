@@ -161,7 +161,7 @@ public class Tenant {
 	 * @return テナント
 	 */
 	public static Tenant create(TenantId tenantId, String tenantName, String createId) {
-		Tenant entity = new Tenant();
+		final Tenant entity = new Tenant();
 		entity.setUUID(UUID.randomUUID());
 		entity.setTenantId(tenantId);
 		entity.setTenantName(tenantName);

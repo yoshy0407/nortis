@@ -10,11 +10,14 @@ import lombok.EqualsAndHashCode;
  * @version 1.0.0
  */
 @EqualsAndHashCode
-public class MailAddress {
+public final class MailAddress {
 
+	/**
+	 * メールアドレスの値
+	 */
 	private final String value;
 	
-	private MailAddress(String value) {
+	private MailAddress(final String value) {
 		Validations.hasText(value, "メールアドレス");
 		Validations.contains(value, "@", "MSG20001");
 		this.value = value;
@@ -33,7 +36,7 @@ public class MailAddress {
 	 * @param mailAddress メールアドレス
 	 * @return {@link MailAddress}
 	 */
-	public static MailAddress of(String mailAddress) {
+	public static MailAddress create(final String mailAddress) {
 		return new MailAddress(mailAddress);
 	}
 	

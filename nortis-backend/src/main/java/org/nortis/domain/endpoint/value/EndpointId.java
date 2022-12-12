@@ -10,11 +10,14 @@ import lombok.EqualsAndHashCode;
  * @version 1.0.0
  */
 @EqualsAndHashCode
-public class EndpointId {
+public final class EndpointId {
 
+	/**
+	 * エンドポイントIDの値
+	 */
 	private final String value;
 	
-	private EndpointId(String value) {
+	private EndpointId(final String value) {
 		Validations.hasText(value, "エンドポイントID");
 		Validations.maxTextLength(value, 10, "エンドポイントID");
 		this.value = value;
@@ -33,7 +36,7 @@ public class EndpointId {
 	 * @param value 値
 	 * @return {@link EndpointId}
 	 */
-	public static EndpointId of(String value) {
+	public static EndpointId create(final String value) {
 		return new EndpointId(value);
 	}
 	

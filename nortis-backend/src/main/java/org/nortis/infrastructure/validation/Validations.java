@@ -10,8 +10,11 @@ import org.springframework.util.StringUtils;
  * @author yoshiokahiroshi
  * @version 1.0.0
  */
-public class Validations {
+public final class Validations {
 
+	/**
+	 * コンストラクター
+	 */
 	private Validations() {
 		throw new IllegalStateException("インスタンス化できません");
 	}

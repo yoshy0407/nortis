@@ -10,12 +10,12 @@ class TenantIdConverterTest {
 	
 	@Test
 	void testConvertToDatabaseColumn() {
-		assertThat(converter.convertToDatabaseColumn(TenantId.of("TEST"))).isEqualTo("TEST");
+		assertThat(converter.convertToDatabaseColumn(TenantId.create("TEST"))).isEqualTo("TEST");
 	}
 
 	@Test
 	void testConvertToEntityAttribute() {
-		assertThat(converter.convertToEntityAttribute("TEST")).isEqualTo(TenantId.of("TEST"));
+		assertThat(converter.convertToEntityAttribute("TEST")).isEqualTo(TenantId.create("TEST"));
 	}
 
 }

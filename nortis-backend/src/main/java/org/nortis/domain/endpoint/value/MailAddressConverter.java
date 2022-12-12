@@ -9,13 +9,13 @@ import jakarta.persistence.Converter;
  * @version 1.0.0
  */
 @Converter(autoApply = true)
-public class MailAddressConverter implements AttributeConverter<MailAddress, String>{
+public class MailAddressConverter implements AttributeConverter<MailAddress, String> {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String convertToDatabaseColumn(MailAddress attribute) {
+	public String convertToDatabaseColumn(final MailAddress attribute) {
 		return attribute.toString();
 	}
 
@@ -23,8 +23,8 @@ public class MailAddressConverter implements AttributeConverter<MailAddress, Str
 	 * {@inheritDoc}
 	 */
 	@Override
-	public MailAddress convertToEntityAttribute(String dbData) {
-		return MailAddress.of(dbData);
+	public MailAddress convertToEntityAttribute(final String dbData) {
+		return MailAddress.create(dbData);
 	}
 
 }

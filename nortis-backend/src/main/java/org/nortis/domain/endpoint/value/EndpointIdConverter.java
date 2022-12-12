@@ -15,7 +15,7 @@ public class EndpointIdConverter implements AttributeConverter<EndpointId, Strin
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String convertToDatabaseColumn(EndpointId attribute) {
+	public String convertToDatabaseColumn(final EndpointId attribute) {
 		return attribute.toString();
 	}
 
@@ -23,8 +23,8 @@ public class EndpointIdConverter implements AttributeConverter<EndpointId, Strin
 	 * {@inheritDoc}
 	 */
 	@Override
-	public EndpointId convertToEntityAttribute(String dbData) {
-		return EndpointId.of(dbData);
+	public EndpointId convertToEntityAttribute(final String dbData) {
+		return EndpointId.create(dbData);
 	}
 
 }

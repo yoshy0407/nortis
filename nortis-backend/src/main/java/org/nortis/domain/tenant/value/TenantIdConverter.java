@@ -24,7 +24,7 @@ public class TenantIdConverter implements AttributeConverter<TenantId, String> {
 	 */
 	@Override
 	public TenantId convertToEntityAttribute(String dbData) {
-		return TenantId.of(dbData);
+		return TenantId.create(dbData);
 	}
 
 }

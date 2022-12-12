@@ -179,7 +179,7 @@
 					</dependency>
 				</dependencies>
 				<configuration>
-					<configLocation>google_checks.xml</configLocation>
+					<configLocation>config/checkstyle/google_checks.xml</configLocation>
 					<failsOnError>true</failsOnError>
 					<failOnViolation>true</failOnViolation>
 					<violationSeverity>error</violationSeverity>
@@ -242,7 +242,7 @@
 				<configuration>
 					<rulesets>
 						<ruleset>/category/java/bestpractices.xml</ruleset>
-						<ruleset>/category/java/codestyle.xml</ruleset>
+						<ruleset>config/pmd/codestyle.xml</ruleset>
 						<ruleset>/category/java/design.xml</ruleset>
 						<ruleset>/category/java/documentation.xml</ruleset>
 						<ruleset>/category/java/errorprone.xml</ruleset>

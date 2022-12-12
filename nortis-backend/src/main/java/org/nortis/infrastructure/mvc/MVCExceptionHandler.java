@@ -1,7 +1,6 @@
 package org.nortis.infrastructure.mvc;
 
 import java.time.LocalDateTime;
-
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.exception.UnexpectedException;
 import org.springframework.http.HttpStatus;

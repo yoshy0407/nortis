@@ -21,10 +21,16 @@ import lombok.Getter;
 @Entity
 public class ReceiveEvent {
 
+	/**
+	 * イベントID
+	 */
 	@Id
 	@Column(name = "EVENT_ID")
 	private UUID eventId;
 	
+	/**
+	 * テナントID
+	 */
 	@Column(name = "TENANT_ID")
 	private TenantId tenantId;
 	

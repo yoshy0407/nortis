@@ -26,12 +26,12 @@ class TenantTest {
 
 	@Test
 	void testChangeTenantName() {
-		Tenant tenant = Tenant.create(TenantId.of("TEST1"), "TEST1 Tenant", "TEST_ID");
+		Tenant tenant = Tenant.create(TenantId.create("TEST1"), "TEST1 Tenant", "TEST_ID");
 
 		tenant.changeTenantName("TEST11 Tenant", "TEST_ID2");
 
 		assertThat(tenant.getUuid()).isNotNull();
-		assertThat(tenant.getTenantId()).isEqualTo(TenantId.of("TEST1"));
+		assertThat(tenant.getTenantId()).isEqualTo(TenantId.create("TEST1"));
 		assertThat(tenant.getTenantName()).isEqualTo("TEST11 Tenant");
 		assertThat(tenant.getCreateDt()).isNotNull();
 		assertThat(tenant.getCreateId()).isEqualTo("TEST_ID");
@@ -42,12 +42,12 @@ class TenantTest {
 
 	@Test
 	void testChangeTenantShortName() {
-		Tenant tenant = Tenant.create(TenantId.of("TEST2"), "TEST3 Tenant", "TEST_ID");
+		Tenant tenant = Tenant.create(TenantId.create("TEST2"), "TEST3 Tenant", "TEST_ID");
 
-		tenant.changeTenantId(TenantId.of("TEST_ID"), "TEST_ID2");
+		tenant.changeTenantId(TenantId.create("TEST_ID"), "TEST_ID2");
 
 		assertThat(tenant.getUuid()).isNotNull();
-		assertThat(tenant.getTenantId()).isEqualTo(TenantId.of("TEST_ID"));
+		assertThat(tenant.getTenantId()).isEqualTo(TenantId.create("TEST_ID"));
 		assertThat(tenant.getTenantName()).isEqualTo("TEST3 Tenant");
 		assertThat(tenant.getCreateDt()).isNotNull();
 		assertThat(tenant.getCreateId()).isEqualTo("TEST_ID");
@@ -58,10 +58,10 @@ class TenantTest {
 
 	@Test
 	void testCreate() {
-		Tenant tenant = Tenant.create(TenantId.of("TEST"), "TEST TENANT", "TEST_ID");
+		Tenant tenant = Tenant.create(TenantId.create("TEST"), "TEST TENANT", "TEST_ID");
 
 		assertThat(tenant.getUuid()).isNotNull();
-		assertThat(tenant.getTenantId()).isEqualTo(TenantId.of("TEST"));
+		assertThat(tenant.getTenantId()).isEqualTo(TenantId.create("TEST"));
 		assertThat(tenant.getTenantName()).isEqualTo("TEST TENANT");
 		assertThat(tenant.getCreateDt()).isNotNull();
 		assertThat(tenant.getCreateId()).isEqualTo("TEST_ID");
@@ -81,21 +81,21 @@ class TenantTest {
 	@Test
 	void testCreateTenantNameEmpty() {
 		assertThrows(DomainException.class, () -> {
-			Tenant.create(TenantId.of("TEST"), "", "TEST_ID");
+			Tenant.create(TenantId.create("TEST"), "", "TEST_ID");
 		}, "テナント名が未設定です");
 	}
 
 	@Test
 	void testCreateTenantNameNull() {
 		assertThrows(DomainException.class, () -> {
-			Tenant.create(TenantId.of("TEST"), null, "TEST_ID");
+			Tenant.create(TenantId.create("TEST"), null, "TEST_ID");
 		}, "テナント名が未設定です");
 	}
 
 	@Test
 	void testCreateTenantNameLength() {
 		assertThrows(DomainException.class, () -> {
-			Tenant.create(TenantId.of("TEST"), "123456789012345678901234567890123456789012345678901", "TEST_ID");
+			Tenant.create(TenantId.create("TEST"), "123456789012345678901234567890123456789012345678901", "TEST_ID");
 			
 		}, "テナント名は50文字以内である必要があります");
 	}
@@ -103,7 +103,7 @@ class TenantTest {
 	@Test
 	void testCreateCreateIdNull() {
 		assertThrows(DomainException.class, () -> {
-			Tenant.create(TenantId.of("TEST"), "123456789012345678901234567890123456789012345678901", "");
+			Tenant.create(TenantId.create("TEST"), "123456789012345678901234567890123456789012345678901", "");
 			
 		}, "作成者IDが未設定です");
 	}

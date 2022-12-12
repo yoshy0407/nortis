@@ -14,9 +14,15 @@ public class DomainException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * メッセージID
+	 */
 	@Getter
 	private final String messageId;
 	
+	/**
+	 * メッセージ引数
+	 */
 	private final Object[] args;
 	
 	/**
@@ -35,7 +41,7 @@ public class DomainException extends RuntimeException {
 	 * @param args メッセージ引数
 	 */
 	public DomainException(String messageId, Throwable cause, Object...args) {
-		super(MessageSourceAccessor.messageSource().getMessage(messageId, args, LocaleContextHolder.getLocale()), cause);
+		super(MessageSourceAccessor.getMessageSource().getMessage(messageId, args, LocaleContextHolder.getLocale()), cause);
 		this.messageId = messageId;
 		this.args = args;
 	}

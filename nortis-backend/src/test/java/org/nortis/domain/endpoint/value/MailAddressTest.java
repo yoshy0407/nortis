@@ -25,39 +25,39 @@ class MailAddressTest {
 	
 	@Test
 	void testHashCodeEqual() {
-		MailAddress address1 = MailAddress.of("test@example.com");
-		MailAddress address2 = MailAddress.of("test@example.com");
+		MailAddress address1 = MailAddress.create("test@example.com");
+		MailAddress address2 = MailAddress.create("test@example.com");
 	
 		assertThat(address1.hashCode()).isEqualTo(address2.hashCode());
 	}
 
 	@Test
 	void testHashCodeNotEqual() {
-		MailAddress address1 = MailAddress.of("test@example.com");
-		MailAddress address2 = MailAddress.of("test1@example.com");
+		MailAddress address1 = MailAddress.create("test@example.com");
+		MailAddress address2 = MailAddress.create("test1@example.com");
 	
 		assertThat(address1.hashCode()).isNotEqualTo(address2.hashCode());
 	}
 
 	@Test
 	void testToString() {
-		MailAddress address1 = MailAddress.of("test@example.com");
+		MailAddress address1 = MailAddress.create("test@example.com");
 	
 		assertThat(address1.toString()).isEqualTo("test@example.com");
 	}
 
 	@Test
 	void testEquals() {
-		MailAddress address1 = MailAddress.of("test@example.com");
-		MailAddress address2 = MailAddress.of("test@example.com");
+		MailAddress address1 = MailAddress.create("test@example.com");
+		MailAddress address2 = MailAddress.create("test@example.com");
 	
 		assertThat(address1.equals(address2)).isTrue();
 	}
 
 	@Test
 	void testNotEquals() {
-		MailAddress address1 = MailAddress.of("test@example.com");
-		MailAddress address2 = MailAddress.of("test1@example.com");
+		MailAddress address1 = MailAddress.create("test@example.com");
+		MailAddress address2 = MailAddress.create("test1@example.com");
 	
 		assertThat(address1.equals(address2)).isFalse();
 	}
@@ -65,21 +65,21 @@ class MailAddressTest {
 	@Test
 	void testNullError() {
 		assertThrows(DomainException.class, () -> {
-			MailAddress.of(null);
+			MailAddress.create(null);
 		}, "メールアドレスが未設定です");
 	}
 
 	@Test
 	void testEmptyError() {
 		assertThrows(DomainException.class, () -> {
-			MailAddress.of("");
+			MailAddress.create("");
 		}, "メールアドレスが未設定です");
 	}
 
 	@Test
 	void testContainsError() {
 		assertThrows(DomainException.class, () -> {
-			MailAddress.of("hoge");
+			MailAddress.create("hoge");
 		}, "メールアドレスのフォーマットが不正です");
 	}
 
