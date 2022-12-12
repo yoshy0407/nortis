@@ -70,11 +70,11 @@ jobs:
           path: staging
 
       - name: notification failure
-        if: ${{ failure() }}
-        working-directory: tools
-        run: bash ./sendMessage.sh ${{ secrets.LINE_ACCESS_TOKEN }} success ${{github.repository}} ${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}
-
-      - name: notification failure
-        if: ${{ success() }}
+        if: success()
         working-directory: tools
         run: bash ./sendMessage.sh ${{ secrets.LINE_ACCESS_TOKEN }} failure ${{github.repository}} ${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}
+
+      - name: notification failure
+        if: failure()
+        working-directory: tools
+        run: bash ./sendMessage.sh ${{ secrets.LINE_ACCESS_TOKEN }} success ${{github.repository}} ${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}
