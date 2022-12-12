@@ -68,3 +68,20 @@ jobs:
         with:
           name: Package
           path: staging
+
+      - uses: snow-actions/line-notify@v1.0.0
+        if: ${{ failure() }}
+        with:
+          access_token: ${{ secrets.LINE_ACCESS_TOKEN }}
+          message: |
+            ${{github.repository}} is build failure
+            check details
+            ${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}
+
+      - uses: snow-actions/line-notify@v1.0.0
+        if: ${{ success() }}
+        with:
+          access_token: ${{ secrets.LINE_ACCESS_TOKEN }}
+          message: |
+            ${{github.repository}} is build success
+            ${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}
