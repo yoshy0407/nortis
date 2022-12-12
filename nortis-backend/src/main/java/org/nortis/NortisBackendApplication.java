@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * アプリケーションのメインクラスです
+ * 
  * @author yoshiokahiroshi
  * @version 1.0.0
  */
