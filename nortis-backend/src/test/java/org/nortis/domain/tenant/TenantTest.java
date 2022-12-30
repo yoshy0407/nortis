@@ -30,37 +30,20 @@ class TenantTest {
 
 		tenant.changeTenantName("TEST11 Tenant", "TEST_ID2");
 
-		assertThat(tenant.getUuid()).isNotNull();
 		assertThat(tenant.getTenantId()).isEqualTo(TenantId.create("TEST1"));
 		assertThat(tenant.getTenantName()).isEqualTo("TEST11 Tenant");
 		assertThat(tenant.getCreateDt()).isNotNull();
 		assertThat(tenant.getCreateId()).isEqualTo("TEST_ID");
 		assertThat(tenant.getUpdateDt()).isNotNull();
 		assertThat(tenant.getUpdateId()).isEqualTo("TEST_ID2");
-		assertThat(tenant.getVersion()).isEqualTo(2L);
-	}
-
-	@Test
-	void testChangeTenantShortName() {
-		Tenant tenant = Tenant.create(TenantId.create("TEST2"), "TEST3 Tenant", "TEST_ID");
-
-		tenant.changeTenantId(TenantId.create("TEST_ID"), "TEST_ID2");
-
-		assertThat(tenant.getUuid()).isNotNull();
-		assertThat(tenant.getTenantId()).isEqualTo(TenantId.create("TEST_ID"));
-		assertThat(tenant.getTenantName()).isEqualTo("TEST3 Tenant");
-		assertThat(tenant.getCreateDt()).isNotNull();
-		assertThat(tenant.getCreateId()).isEqualTo("TEST_ID");
-		assertThat(tenant.getUpdateDt()).isNotNull();
-		assertThat(tenant.getUpdateId()).isEqualTo("TEST_ID2");
-		assertThat(tenant.getVersion()).isEqualTo(2L);
+		//Domaによって更新されるため、同じになる
+		assertThat(tenant.getVersion()).isEqualTo(1L);
 	}
 
 	@Test
 	void testCreate() {
 		Tenant tenant = Tenant.create(TenantId.create("TEST"), "TEST TENANT", "TEST_ID");
 
-		assertThat(tenant.getUuid()).isNotNull();
 		assertThat(tenant.getTenantId()).isEqualTo(TenantId.create("TEST"));
 		assertThat(tenant.getTenantName()).isEqualTo("TEST TENANT");
 		assertThat(tenant.getCreateDt()).isNotNull();

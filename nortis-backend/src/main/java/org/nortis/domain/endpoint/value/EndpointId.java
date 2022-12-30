@@ -1,6 +1,9 @@
 package org.nortis.domain.endpoint.value;
 
+import java.io.Serializable;
+
 import org.nortis.infrastructure.validation.Validations;
+import org.seasar.doma.Domain;
 
 import lombok.EqualsAndHashCode;
 
@@ -9,18 +12,21 @@ import lombok.EqualsAndHashCode;
  * @author yoshiokahiroshi
  * @version 1.0.0
  */
+@Domain(valueType = String.class, factoryMethod = "create", accessorMethod = "toString")
 @EqualsAndHashCode
-public final class EndpointId {
+public final class EndpointId implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	/**
 	 * エンドポイントIDの値
 	 */
-	private final String value;
+	private final String endpointId;
 	
-	private EndpointId(final String value) {
-		Validations.hasText(value, "エンドポイントID");
-		Validations.maxTextLength(value, 10, "エンドポイントID");
-		this.value = value;
+	private EndpointId(final String endpointId) {
+		Validations.hasText(endpointId, "エンドポイントID");
+		Validations.maxTextLength(endpointId, 10, "エンドポイントID");
+		this.endpointId = endpointId;
 	}
 	
 	/**
@@ -28,7 +34,7 @@ public final class EndpointId {
 	 */
 	@Override
 	public String toString() {
-		return this.value;
+		return this.endpointId;
 	}
 	
 	/**

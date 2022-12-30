@@ -2,24 +2,21 @@ package org.nortis.domain.tenant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.MessageSourceAccessor;
 import org.nortis.infrastructure.exception.DomainException;
-import org.nortis.infrastructure.exception.UnexpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
-import org.springframework.data.domain.Example;
 
 @SpringBootTest(classes = MessageSourceAutoConfiguration.class)
 class TenantDomainServiceTest {
@@ -38,14 +35,12 @@ class TenantDomainServiceTest {
 		this.domainService = new TenantDomainService(repository);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test
 	void testCreateTenant() {
-		when(this.repository.findAll(any(Example.class))).thenReturn(new ArrayList<>());
+		when(this.repository.get(eq(TenantId.create("TEST")))).thenReturn(Optional.empty());
 		
 		Tenant tenant = this.domainService.createTenant(TenantId.create("TEST"), "テナント", "TEST_ID");
 	
-		assertThat(tenant.getUuid()).isNotNull();
 		assertThat(tenant.getTenantId()).isEqualTo(TenantId.create("TEST"));
 		assertThat(tenant.getTenantName()).isEqualTo("テナント");
 		assertThat(tenant.getCreateDt()).isNotNull();
@@ -56,67 +51,14 @@ class TenantDomainServiceTest {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
-	void testCreateTenantError() {
-		List<Tenant> tenantList = new ArrayList<>();
-		tenantList.add(Tenant.create(TenantId.create("TEST"), "テナント", "TEST_ID"));
-		
-		when(this.repository.findAll(any(Example.class))).thenReturn(tenantList);
+	void testCreateTenantError() {		
+		when(this.repository.get(eq(TenantId.create("TEST"))))
+			.thenReturn(Optional.of(Tenant.create(TenantId.create("TEST"), "テナント", "TEST_ID")));
 		
 		assertThrows(DomainException.class, () -> {
 			this.domainService.createTenant(TenantId.create("TEST"), "テナント", "TEST_ID");
 		}, "指定されたテナントIDはすでに使われています");
 	}
 	
-	@Test
-	void testChangeTenantId() {
-
-		when(this.repository.findByTenantId(eq(TenantId.create("TEST_ID")))).thenReturn(new ArrayList<>());
-
-		List<Tenant> tenantList = new ArrayList<>();
-		tenantList.add(Tenant.create(TenantId.create("TEST"), "テナント", "TEST_ID"));
-
-		when(this.repository.findByTenantId(eq(TenantId.create("TEST")))).thenReturn(tenantList);
-
-		Tenant tenant = this.domainService.changeTenantId(TenantId.create("TEST"), TenantId.create("TESTID"), "TEST_ID");
-	
-		assertThat(tenant.getUuid()).isNotNull();
-		assertThat(tenant.getTenantId()).isEqualTo(TenantId.create("TESTID"));
-		assertThat(tenant.getTenantName()).isEqualTo("テナント");
-		assertThat(tenant.getCreateDt()).isNotNull();
-		assertThat(tenant.getCreateId()).isEqualTo("TEST_ID");
-		assertThat(tenant.getUpdateDt()).isNotNull();
-		assertThat(tenant.getUpdateId()).isEqualTo("TEST_ID");
-		assertThat(tenant.getVersion()).isEqualTo(2L);
-	}
-	
-	@Test
-	void testChangeTenantIdCheckError() {
-		List<Tenant> tenantList = new ArrayList<>();
-		tenantList.add(Tenant.create(TenantId.create("TESTID"), "テナント", "TEST_ID"));
-
-		when(this.repository.findByTenantId(eq(TenantId.create("TESTID")))).thenReturn(tenantList);
-
-		assertThrows(DomainException.class, () -> {
-			this.domainService.changeTenantId(TenantId.create("TEST"), TenantId.create("TESTID"), "TEST_ID");
-		}, "指定されたテナントIDはすでに使われています");
-	}
-
-	@Test
-	void testChangeTenantIdCurrentError() {
-
-		when(this.repository.findByTenantId(eq(TenantId.create("TEST_ID")))).thenReturn(new ArrayList<>());
-
-		List<Tenant> tenantList = new ArrayList<>();
-		tenantList.add(Tenant.create(TenantId.create("TEST"), "テナント", "TEST_ID"));
-		tenantList.add(Tenant.create(TenantId.create("TEST"), "テナント", "TEST_ID"));
-
-		when(this.repository.findByTenantId(eq(TenantId.create("TEST")))).thenReturn(tenantList);
-
-		assertThrows(UnexpectedException.class, () -> {
-			this.domainService.changeTenantId(TenantId.create("TEST"), TenantId.create("TESTID"), "TEST_ID");
-		});
-	}
-
 }

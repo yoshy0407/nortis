@@ -1,16 +1,18 @@
 package org.nortis.domain.tenant;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
+import org.nortis.domain.endpoint.Endpoint;
+import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.validation.Validations;
+import org.seasar.doma.Column;
+import org.seasar.doma.Entity;
+import org.seasar.doma.Id;
+import org.seasar.doma.Table;
+import org.seasar.doma.Version;
+import org.springframework.data.domain.AbstractAggregateRoot;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -22,21 +24,15 @@ import lombok.ToString;
  */
 @ToString
 @Getter
-@Table(name = "M_TENANT")
-@Entity
-public class Tenant {
+@Table(name = "TENANT")
+@Entity(listener = TenantEntityListener.class)
+public class Tenant extends AbstractAggregateRoot<Tenant> {
 
-	/**
-	 * テナントID
-	 */
-	@Id
-	@Column(name = "UUID")
-	private UUID uuid;
-		
 	/**
 	 * テナント省略名
 	 */
-	@Column(name = "TENANT_ID", unique = true)
+	@Id
+	@Column(name = "TENANT_ID")
 	private TenantId tenantId;
 	
 	/**
@@ -88,28 +84,17 @@ public class Tenant {
 		setTenantName(tenantName);
 		setUpdateId(updateId);
 		setUpdateDt(LocalDateTime.now());
-		incrementVersion();
-	}
+	}	
 	
 	/**
-	 * テナントIDを変更します
-	 * @param tenantId テナントID
-	 * @param updateId 更新者ID
+	 * エンドポイントを作成します
+	 * @param endpointId エンドポイント
+	 * @param endpointName エンドポイント名
+	 * @param createId 作成者ID
+	 * @return エンドポイント
 	 */
-	public void changeTenantId(TenantId tenantId, String updateId) {
-		setTenantId(tenantId);
-		setUpdateId(updateId);
-		setUpdateDt(LocalDateTime.now());
-		incrementVersion();
-	}
-	
-	/**
-	 * UUIDを設定します
-	 * @param uuid UUID
-	 */
-	public void setUUID(UUID uuid) {
-		Validations.notNull(uuid, "テナントID");
-		this.uuid = uuid;
+	public Endpoint createEndpoint(EndpointId endpointId, String endpointName, String createId) {
+		return Endpoint.create(endpointId, this.tenantId, endpointName, createId);
 	}
 	
 	/**
@@ -149,10 +134,6 @@ public class Tenant {
 		this.createDt = createDt;		
 	}
 	
-	private void incrementVersion() {
-		setVersion(getVersion() + 1L);
-	}
-	
 	/**
 	 * エンティティを新規作成します
 	 * @param tenantId テナントID
@@ -162,7 +143,6 @@ public class Tenant {
 	 */
 	public static Tenant create(TenantId tenantId, String tenantName, String createId) {
 		final Tenant entity = new Tenant();
-		entity.setUUID(UUID.randomUUID());
 		entity.setTenantId(tenantId);
 		entity.setTenantName(tenantName);
 		entity.setCreateId(createId);

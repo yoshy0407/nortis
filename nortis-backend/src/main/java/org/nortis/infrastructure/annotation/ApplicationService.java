@@ -10,6 +10,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * アプリケーションサービスを表す注釈型です
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
  * @author yoshiokahiroshi
  * @version 1.0.0
  */
+@Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = Throwable.class)
 @Service
 @Scope(BeanDefinition.SCOPE_SINGLETON)
 @Documented
