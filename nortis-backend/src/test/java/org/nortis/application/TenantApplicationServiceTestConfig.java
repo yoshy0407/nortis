@@ -1,5 +1,6 @@
 package org.nortis.application;
 
+import org.nortis.application.tenant.TenantApplicationService;
 import org.nortis.domain.tenant.TenantDomainService;
 import org.nortis.domain.tenant.TenantEntityListener;
 import org.nortis.domain.tenant.TenantRepository;
@@ -10,7 +11,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 
 @TestConfiguration
-public class TenantApplicationServiceTestConfig {
+class TenantApplicationServiceTestConfig {
 
 	@Bean
 	TenantRepository tenantRepository(Config config) {

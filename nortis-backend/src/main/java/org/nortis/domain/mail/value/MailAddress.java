@@ -1,9 +1,8 @@
 package org.nortis.domain.mail.value;
 
+import lombok.EqualsAndHashCode;
 import org.nortis.infrastructure.validation.Validations;
 import org.seasar.doma.Domain;
-
-import lombok.EqualsAndHashCode;
 
 /**
  * メールアドレスを表すオブジェクトです

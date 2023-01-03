@@ -1,7 +1,9 @@
 package org.nortis.domain.tenant;
 
 import java.time.LocalDateTime;
-
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.nortis.domain.endpoint.Endpoint;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.tenant.value.TenantId;
@@ -12,10 +14,6 @@ import org.seasar.doma.Id;
 import org.seasar.doma.Table;
 import org.seasar.doma.Version;
 import org.springframework.data.domain.AbstractAggregateRoot;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 /**
  * テナント

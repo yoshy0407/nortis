@@ -1,10 +1,9 @@
 package org.nortis.domain.mail;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nortis.domain.endpoint.value.EndpointId;
@@ -30,11 +29,14 @@ class MailConsumerTest {
 	@Test
 	void testUpdateMailAddress() {
 		MailConsumer mailConsumer = MailConsumer.create(
-				EndpointId.create("TEST_ID"), MailAddress.create("hoge@exampple.com"), "userId");
+				EndpointId.create("TEST_ID"),
+				MailAddress.create("hoge@exampple.com"),
+				"userId");
 		
 		mailConsumer.updateMailAddress(MailAddress.create("test@example.com"), "testId");
 
-		assertThat(mailConsumer.getMailAddress()).isEqualTo(MailAddress.create("test@example.com"));
+		assertThat(mailConsumer.getMailAddress())
+			.isEqualTo(MailAddress.create("test@example.com"));
 		assertThat(mailConsumer.getUpdateId()).isEqualTo("testId");
 		assertThat(mailConsumer.getUpdateDt()).isBefore(LocalDateTime.now());
 		//Domaによってバージョンが更新されるため1のまま
@@ -44,11 +46,14 @@ class MailConsumerTest {
 	@Test
 	void testCreate() {
 		MailConsumer mailConsumer = MailConsumer.create(
-				EndpointId.create("TEST_ID"), MailAddress.create("hoge@example.com"), "userId");
+				EndpointId.create("TEST_ID"), 
+				MailAddress.create("hoge@example.com"), 
+				"userId");
 
 		assertThat(mailConsumer.getConsumerId()).isNotNull();
 		assertThat(mailConsumer.getEndpointId()).isEqualTo(EndpointId.create("TEST_ID"));
-		assertThat(mailConsumer.getMailAddress()).isEqualTo(MailAddress.create("hoge@example.com"));
+		assertThat(mailConsumer.getMailAddress())
+			.isEqualTo(MailAddress.create("hoge@example.com"));
 		assertThat(mailConsumer.getCreateId()).isEqualTo("userId");
 		assertThat(mailConsumer.getCreateDt()).isBefore(LocalDateTime.now());
 		assertThat(mailConsumer.getUpdateId()).isNull();
@@ -73,14 +78,20 @@ class MailConsumerTest {
 	@Test
 	void testCreateUserIdNull() {
 		assertThrows(DomainException.class, () -> {
-			MailConsumer.create(EndpointId.create("TEST_ID"), MailAddress.create("hoge@example.com"), null);
+			MailConsumer.create(
+					EndpointId.create("TEST_ID"), 
+					MailAddress.create("hoge@example.com"), 
+					null);
 		}, "作成者IDが未設定です");
 	}
 
 	@Test
 	void testCreateUserIdEmpty() {
 		assertThrows(DomainException.class, () -> {
-			MailConsumer.create(EndpointId.create("TEST_ID"), MailAddress.create("hoge@example.com"), "");
+			MailConsumer.create(
+					EndpointId.create("TEST_ID"), 
+					MailAddress.create("hoge@example.com"), 
+					"");
 		}, "作成者IDが未設定です");
 	}
 

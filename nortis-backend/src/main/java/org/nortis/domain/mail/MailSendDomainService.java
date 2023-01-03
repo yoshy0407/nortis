@@ -1,19 +1,16 @@
 package org.nortis.domain.mail;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+import lombok.AllArgsConstructor;
 import org.nortis.domain.event.ReceiveEvent;
-import org.nortis.infrastructure.annotation.DomainService;
 import org.nortis.infrastructure.mail.MailSendFailureHandler;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class MailSendDomainService {

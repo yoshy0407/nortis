@@ -3,8 +3,11 @@ package org.nortis.application;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
+import org.nortis.application.endpoint.EndpointApplicationService;
+import org.nortis.application.endpoint.EndpointDeleteCommand;
+import org.nortis.application.endpoint.EndpointNameUpdateCommand;
+import org.nortis.application.endpoint.EndpointRegisterCommand;
 import org.nortis.domain.endpoint.Endpoint;
 import org.nortis.domain.endpoint.EndpointRepository;
 import org.nortis.domain.endpoint.value.EndpointId;
@@ -42,7 +45,8 @@ class EndpointApplicationServiceTest {
 	
 	@Test
 	void testRegisterEndpoint() {
-		Endpoint endpoint = endpointApplicationService.registerEndpoint("TEST1", "test-point", "エンドポイント", "TEST_ID", data -> {
+		EndpointRegisterCommand command = new EndpointRegisterCommand("TEST1", "test-point", "エンドポイント", "TEST_ID");
+		Endpoint endpoint = endpointApplicationService.registerEndpoint(command, data -> {
 			return data;
 		});
 		
@@ -57,7 +61,8 @@ class EndpointApplicationServiceTest {
 
 	@Test
 	void testChangeName() {
-		endpointApplicationService.changeName("TEST2", "ENDPOINT2", "TEST POINT", "TEST_ID", data -> {
+		EndpointNameUpdateCommand command = new EndpointNameUpdateCommand("TEST2", "ENDPOINT2", "TEST POINT", "TEST_ID");
+		endpointApplicationService.changeName(command, data -> {
 			return data;
 		});
 
@@ -69,7 +74,8 @@ class EndpointApplicationServiceTest {
 	
 	@Test
 	void testDelete() {
-		endpointApplicationService.delete("TEST1", "ENDPOINT1");
+		EndpointDeleteCommand command = new EndpointDeleteCommand("TEST1", "ENDPOINT1");
+		endpointApplicationService.delete(command);
 
 		Optional<Endpoint> opt = this.endpointRepository.get(TenantId.create("TEST1"), EndpointId.create("ENDPOINT1"));
 		

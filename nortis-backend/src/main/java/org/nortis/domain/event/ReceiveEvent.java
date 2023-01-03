@@ -1,6 +1,9 @@
 package org.nortis.domain.event;
 
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.event.value.EventId;
 import org.nortis.domain.tenant.value.TenantId;
@@ -10,14 +13,12 @@ import org.seasar.doma.Entity;
 import org.seasar.doma.Id;
 import org.seasar.doma.Table;
 
-import lombok.Getter;
-import lombok.Setter;
-
 /**
  * 受信イベント
  * @author yoshiokahiroshi
  * @version 1.0.0
  */
+@ToString
 @Getter
 @Table(name = "RECEIVE_EVENT")
 @Entity
@@ -77,7 +78,7 @@ public class ReceiveEvent {
 	/**
 	 * 受信済みに設定します
 	 */
-	public void subscribed() {
+	public void subscribe() {
 		setSubscribed(true);
 		setUpdateDt(LocalDateTime.now());
 	}
@@ -100,26 +101,50 @@ public class ReceiveEvent {
 		this.tenantId = tenantId;
 	}
 	
+	/**
+	 * エンドポイントIDを設定します
+	 * @param endpointId エンドポイントID
+	 */
 	public void setEndpointId(EndpointId endpointId) {
 		Validations.notNull(endpointId, "エンドポイントID");
 		this.endpointId = endpointId;
 	}
 	
+	/**
+	 * 発生時刻を設定します
+	 * @param occuredOn 発生時刻
+	 */
 	public void setOccuredOn(LocalDateTime occuredOn) {
 		Validations.notNull(occuredOn, "発生時刻");
 		this.occuredOn = occuredOn;
 	}
 	
+	/**
+	 * 件名を設定します
+	 * @param subject 件名
+	 */
 	public void setSubject(String subject) {
 		Validations.maxTextLength(subject, 100, "件名");
 		this.subject = subject;
 	}
 	
+	/**
+	 * メッセージ本部を設定します
+	 * @param messageBody メッセージ本文
+	 */
 	public void setMessageBody(String messageBody) {
 		Validations.maxTextLength(messageBody, 1000, "メッセージ本体");
 		this.messageBody = messageBody;
 	}
 	
+	/**
+	 * 受信イベントを新規作成します
+	 * @param tenantId テナントID
+	 * @param endpointId エンドポイントID
+	 * @param subject 件名
+	 * @param messageBody メッセージ本文
+	 * @return 受信イベント
+	 */
 	public static ReceiveEvent create(
 			TenantId tenantId,
 			EndpointId endpointId,
@@ -135,4 +160,5 @@ public class ReceiveEvent {
 		receiveEvent.setMessageBody(messageBody);
 		return receiveEvent;
 	}
+	
 }

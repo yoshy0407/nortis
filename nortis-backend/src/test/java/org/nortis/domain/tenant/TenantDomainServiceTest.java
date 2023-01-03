@@ -1,12 +1,11 @@
 package org.nortis.domain.tenant;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -39,7 +38,8 @@ class TenantDomainServiceTest {
 	void testCreateTenant() {
 		when(this.repository.get(eq(TenantId.create("TEST")))).thenReturn(Optional.empty());
 		
-		Tenant tenant = this.domainService.createTenant(TenantId.create("TEST"), "テナント", "TEST_ID");
+		Tenant tenant = this.domainService
+				.createTenant(TenantId.create("TEST"), "テナント", "TEST_ID");
 	
 		assertThat(tenant.getTenantId()).isEqualTo(TenantId.create("TEST"));
 		assertThat(tenant.getTenantName()).isEqualTo("テナント");
@@ -54,7 +54,8 @@ class TenantDomainServiceTest {
 	@Test
 	void testCreateTenantError() {		
 		when(this.repository.get(eq(TenantId.create("TEST"))))
-			.thenReturn(Optional.of(Tenant.create(TenantId.create("TEST"), "テナント", "TEST_ID")));
+			.thenReturn(Optional.of(
+					Tenant.create(TenantId.create("TEST"), "テナント", "TEST_ID")));
 		
 		assertThrows(DomainException.class, () -> {
 			this.domainService.createTenant(TenantId.create("TEST"), "テナント", "TEST_ID");

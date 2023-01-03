@@ -1,9 +1,10 @@
 package org.nortis.infrastructure.exception;
 
+import java.util.Arrays;
+import lombok.Getter;
 import org.nortis.infrastructure.MessageSourceAccessor;
 import org.springframework.context.i18n.LocaleContextHolder;
 
-import lombok.Getter;
 
 /**
  * 想定外のエラーが発生した場合の例外です
@@ -30,7 +31,7 @@ public class UnexpectedException extends RuntimeException {
 	 * @param messageId メッセージID
 	 * @param args メッセージの引数
 	 */
-	public UnexpectedException(String messageId, Object...args) {
+	public UnexpectedException(String messageId, Object... args) {
 		this(messageId, null, args);
 	}
 
@@ -40,10 +41,12 @@ public class UnexpectedException extends RuntimeException {
 	 * @param cause ラップする例外
 	 * @param args メッセージ引数
 	 */
-	public UnexpectedException(String messageId, Throwable cause, Object...args) {
-		super(MessageSourceAccessor.getMessageSource().getMessage(messageId, args, LocaleContextHolder.getLocale()), cause);
+	public UnexpectedException(String messageId, Throwable cause, Object... args) {
+		super(MessageSourceAccessor.getMessageSource()
+				.getMessage(messageId, args, LocaleContextHolder.getLocale()), 
+				cause);
 		this.messageId = messageId;
-		this.args = args;
+		this.args = Arrays.copyOf(args, args.length);
 	}
 
 	/**
@@ -51,7 +54,7 @@ public class UnexpectedException extends RuntimeException {
 	 * @return 引数
 	 */
 	public Object[] getArgs() {
-		return new Object[]{this.args};
+		return this.args;
 	}
 
 }

@@ -11,9 +11,19 @@ package org.nortis.infrastructure.application;
 @FunctionalInterface
 public interface ApplicationTranslator<D, R> {
 
+	/**
+	 * 変換します
+	 * @param data 変換元データ
+	 * @return 変換後データ
+	 */
 	R translate(D data);
 	
-	default <T> ApplicationTranslator<T, R> nothing() {
-		return T -> null;
+	/**
+	 * 何も変換しない{@link ApplicationTranslator}を返却します
+	 * @param <T> 元クラス
+	 * @return 変換しない{@link ApplicationTranslator}
+	 */
+	static <T> ApplicationTranslator<T, Void> nothing() {
+		return t -> null;
 	}
 }

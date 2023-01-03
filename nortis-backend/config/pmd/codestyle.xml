@@ -39,7 +39,8 @@ by {% rule java/codestyle/ClassNamingConventions %}.
 ]]>
                 </value>
             </property>
-            <property name="strict" type="Boolean" value="true" description="Also flag classes, that are named Abstract, but are not abstract." />
+            <property name="strict" type="Boolean" value="true"
+                description="Also flag classes, that are named Abstract, but are not abstract." />
         </properties>
         <example>
             <![CDATA[
@@ -53,25 +54,28 @@ public abstract class Foo { // should be AbstractFoo
     <rule name="AtLeastOneConstructor"
           language="java"
           since="1.04"
-          message="Each class should declare at least one constructor"
-          class="net.sourceforge.pmd.lang.java.rule.codestyle.AtLeastOneConstructorRule"
-          externalInfoUrl="https://pmd.github.io/pmd-6.52.0/pmd_rules_java_codestyle.html#atleastoneconstructor">
-        <description>
+    message="Each class should declare at least one constructor"
+    class="net.sourceforge.pmd.lang.java.rule.codestyle.AtLeastOneConstructorRule"
+    externalInfoUrl="https://pmd.github.io/pmd-6.52.0/pmd_rules_java_codestyle.html#atleastoneconstructor">
+    <description>
 <![CDATA[
 Each non-static class should declare at least one constructor.
-Classes with solely static members are ignored, refer to [UseUtilityClassRule](pmd_rules_java_design.html#useutilityclass) to detect those.
+Classes
+    with solely static members are ignored, refer to
+    [UseUtilityClassRule](pmd_rules_java_design.html#useutilityclass) to detect those.
 ]]>
-        </description>
+    </description>
         <priority>3</priority>
         <example>
 <![CDATA[
 public class Foo {
-   // missing constructor
+   //
+    missing constructor
   public void doSomething() { ... }
   public void doOtherThing { ... }
 }
 ]]>
-        </example>
+    </example>
     </rule>
 -->
     <rule name="AvoidDollarSigns"
@@ -335,7 +339,8 @@ prefix for these methods.
 ]]>
                 </value>
             </property>
-            <property name="checkParameterizedMethods" type="Boolean" description="Check parameterized methods" value="false" />
+            <property name="checkParameterizedMethods" type="Boolean"
+                description="Check parameterized methods" value="false" />
         </properties>
         <example>
             <![CDATA[
@@ -433,46 +438,53 @@ public class Éléphant {}
         </example>
     </rule>
 
+    <!--
     <rule name="CommentDefaultAccessModifier"
         language="java"
         since="5.4.0"
-        class="net.sourceforge.pmd.lang.java.rule.codestyle.CommentDefaultAccessModifierRule"
-        message="Missing commented default access modifier"
-        externalInfoUrl="https://pmd.github.io/pmd-6.52.0/pmd_rules_java_codestyle.html#commentdefaultaccessmodifier">
-        <description>
-To avoid mistakes if we want that an Annotation, Class, Enum, Method, Constructor or Field have a default access modifier
-we must add a comment at the beginning of its declaration.
-By default, the comment must be `/* default */` or `/* package */`, if you want another, you have to provide a regular expression.
+    class="net.sourceforge.pmd.lang.java.rule.codestyle.CommentDefaultAccessModifierRule"
+    message="Missing commented default access modifier"
+    externalInfoUrl="https://pmd.github.io/pmd-6.52.0/pmd_rules_java_codestyle.html#commentdefaultaccessmodifier">
+    <description>
+To avoid mistakes if we want that an Annotation, Class, Enum, Method, Constructor
+    or Field have a default access modifier
+we must add a comment at the beginning of its
+    declaration.
+By default, the comment must be `/* default */` or `/* package */`, if you want
+    another, you have to provide a regular expression.
 
-This rule ignores by default all cases that have a `@VisibleForTesting` annotation or any JUnit5 annotation. Use the
-property "ignoredAnnotations" to customize the recognized annotations.
+This rule ignores by default all cases that
+    have a `@VisibleForTesting` annotation or any JUnit5 annotation. Use the
+property
+    "ignoredAnnotations" to customize the recognized annotations.
         </description>
-        <priority>3</priority>
+    <priority>3</priority>
         <example>
             <![CDATA[
 public class Foo {
-    final String stringValue = "some string";
+    final
+    String stringValue = "some string";
     String getString() {
        return stringValue;
     }
-
     class NestedFoo {
     }
 }
 
 // should be
 public class Foo {
-    /* default */ final String stringValue = "some string";
+    /* default */ final String
+    stringValue = "some string";
     /* default */ String getString() {
        return stringValue;
     }
-
     /* default */ class NestedFoo {
     }
 }
 ]]>
         </example>
     </rule>
+-->
 
     <rule name="ConfusingTernary"
         language="java"
@@ -515,14 +527,21 @@ boolean bar(int x, int y) {
         </description>
         <priority>3</priority>
         <properties>
-            <property name="checkIfElseStmt" type="Boolean" value="true" description="Require that 'if ... else' statements use braces" />
-            <property name="checkSingleIfStmt" type="Boolean" value="true" description="Require that 'if' statements with a single branch use braces" />
-            <property name="checkWhileStmt" type="Boolean" value="true" description="Require that 'while' loops use braces" />
-            <property name="checkForStmt" type="Boolean" value="true" description="Require that 'for' loops should use braces" />
-            <property name="checkDoWhileStmt" type="Boolean" value="true" description="Require that 'do ... while' loops use braces" />
-            <property name="checkCaseStmt" type="Boolean" value="false" description="Require that cases of a switch have braces" />
+            <property name="checkIfElseStmt" type="Boolean" value="true"
+                description="Require that 'if ... else' statements use braces" />
+            <property name="checkSingleIfStmt" type="Boolean" value="true"
+                description="Require that 'if' statements with a single branch use braces" />
+            <property name="checkWhileStmt" type="Boolean" value="true"
+                description="Require that 'while' loops use braces" />
+            <property name="checkForStmt" type="Boolean" value="true"
+                description="Require that 'for' loops should use braces" />
+            <property name="checkDoWhileStmt" type="Boolean" value="true"
+                description="Require that 'do ... while' loops use braces" />
+            <property name="checkCaseStmt" type="Boolean" value="false"
+                description="Require that cases of a switch have braces" />
 
-            <property name="allowEmptyLoop" type="Boolean" value="false" description="Allow loops with an empty statement, e.g. 'while(true);'" />
+            <property name="allowEmptyLoop" type="Boolean" value="false"
+                description="Allow loops with an empty statement, e.g. 'while(true);'" />
 
             <property name="version" value="2.0" />
             <property name="xpath">
@@ -565,56 +584,77 @@ while (true) {  // preferred approach
         </example>
     </rule>
 
+    <!--
     <rule name="DefaultPackage"
         deprecated="true"
         language="java"
-        since="3.4"
+    since="3.4"
         message="Use explicit scoping instead of the default package private level"
-        class="net.sourceforge.pmd.lang.rule.XPathRule"
-        externalInfoUrl="https://pmd.github.io/pmd-6.52.0/pmd_rules_java_codestyle.html#defaultpackage">
-        <description>
+    class="net.sourceforge.pmd.lang.rule.XPathRule"
+    externalInfoUrl="https://pmd.github.io/pmd-6.52.0/pmd_rules_java_codestyle.html#defaultpackage">
+    <description>
 Use explicit scoping instead of accidental usage of default package private level.
-The rule allows methods and fields annotated with Guava's @VisibleForTesting and JUnit 5's annotations.
+    The rule allows methods and fields annotated with Guava's @VisibleForTesting and JUnit 5's
+    annotations.
 
-This rule is deprecated since PMD 6.35.0. It assumes that any usage of package-access is accidental,
-and by doing so, prohibits using a really fundamental and useful feature of the language.
+This rule is deprecated since PMD 6.35.0. It assumes that any usage of
+    package-access is accidental,
+and by doing so, prohibits using a really fundamental and useful
+    feature of the language.
 
-To satisfy the rule, you have to make the member public even if it doesn't need to, or make it protected,
-which muddies your intent even more if you don't intend the class to be extended, and may be at odds with
-other rules like {% rule "java/codestyle/AvoidProtectedFieldInFinalClass" %}.
+To satisfy the rule, you have to make the member public even if it
+    doesn't need to, or make it protected,
+which muddies your intent even more if you don't intend
+    the class to be extended, and may be at odds with
+other rules like {% rule
+    "java/codestyle/AvoidProtectedFieldInFinalClass" %}.
 
-The rule {% rule "java/codestyle/CommentDefaultAccessModifier" %} should be used instead. This rule flags
-the same thing, but has an escape hatch.
+The rule {% rule
+    "java/codestyle/CommentDefaultAccessModifier" %} should be used instead. This rule flags
+the
+    same thing, but has an escape hatch.
         </description>
         <priority>3</priority>
-        <properties>
+    <properties>
             <property name="version" value="2.0" />
-            <property name="xpath">
+            <property
+    name="xpath">
                 <value>
                     <![CDATA[
-//ClassOrInterfaceDeclaration[@Interface= false()]
+    //ClassOrInterfaceDeclaration[@Interface= false()]
 /ClassOrInterfaceBody
-/ClassOrInterfaceBodyDeclaration
+    /ClassOrInterfaceBodyDeclaration
 [not(Annotation//Name[
     pmd-java:typeIs('org.junit.jupiter.api.Test')
-    or pmd-java:typeIs('org.junit.jupiter.api.RepeatedTest')
-    or pmd-java:typeIs('org.junit.jupiter.api.ParameterizedTest')
-    or pmd-java:typeIs('org.junit.jupiter.api.TestFactory')
-    or pmd-java:typeIs('org.junit.jupiter.api.TestTemplate')
-    or pmd-java:typeIs('org.junit.jupiter.api.BeforeAll')
-    or pmd-java:typeIs('org.junit.jupiter.api.AfterAll')
-    or pmd-java:typeIs('org.junit.jupiter.api.BeforeEach')
-    or pmd-java:typeIs('org.junit.jupiter.api.AfterEach')
-    or ends-with(@Image, 'VisibleForTesting')])]
+    or
+    pmd-java:typeIs('org.junit.jupiter.api.RepeatedTest')
+    or
+    pmd-java:typeIs('org.junit.jupiter.api.ParameterizedTest')
+    or
+    pmd-java:typeIs('org.junit.jupiter.api.TestFactory')
+    or
+    pmd-java:typeIs('org.junit.jupiter.api.TestTemplate')
+    or
+    pmd-java:typeIs('org.junit.jupiter.api.BeforeAll')
+    or
+    pmd-java:typeIs('org.junit.jupiter.api.AfterAll')
+    or
+    pmd-java:typeIs('org.junit.jupiter.api.BeforeEach')
+    or
+    pmd-java:typeIs('org.junit.jupiter.api.AfterEach')
+    or ends-with(@Image,
+    'VisibleForTesting')])]
 [
 FieldDeclaration[@PackagePrivate= true()]
-or MethodDeclaration[@PackagePrivate= true()]
+or
+    MethodDeclaration[@PackagePrivate= true()]
 ]
 ]]>
                 </value>
             </property>
-        </properties>
+    </properties>
     </rule>
+-->
 
     <rule name="DontImportJavaLang"
         language="java"
@@ -725,8 +765,10 @@ public abstract class ShouldBeAbstract {
         class="net.sourceforge.pmd.lang.java.rule.codestyle.EmptyControlStatementRule"
         externalInfoUrl="https://pmd.github.io/pmd-6.52.0/pmd_rules_java_codestyle.html#emptycontrolstatement">
         <!-- Note about naming: EmptyCodeBlock does not work because the rule flags `if(true);`  -->
-        <!-- EmptyControlStatement is weird because `{}` is not a control statement, and we also flag initializers. -->
-        <!-- EmptyStatement does not work because `;` is called an "empty statement" and is not flagged by this rule, rather, by UnnecessarySemicolon. -->
+        <!-- EmptyControlStatement is weird because `{}` is not a control statement, and we also
+        flag initializers. -->
+        <!-- EmptyStatement does not work because `;` is called an "empty statement" and is not
+        flagged by this rule, rather, by UnnecessarySemicolon. -->
         <!-- EmptyCodeConstruct would work but sounds a bit odd (right?). -->
         <description>
             <![CDATA[
@@ -1303,18 +1345,20 @@ public interface MissingProperSuffix extends javax.ejb.EJBLocalObject {}    // n
     <rule name="LocalVariableCouldBeFinal"
         language="java"
         since="2.2"
-        message="Local variable ''{0}'' could be declared final"
-        class="net.sourceforge.pmd.lang.java.rule.codestyle.LocalVariableCouldBeFinalRule"
-        externalInfoUrl="https://pmd.github.io/pmd-6.52.0/pmd_rules_java_codestyle.html#localvariablecouldbefinal">
-        <description>
+    message="Local variable ''{0}'' could be declared final"
+    class="net.sourceforge.pmd.lang.java.rule.codestyle.LocalVariableCouldBeFinalRule"
+    externalInfoUrl="https://pmd.github.io/pmd-6.52.0/pmd_rules_java_codestyle.html#localvariablecouldbefinal">
+    <description>
 A local variable assigned only once can be declared final.
         </description>
-        <priority>3</priority>
+    <priority>3</priority>
         <example>
             <![CDATA[
 public class Bar {
-    public void foo () {
-    String txtA = "a";          // if txtA will not be assigned again it is better to do this:
+    public
+    void foo () {
+    String txtA = "a";          // if txtA will not be assigned again it is better
+    to do this:
     final String txtB = "b";
     }
 }
@@ -1369,7 +1413,8 @@ Fields, formal arguments, or local variable names that are too long can make the
         </description>
         <priority>3</priority>
         <properties>
-            <property name="minimum" type="Integer" description="The variable length reporting threshold" min="1" max="100" value="17" />
+            <property name="minimum" type="Integer"
+                description="The variable length reporting threshold" min="1" max="100" value="30" />
             <property name="version" value="2.0" />
             <property name="xpath">
                 <value>
@@ -1439,24 +1484,26 @@ public class MissingTheProperSuffix implements SessionBean {}   // non-standard 
     <rule name="MethodArgumentCouldBeFinal"
         language="java"
         since="2.2"
-        message="Parameter ''{0}'' is not assigned and could be declared final"
-        class="net.sourceforge.pmd.lang.java.rule.codestyle.MethodArgumentCouldBeFinalRule"
-        externalInfoUrl="https://pmd.github.io/pmd-6.52.0/pmd_rules_java_codestyle.html#methodargumentcouldbefinal">
-        <description>
-A method argument that is never re-assigned within the method can be declared final.
+    message="Parameter ''{0}'' is not assigned and could be declared final"
+    class="net.sourceforge.pmd.lang.java.rule.codestyle.MethodArgumentCouldBeFinalRule"
+    externalInfoUrl="https://pmd.github.io/pmd-6.52.0/pmd_rules_java_codestyle.html#methodargumentcouldbefinal">
+    <description>
+A method argument that is never re-assigned within the method can be declared
+    final.
         </description>
         <priority>3</priority>
         <example>
             <![CDATA[
-public void foo1 (String param) {       // do stuff with param never assigning it
+    public void foo1 (String param) {       // do stuff with param never assigning it
 
 }
 
-public void foo2 (final String param) { // better, do stuff with param never assigning it
+public
+    void foo2 (final String param) { // better, do stuff with param never assigning it
 
 }
 ]]>
-        </example>
+    </example>
     </rule>
 -->
 
@@ -1782,7 +1829,8 @@ Short Classnames with fewer than e.g. five characters are not recommended.
         </description>
         <priority>4</priority>
         <properties>
-            <property name="minimum" type="Integer" value="5" min="1" max="100" description="Number of characters that are required as a minimum for a class name." />
+            <property name="minimum" type="Integer" value="5" min="1" max="100"
+                description="Number of characters that are required as a minimum for a class name." />
             <property name="version" value="2.0" />
             <property name="xpath">
                 <value>
@@ -1811,7 +1859,8 @@ Method names that are very short are not helpful to the reader.
         </description>
         <priority>3</priority>
         <properties>
-            <property name="minimum" type="Integer" value="3" min="1" max="100" description="Number of characters that are required as a minimum for a method name." />
+            <property name="minimum" type="Integer" value="3" min="1" max="100"
+                description="Number of characters that are required as a minimum for a method name." />
             <property name="version" value="2.0" />
             <property name="xpath">
                 <value>
@@ -1835,42 +1884,54 @@ public class ShortMethod {
     <rule name="ShortVariable"
         language="java"
         since="0.3"
-        message="Avoid variables with short names like {0}"
+        message="Avoid
+    variables with short names like {0}"
         class="net.sourceforge.pmd.lang.rule.XPathRule"
-        externalInfoUrl="https://pmd.github.io/pmd-6.52.0/pmd_rules_java_codestyle.html#shortvariable">
-        <description>
-Fields, local variables, or parameter names that are very short are not helpful to the reader.
+    externalInfoUrl="https://pmd.github.io/pmd-6.52.0/pmd_rules_java_codestyle.html#shortvariable">
+    <description>
+Fields, local variables, or parameter names that are very short are not helpful to
+    the reader.
         </description>
         <priority>3</priority>
         <properties>
-            <property name="minimum" type="Integer" value="3" min="1" max="100" description="Number of characters that are required as a minimum for a variable name." />
-            <property name="version" value="2.0" />
+            <property
+    name="minimum" type="Integer" value="3" min="1" max="100" description="Number of characters that
+    are required as a minimum for a variable name." />
+            <property name="version"
+    value="2.0" />
             <property name="xpath">
                 <value>
                     <![CDATA[
-//VariableDeclaratorId[string-length(@Name) < $minimum]
+    //VariableDeclaratorId[string-length(@Name) < $minimum]
  (: ForStatement :)
- [not(../../..[self::ForInit])]
+    [not(../../..[self::ForInit])]
  (: Foreach statement :)
  [not(../../..[self::ForStatement])]
- (: Catch statement parameter :)
+ (:
+    Catch statement parameter :)
  [not(../..[self::CatchStatement])]
- (: Lambda expression parameter :)
+ (: Lambda expression parameter
+    :)
  [not(parent::LambdaExpression or ../../..[self::LambdaExpression])]
 ]]>
                 </value>
-            </property>
+    </property>
         </properties>
         <example>
             <![CDATA[
-public class Something {
+public class Something
+    {
     private int q = 15;                         // field - too short
-    public static void main( String as[] ) {    // formal arg - too short
-        int r = 20 + q;                         // local var - too short
-        for (int i = 0; i < 10; i++) {          // not a violation (inside 'for' loop)
+    public static void
+    main( String as[] ) {    // formal arg - too short
+        int r = 20 + q;                         //
+    local var - too short
+        for (int i = 0; i < 10; i++) {          // not a violation (inside
+    'for' loop)
             r += q;
         }
-        for (Integer i : numbers) {             // not a violation (inside 'for-each' loop)
+        for (Integer i : numbers) {             // not
+    a violation (inside 'for-each' loop)
             r += q;
         }
     }
@@ -1935,7 +1996,8 @@ which class a static member comes from (Sun 1.5 Language Guide).
         <priority>3</priority>
         <properties>
             <property name="maximumStaticImports" type="Integer"
-                description="All static imports can be disallowed by setting this to 0" min="0" max="100" value="4" />
+                description="All static imports can be disallowed by setting this to 0" min="0"
+                max="100" value="4" />
             <property name="version" value="2.0" />
             <property name="xpath">
                 <value>
@@ -2277,7 +2339,9 @@ false positives.
 ]]>
                 </value>
             </property>
-            <property name="java7Compatibility" type="Boolean" description="If disabled, the rule shows also violations that are applicable for java8+" value="false" />
+            <property name="java7Compatibility" type="Boolean"
+                description="If disabled, the rule shows also violations that are applicable for java8+"
+                value="false" />
         </properties>
         <example>
             <![CDATA[

@@ -1,11 +1,10 @@
 package org.nortis.domain.endpoint.value;
 
 import java.io.Serializable;
-
+import lombok.EqualsAndHashCode;
 import org.nortis.infrastructure.validation.Validations;
 import org.seasar.doma.Domain;
 
-import lombok.EqualsAndHashCode;
 
 /**
  * エンドポイントIDの値オブジェクトです
@@ -21,12 +20,16 @@ public final class EndpointId implements Serializable {
 	/**
 	 * エンドポイントIDの値
 	 */
-	private final String endpointId;
+	private final String value;
 	
-	private EndpointId(final String endpointId) {
-		Validations.hasText(endpointId, "エンドポイントID");
-		Validations.maxTextLength(endpointId, 10, "エンドポイントID");
-		this.endpointId = endpointId;
+	/**
+	 * コンストラクター
+	 * @param value 値
+	 */
+	private EndpointId(final String value) {
+		Validations.hasText(value, "エンドポイントID");
+		Validations.maxTextLength(value, 10, "エンドポイントID");
+		this.value = value;
 	}
 	
 	/**
@@ -34,7 +37,7 @@ public final class EndpointId implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return this.endpointId;
+		return this.value;
 	}
 	
 	/**

@@ -1,11 +1,10 @@
 package org.nortis.domain.tenant;
 
 import java.util.Optional;
-
+import lombok.AllArgsConstructor;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.annotation.DomainService;
 import org.nortis.infrastructure.exception.DomainException;
-import lombok.AllArgsConstructor;
 
 /**
  * テナントに関するドメインサービスです

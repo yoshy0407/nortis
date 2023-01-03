@@ -3,8 +3,10 @@ package org.nortis.application;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
+import org.nortis.application.mail.MailAddressChangeCommand;
+import org.nortis.application.mail.MailConsumerApplicationService;
+import org.nortis.application.mail.MailRegisterCommand;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.mail.MailConsumer;
 import org.nortis.domain.mail.MailConsumerRepository;
@@ -43,7 +45,8 @@ class MailConsumerApplicationServiceTest {
 	
 	@Test
 	void testRegister() {
-		MailConsumer result = this.applicationService.register("TEST1", "ENDPOINT1", "test1@example.com", "TEST_ID", data -> {
+		MailRegisterCommand command = new MailRegisterCommand("TEST1", "ENDPOINT1", "test1@example.com", "TEST_ID");
+		MailConsumer result = this.applicationService.register(command, data -> {
 			return data;
 		});
 		
@@ -58,8 +61,9 @@ class MailConsumerApplicationServiceTest {
 
 	@Test
 	void testChangeMailAddress() {
+		MailAddressChangeCommand command = new MailAddressChangeCommand("68E75233-7C82-40A6-A34D-CD5FD858EFA6", "test2@example.com", "TEST_ID");
 		this.applicationService
-			.changeMailAddress("68E75233-7C82-40A6-A34D-CD5FD858EFA6", "test2@example.com", "TEST_ID", data -> data);
+			.changeMailAddress(command, data -> data);
 
 		Optional<MailConsumer> optMailConsumer = this.mailConsumerRepository.get(ConsumerId.create("68E75233-7C82-40A6-A34D-CD5FD858EFA6"));
 		

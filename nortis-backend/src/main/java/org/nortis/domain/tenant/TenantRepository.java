@@ -1,8 +1,6 @@
 package org.nortis.domain.tenant;
 
-
 import java.util.Optional;
-
 import org.nortis.domain.tenant.value.TenantId;
 import org.seasar.doma.Dao;
 import org.seasar.doma.Delete;
@@ -28,12 +26,27 @@ public interface TenantRepository  {
 	@Select
 	Optional<Tenant> get(TenantId tenantId);
 	
+	/**
+	 * テナントを保存します
+	 * @param tenant テナント
+	 * @return 保存件数
+	 */
 	@Insert
 	int save(Tenant tenant);
 
+	/**
+	 * 更新します
+	 * @param tenant テナント
+	 * @return 更新件数
+	 */
 	@Update
 	int update(Tenant tenant);
 
+	/**
+	 * 削除します
+	 * @param tenant テナント
+	 * @return 削除件数
+	 */
 	@Delete
 	int remove(Tenant tenant);
 

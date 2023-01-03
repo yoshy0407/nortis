@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
+import org.nortis.application.tenant.TenantApplicationService;
+import org.nortis.application.tenant.TenantNameUpdateCommand;
+import org.nortis.application.tenant.TenantRegisterCommand;
 import org.nortis.domain.tenant.Tenant;
 import org.nortis.domain.tenant.TenantRepository;
 import org.nortis.domain.tenant.event.TenantDeletedEvent;
@@ -40,8 +42,9 @@ class TenantApplicationServiceTest {
 	
 	@Test
 	void testRegister() {
+		TenantRegisterCommand command = new TenantRegisterCommand("TENANT1", "登録テナント", "TEST_ID");
 		TenantId tenantId = tenantApplicationService
-				.register("TENANT1", "登録テナント", "TEST_ID", data -> data.getTenantId());
+				.register(command, data -> data.getTenantId());
 		
 		Optional<Tenant> optTenant = this.tenantRepository.get(tenantId);
 		assertThat(optTenant).isPresent();
@@ -58,8 +61,9 @@ class TenantApplicationServiceTest {
 
 	@Test
 	void testChangeName() {
+		TenantNameUpdateCommand command = new TenantNameUpdateCommand("TEST2", "テストテナント", "USER_ID");
 		TenantId tenantId = tenantApplicationService
-				.changeName("TEST2", "テストテナント", "USER_ID", data -> data.getTenantId());
+				.changeName(command, data -> data.getTenantId());
 
 		Optional<Tenant> optTenant = this.tenantRepository.get(tenantId);
 		assertThat(optTenant).isPresent();

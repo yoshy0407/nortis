@@ -132,6 +132,10 @@
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 						</exclude>
+						<exclude>
+							<groupId>org.seasar.doma</groupId>
+							<artifactId>doma-processor</artifactId>
+						</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
@@ -186,12 +190,13 @@
 					<failsOnError>true</failsOnError>
 					<failOnViolation>true</failOnViolation>
 					<violationSeverity>error</violationSeverity>
-					<consoleOutput>true </consoleOutput>
+					<consoleOutput>true</consoleOutput>
+					<excludes>**/generated-sources/annotations/**</excludes>
 				</configuration>
 				<executions>
 					<execution>
 						<id>checkstyle</id>
-						<phase>verify</phase>
+						<phase>validate</phase>
 						<goals>
 							<goal>check</goal>
 						</goals>
@@ -247,9 +252,9 @@
 					<rulesets>
 						<ruleset>/category/java/bestpractices.xml</ruleset>
 						<ruleset>config/pmd/codestyle.xml</ruleset>
-						<ruleset>/category/java/design.xml</ruleset>
-						<ruleset>/category/java/documentation.xml</ruleset>
-						<ruleset>/category/java/errorprone.xml</ruleset>
+						<ruleset>config/pmd/design.xml</ruleset>
+						<ruleset>config/pmd/documentation.xml</ruleset>
+						<ruleset>config/pmd/errorprone.xml</ruleset>
 						<ruleset>/category/java/multithreading.xml</ruleset>
 						<ruleset>/category/java/performance.xml</ruleset>
 						<ruleset>/category/java/security.xml</ruleset>
@@ -260,6 +265,12 @@
 					<printFailingErrors>true</printFailingErrors>
 					<verbose>true</verbose>
 					<analysisCache>true</analysisCache>
+					<excludeRoots>
+						<excludeRoot>target/generated-sources/annotations/</excludeRoot>
+					</excludeRoots>
+					<excludes>
+						<exclude>org/nortis/NortisBackendApplication.java</exclude>
+					</excludes>
 				</configuration>
 				<executions>
 					<execution>
@@ -286,6 +297,17 @@
 					<reportSet>
 						<reports>
 							<report>report</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>checkstyle</report>
 						</reports>
 					</reportSet>
 				</reportSets>

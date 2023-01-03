@@ -1,6 +1,9 @@
 package org.nortis.domain.endpoint;
 
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.validation.Validations;
@@ -11,8 +14,6 @@ import org.seasar.doma.Table;
 import org.seasar.doma.Version;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * エンドポイント
@@ -20,6 +21,7 @@ import lombok.Setter;
  * @author yoshiokahiroshi
  * @version 1.0.0
  */
+@ToString
 @Getter
 @Table(name = "ENDPOINT")
 @Entity(listener = EndpointEntityListener.class)
@@ -143,7 +145,19 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 		this.version = version;
 	}
 	
-	public static Endpoint create(EndpointId endpointId, TenantId tenantId, String endpointName, String createId) {
+	/**
+	 * エンドポイントを新規作成します
+	 * @param endpointId エンドポイントID
+	 * @param tenantId テナントID
+	 * @param endpointName エンドポイント名
+	 * @param createId 作成者ID
+	 * @return 作成したエンドポイント
+	 */
+	public static Endpoint create(
+			EndpointId endpointId, 
+			TenantId tenantId, 
+			String endpointName, 
+			String createId) {
 		Endpoint entity = new Endpoint();
 		entity.setEndpointId(endpointId);
 		entity.setTenantId(tenantId);

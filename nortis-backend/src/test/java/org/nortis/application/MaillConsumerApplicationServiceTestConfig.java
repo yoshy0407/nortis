@@ -1,5 +1,6 @@
 package org.nortis.application;
 
+import org.nortis.application.mail.MailConsumerApplicationService;
 import org.nortis.domain.endpoint.EndpointRepository;
 import org.nortis.domain.endpoint.EndpointRepositoryImpl;
 import org.nortis.domain.mail.MailConsumerDomainService;
@@ -10,7 +11,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 @TestConfiguration
-public class MaillConsumerApplicationServiceTestConfig {
+class MaillConsumerApplicationServiceTestConfig {
 
 	@Bean
 	MailConsumerRepository mailConsumerRepository(Config config) {

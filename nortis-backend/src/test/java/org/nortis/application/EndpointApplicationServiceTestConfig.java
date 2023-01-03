@@ -1,5 +1,6 @@
 package org.nortis.application;
 
+import org.nortis.application.endpoint.EndpointApplicationService;
 import org.nortis.domain.endpoint.EndpointEntityListener;
 import org.nortis.domain.endpoint.EndpointRepository;
 import org.nortis.domain.endpoint.EndpointRepositoryImpl;
@@ -12,7 +13,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 
 @TestConfiguration
-public class EndpointApplicationServiceTestConfig {
+class EndpointApplicationServiceTestConfig {
 
 	@Bean
 	TenantRepository tenantRepository(Config config) {

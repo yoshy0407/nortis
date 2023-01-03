@@ -1,7 +1,6 @@
 package org.nortis.infrastructure.validation;
 
 import java.util.regex.Pattern;
-
 import org.nortis.infrastructure.exception.DomainException;
 import org.springframework.util.StringUtils;
 
@@ -25,7 +24,7 @@ public final class Validations {
 	 * @param valueName 値の名前
 	 * @throws DomainException 空文字の場合
 	 */
-	public static void hasText(String text, String valueName) throws DomainException {
+	public static void hasText(String text, String valueName) {
 		if (!StringUtils.hasText(text)) {
 			throw new DomainException("MSG00001", valueName);
 		}
@@ -38,7 +37,7 @@ public final class Validations {
 	 * @param valueName 値の名前
 	 * @throws DomainException 文字数以上の場合
 	 */
-	public static void maxTextLength(String text, int length, String valueName) throws DomainException {
+	public static void maxTextLength(String text, int length, String valueName) {
 		if (text.length() > length) {
 			throw new DomainException("MSG00002", valueName, length);
 		}
@@ -50,7 +49,7 @@ public final class Validations {
 	 * @param valueName 値の名前
 	 * @throws DomainException nullの場合
 	 */
-	public static void notNull(Object obj, String valueName) throws DomainException {
+	public static void notNull(Object obj, String valueName) {
 		if (obj == null) {
 			throw new DomainException("MSG00001", valueName);			
 		}
@@ -64,7 +63,7 @@ public final class Validations {
 	 * @param args 引数
 	 * @throws DomainException 正規表現に一致しない場合
 	 */
-	public static void regex(String text, String regex, String messageId, Object...args) throws DomainException {
+	public static void regex(String text, String regex, String messageId, Object... args) {
 		if (!Pattern.matches(regex, text)) {
 			throw new DomainException(messageId, args);
 		}
@@ -77,7 +76,8 @@ public final class Validations {
 	 * @param messageId メッセージID
 	 * @param args 引数
 	 */
-	public static void contains(String text, String containText, String messageId, Object...args) {
+	public static void contains(String text, String containText, 
+			String messageId, Object... args) {
 		if (!text.contains(containText)) {
 			throw new DomainException(messageId, args);			
 		}

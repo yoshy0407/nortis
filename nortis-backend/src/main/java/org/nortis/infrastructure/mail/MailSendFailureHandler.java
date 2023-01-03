@@ -1,7 +1,7 @@
 package org.nortis.infrastructure.mail;
 
-import org.springframework.mail.MailException;
 import jakarta.mail.MessagingException;
+import org.springframework.mail.MailException;
 
 /**
  * メールの送信エラーを処理するインタフェーです

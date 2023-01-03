@@ -17,7 +17,7 @@ class ReceiveEventTest {
 				"message");
 		
 		assertThat(receiveEvent.isSubscribed()).isFalse();
-		receiveEvent.subscribed();
+		receiveEvent.subscribe();
 		assertThat(receiveEvent.isSubscribed()).isTrue();
 	}
 

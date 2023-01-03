@@ -1,9 +1,9 @@
 package org.nortis.infrastructure.exception;
 
+import java.util.Arrays;
+import lombok.Getter;
 import org.nortis.infrastructure.MessageSourceAccessor;
 import org.springframework.context.i18n.LocaleContextHolder;
-
-import lombok.Getter;
 
 /**
  * ドメインに関する例外クラスです
@@ -30,7 +30,7 @@ public class DomainException extends RuntimeException {
 	 * @param messageId メッセージID
 	 * @param args メッセージの引数
 	 */
-	public DomainException(String messageId, Object...args) {
+	public DomainException(String messageId, Object... args) {
 		this(messageId, null, args);
 	}
 
@@ -40,10 +40,12 @@ public class DomainException extends RuntimeException {
 	 * @param cause ラップする例外
 	 * @param args メッセージ引数
 	 */
-	public DomainException(String messageId, Throwable cause, Object...args) {
-		super(MessageSourceAccessor.getMessageSource().getMessage(messageId, args, LocaleContextHolder.getLocale()), cause);
+	public DomainException(String messageId, Throwable cause, Object... args) {
+		super(MessageSourceAccessor.getMessageSource()
+				.getMessage(messageId, args, LocaleContextHolder.getLocale()), 
+				cause);
 		this.messageId = messageId;
-		this.args = args;
+		this.args = Arrays.copyOf(args, args.length);
 	}
 
 	/**
@@ -51,7 +53,7 @@ public class DomainException extends RuntimeException {
 	 * @return 引数
 	 */
 	public Object[] getArgs() {
-		return new Object[]{this.args};
+		return this.args;
 	}
 	
 }

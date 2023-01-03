@@ -1,10 +1,9 @@
 package org.nortis.domain.tenant.value;
 
-import org.nortis.infrastructure.validation.Validations;
-import org.seasar.doma.Domain;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.nortis.infrastructure.validation.Validations;
+import org.seasar.doma.Domain;
 
 /**
  * テナント省略名を表すクラスです
@@ -19,12 +18,12 @@ public final class TenantId {
 	 * 値
 	 */
 	@Getter
-	private final String tenantId;
+	private final String value;
 	
 	private TenantId(String value) {
 		Validations.hasText(value, "テナントID");
 		Validations.maxTextLength(value, 10, "テナントID");
-		this.tenantId = value;
+		this.value = value;
 	}
 	
 	/**
@@ -32,7 +31,7 @@ public final class TenantId {
 	 */
 	@Override
 	public String toString() {
-		return this.tenantId;
+		return this.value;
 	}
 	
 	/**
