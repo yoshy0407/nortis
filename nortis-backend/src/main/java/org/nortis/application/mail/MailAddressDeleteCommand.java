@@ -1,17 +1,19 @@
 package org.nortis.application.mail;
 
+import java.util.List;
+
 /**
  * メールアドレスの変更コマンド
  * 
  * @author yoshiokahiroshi
  * @param consumerId コンシューマID
- * @param mailAddress メールアドレス
+ * @param mailAddressList メールアドレス
  * @param userId ユーザID
  * @version 1.0.0
  */
-public record MailAddressChangeCommand(
+public record MailAddressDeleteCommand(
 		String consumerId, 
-		String mailAddress, 
+		List<String> mailAddressList, 
 		String userId) {
 
 }

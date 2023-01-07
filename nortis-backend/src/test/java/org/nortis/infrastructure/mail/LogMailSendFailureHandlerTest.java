@@ -40,7 +40,7 @@ class LogMailSendFailureHandlerTest {
 		List<LoggingEvent> events = this.logMockit.verify();
 		
 		assertThat(events).hasSize(1);
-		assertThat(events.get(0).getMessage()).isEqualTo("メールのメッセージの作成に失敗しました");
+		assertThat(events.get(0).getMessage()).isEqualTo("[90001]メールのメッセージの作成に失敗しました");
 	}
 
 	@Test
@@ -50,7 +50,7 @@ class LogMailSendFailureHandlerTest {
 		List<LoggingEvent> events = this.logMockit.verify();
 		
 		assertThat(events).hasSize(1);
-		assertThat(events.get(0).getMessage()).isEqualTo("メールの送信に失敗しました");
+		assertThat(events.get(0).getMessage()).isEqualTo("[90002]メールの送信に失敗しました");
 	}
 
 }

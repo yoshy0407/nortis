@@ -6,8 +6,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.nortis.application.endpoint.EndpointApplicationService;
 import org.nortis.application.endpoint.EndpointDeleteCommand;
-import org.nortis.application.endpoint.EndpointNameUpdateCommand;
 import org.nortis.application.endpoint.EndpointRegisterCommand;
+import org.nortis.application.endpoint.EndpointUpdateCommand;
 import org.nortis.domain.endpoint.Endpoint;
 import org.nortis.domain.endpoint.EndpointRepository;
 import org.nortis.domain.endpoint.value.EndpointId;
@@ -45,7 +45,8 @@ class EndpointApplicationServiceTest {
 	
 	@Test
 	void testRegisterEndpoint() {
-		EndpointRegisterCommand command = new EndpointRegisterCommand("TEST1", "test-point", "エンドポイント", "TEST_ID");
+		EndpointRegisterCommand command = 
+				new EndpointRegisterCommand("TEST1", "test-point", "エンドポイント", "${name}!!", "Hello! ${name}", "TEST_ID");
 		Endpoint endpoint = endpointApplicationService.registerEndpoint(command, data -> {
 			return data;
 		});
@@ -60,9 +61,10 @@ class EndpointApplicationServiceTest {
 	}
 
 	@Test
-	void testChangeName() {
-		EndpointNameUpdateCommand command = new EndpointNameUpdateCommand("TEST2", "ENDPOINT2", "TEST POINT", "TEST_ID");
-		endpointApplicationService.changeName(command, data -> {
+	void testUpdate() {
+		EndpointUpdateCommand command = 
+				new EndpointUpdateCommand("TEST2", "ENDPOINT2", "TEST POINT", "件名", "本文", "TEST_ID");
+		endpointApplicationService.updateEndpoint(command, data -> {
 			return data;
 		});
 

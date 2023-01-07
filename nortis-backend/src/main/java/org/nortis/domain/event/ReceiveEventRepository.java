@@ -1,6 +1,7 @@
 package org.nortis.domain.event;
 
 import java.util.List;
+import org.nortis.domain.endpoint.value.EndpointId;
 import org.seasar.doma.Dao;
 import org.seasar.doma.Delete;
 import org.seasar.doma.Insert;
@@ -24,6 +25,14 @@ public interface ReceiveEventRepository {
 	 */
 	@Select
 	List<ReceiveEvent> notSubscribed();
+	
+	/**
+	 * 未受信の指定エンドポイントのイベントを取得します
+	 * @param endpointId エンドポイントID
+	 * @return 未受信イベントのリスト
+	 */
+	@Select
+	List<ReceiveEvent> notSubscribedEndpoint(EndpointId endpointId);
 	
 	/**
 	 * 保存します

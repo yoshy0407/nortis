@@ -1,4 +1,4 @@
 /**
  * メールに関するドメインパッケージです
  */
-package org.nortis.domain.mail;
+package org.nortis.domain.consumer;

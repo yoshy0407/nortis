@@ -1,11 +1,11 @@
 package org.nortis.application;
 
 import org.nortis.application.mail.MailConsumerApplicationService;
+import org.nortis.domain.consumer.mail.DomaMailConsumerRepository;
+import org.nortis.domain.consumer.mail.MailConsumerDomainService;
+import org.nortis.domain.consumer.mail.MailConsumerRepository;
 import org.nortis.domain.endpoint.EndpointRepository;
 import org.nortis.domain.endpoint.EndpointRepositoryImpl;
-import org.nortis.domain.mail.MailConsumerDomainService;
-import org.nortis.domain.mail.MailConsumerRepository;
-import org.nortis.domain.mail.MailConsumerRepositoryImpl;
 import org.seasar.doma.jdbc.Config;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +15,7 @@ class MaillConsumerApplicationServiceTestConfig {
 
 	@Bean
 	MailConsumerRepository mailConsumerRepository(Config config) {
-		return new MailConsumerRepositoryImpl(config);
+		return new DomaMailConsumerRepository(config);
 	}
 	
 	@Bean

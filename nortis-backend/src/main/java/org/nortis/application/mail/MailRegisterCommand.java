@@ -1,19 +1,21 @@
 package org.nortis.application.mail;
 
+import java.util.List;
+
 /**
  * メールの登録コマンド
  * 
  * @author yoshiokahiroshi
  * @param tenantId テナントID
  * @param endpointId エンドポイントID
- * @param mailAddress メールアドレス
+ * @param mailAddressList 登録するメールアドレスたち
  * @param userId ユーザID
  * @version 1.0.0
  */
 public record MailRegisterCommand(
 		String tenantId,
 		String endpointId, 
-		String mailAddress, 
+		List<String> mailAddressList, 
 		String userId) {
 
 }

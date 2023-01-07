@@ -88,11 +88,14 @@ public class Tenant extends AbstractAggregateRoot<Tenant> {
 	 * エンドポイントを作成します
 	 * @param endpointId エンドポイント
 	 * @param endpointName エンドポイント名
+	 * @param subjectTemplate サブジェクトテンプレート
+	 * @param templateText メッセージテンプレート
 	 * @param createId 作成者ID
 	 * @return エンドポイント
 	 */
-	public Endpoint createEndpoint(EndpointId endpointId, String endpointName, String createId) {
-		return Endpoint.create(endpointId, this.tenantId, endpointName, createId);
+	public Endpoint createEndpoint(EndpointId endpointId, String endpointName, 
+			String subjectTemplate, String templateText, String createId) {
+		return Endpoint.create(endpointId, this.tenantId, endpointName, subjectTemplate, templateText, createId);
 	}
 	
 	/**

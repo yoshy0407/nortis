@@ -1,11 +1,12 @@
 package org.nortis.application.mail;
 
+import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import org.nortis.domain.consumer.mail.MailConsumer;
+import org.nortis.domain.consumer.mail.MailConsumerDomainService;
+import org.nortis.domain.consumer.mail.MailConsumerRepository;
 import org.nortis.domain.endpoint.value.EndpointId;
-import org.nortis.domain.mail.MailConsumer;
-import org.nortis.domain.mail.MailConsumerDomainService;
-import org.nortis.domain.mail.MailConsumerRepository;
 import org.nortis.domain.mail.value.ConsumerId;
 import org.nortis.domain.mail.value.MailAddress;
 import org.nortis.domain.tenant.value.TenantId;
@@ -41,10 +42,12 @@ public class MailConsumerApplicationService {
 		
 		TenantId tenantId = TenantId.create(command.tenantId());
 		EndpointId endpointId = EndpointId.create(command.endpointId());
-		MailAddress mailAddress = MailAddress.create(command.mailAddress());
+		List<MailAddress> mailAddressList = command.mailAddressList().stream()
+					.map(str -> MailAddress.create(str))
+					.toList();
 		
 		MailConsumer mailConsumer = this.mailConsumerDomainService.createMailConsumer(
-				tenantId, endpointId, mailAddress, command.userId());
+				tenantId, endpointId, mailAddressList, command.userId());
 		
 		this.mailConsumerRepository.save(mailConsumer);
 		
@@ -58,8 +61,8 @@ public class MailConsumerApplicationService {
 	 * @param translator 変換処理
 	 * @return 処理結果
 	 */
-	public <R> R changeMailAddress(
-			MailAddressChangeCommand command,
+	public <R> R addMailAddress(
+			MailAddressAddCommand command,
 			ApplicationTranslator<MailConsumer, R> translator) {
 		ConsumerId consumerId = ConsumerId.create(command.consumerId());
 		
@@ -67,13 +70,48 @@ public class MailConsumerApplicationService {
 				this.mailConsumerRepository.get(consumerId);
 		
 		if (optMailConsumer.isEmpty()) {
-			throw new DomainException("");
+			throw new DomainException("MSG30005");
 		}
 		
 		MailConsumer mailConsumer = optMailConsumer.get();
 		
-		MailAddress mailAddress = MailAddress.create(command.mailAddress());
-		mailConsumer.updateMailAddress(mailAddress, command.userId());
+		command.mailAddressList().stream()
+				.map(str -> MailAddress.create(str))
+				.forEach(address -> {
+					mailConsumer.addMailAddress(address);
+				});
+		
+		this.mailConsumerRepository.update(mailConsumer);
+		
+		return translator.translate(mailConsumer);
+	}
+	
+	/**
+	 * メールアドレスを削除します
+	 * @param <R> 結果クラス
+	 * @param command メールアドレス削除コマンド
+	 * @param translator 変換処理
+	 * @return 処理結果
+	 */
+	public <R> R deleteMailAddress(
+			MailAddressDeleteCommand command,
+			ApplicationTranslator<MailConsumer, R> translator) {
+		ConsumerId consumerId = ConsumerId.create(command.consumerId());
+		
+		Optional<MailConsumer> optMailConsumer = 
+				this.mailConsumerRepository.get(consumerId);
+		
+		if (optMailConsumer.isEmpty()) {
+			throw new DomainException("MSG30005");
+		}
+		
+		MailConsumer mailConsumer = optMailConsumer.get();
+		
+		command.mailAddressList().stream()
+				.map(str -> MailAddress.create(str))
+				.forEach(address -> {
+					mailConsumer.removeMailAddress(address);
+				});
 		
 		this.mailConsumerRepository.update(mailConsumer);
 		

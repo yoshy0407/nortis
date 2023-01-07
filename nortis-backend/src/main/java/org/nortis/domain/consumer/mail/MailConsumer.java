@@ -1,17 +1,22 @@
-package org.nortis.domain.mail;
+package org.nortis.domain.consumer.mail;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.mail.value.ConsumerId;
 import org.nortis.domain.mail.value.MailAddress;
+import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.validation.Validations;
 import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
 import org.seasar.doma.Id;
+import org.seasar.doma.Metamodel;
 import org.seasar.doma.Table;
+import org.seasar.doma.Transient;
 import org.seasar.doma.Version;
 
 /**
@@ -20,14 +25,14 @@ import org.seasar.doma.Version;
  * @version 1.0.0
  */
 @ToString
-@Getter
 @Table(name = "MAIL_CONSUMER")
-@Entity
+@Entity(metamodel = @Metamodel)
 public class MailConsumer {
 
 	/**
 	 * コンシューマID
 	 */
+	@Getter
 	@Id
 	@Column(name = "CONSUMER_ID")
 	private ConsumerId consumerId;
@@ -35,30 +40,35 @@ public class MailConsumer {
 	/**
 	 * エンドポイントID
 	 */
+	@Getter
 	@Column(name = "ENDPOINT_ID")
 	private EndpointId endpointId;
 	
 	/**
-	 * メールアドレス
+	 * メールアドレスのリスト
 	 */
-	@Column(name = "MAIL_ADDRESS")
-	private MailAddress mailAddress;
-
+	@Getter
+	@Transient
+	private final List<MailInfo> mailList = new ArrayList<>();
+	
 	/**
 	 * 作成者ID
 	 */
+	@Getter
 	@Column(name = "CREATE_ID")
 	private String createId;
 	
 	/**
 	 * 作成日付
 	 */
+	@Getter
 	@Column(name = "CREATE_DT")
 	private LocalDateTime createDt;
 
 	/**
 	 * 更新者ID
 	 */
+	@Getter
 	@Setter
 	@Column(name = "UPDATE_ID")
 	private String updateId;
@@ -66,6 +76,7 @@ public class MailConsumer {
 	/**
 	 * 更新日付
 	 */
+	@Getter
 	@Setter
 	@Column(name = "UPDATE_DT")
 	private LocalDateTime updateDt;
@@ -74,21 +85,38 @@ public class MailConsumer {
 	 * バージョン
 	 */
 	@Setter
+	@Getter
 	@Version
 	@Column(name = "VERSION")
 	private long version;
 	
 	/**
-	 * メールアドレスを更新します
-	 * @param mailAddress メールアドレス
-	 * @param updateId 更新者ID
+	 * メールアドレスを追加します
+	 * @param address メールアドレス
 	 */
-	public void updateMailAddress(MailAddress mailAddress, String updateId) {
-		setMailAddress(mailAddress);
-		setUpdateId(updateId);
-		setUpdateDt(LocalDateTime.now());
+	public void addMailAddress(MailAddress address) {
+		for (MailInfo mailInfo : this.mailList) {
+			if (mailInfo.getMailAddress().equals(address)) {
+				throw new DomainException("MSG30003", address.toString());
+			}
+		}
+		MailInfo mailInfo = new MailInfo(this.consumerId, this.mailList.size() + 1, address);
+		mailInfo.setAdd(true);
+		this.mailList.add(mailInfo);
 	}
-
+	
+	/**
+	 * メールアドレスを削除します
+	 * @param mailAddress メールアドレス
+	 */
+	public void removeMailAddress(MailAddress mailAddress) {
+		for (MailInfo mailInfo : this.mailList) {
+			if (mailInfo.getMailAddress().equals(mailAddress)) {
+				mailInfo.setRemove(true);
+			}
+		}
+	}
+	
 	/**
 	 * コンシューマIDを設定します
 	 * @param consumerId コンシューマID
@@ -105,15 +133,6 @@ public class MailConsumer {
 	public void setEndpointId(EndpointId endppointId) {
 		Validations.notNull(endppointId, "エンドポイントID");
 		this.endpointId = endppointId;
-	}
-
-	/**
-	 * メールアドレスを設定します
-	 * @param mailAddress メールアドレス
-	 */
-	public void setMailAddress(MailAddress mailAddress) {
-		Validations.notNull(mailAddress, "メールアドレス");
-		this.mailAddress = mailAddress;
 	}
 
 	/**
@@ -137,15 +156,21 @@ public class MailConsumer {
 	/**
 	 * 作成します
 	 * @param endpointId エンドポイントID
-	 * @param mailAddress メールアドレス
+	 * @param addressList 登録するアドレス
 	 * @param createId 作成者
 	 * @return 作成したオブジェクト
 	 */
-	public static MailConsumer create(EndpointId endpointId, MailAddress mailAddress, String createId) {
+	public static MailConsumer create(EndpointId endpointId, List<MailAddress> addressList, String createId) {
 		MailConsumer entity = new MailConsumer();
-		entity.setConsumerId(ConsumerId.createNew());
+		ConsumerId consumerId = ConsumerId.createNew();
+		entity.setConsumerId(consumerId);
 		entity.setEndpointId(endpointId);
-		entity.setMailAddress(mailAddress);
+		if (addressList == null || addressList.isEmpty()) {
+			throw new DomainException("MSG30004");
+		}
+		for (MailAddress address : addressList) {
+			entity.addMailAddress(address);
+		}
 		entity.setCreateId(createId);
 		entity.setCreateDt(LocalDateTime.now());
 		entity.setVersion(1L);

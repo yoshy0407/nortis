@@ -51,6 +51,8 @@ public class EndpointApplicationService {
 				.createEndpoint(
 						endpointId, 
 						command.endpointName(), 
+						command.subjectTemplate(),
+						command.messageTemplate(),
 						command.userId());
 		
 		this.endpointRepository.save(endpoint);
@@ -59,14 +61,14 @@ public class EndpointApplicationService {
 	}
 	
 	/**
-	 * エンドポイント名を変更します
+	 * エンドポイントを更新します
 	 * @param <R> 結果クラス
-	 * @param command エンドポイント名更新コマンド
+	 * @param command エンドポイント更新コマンド
 	 * @param translator 変換処理
 	 * @return 処理結果
 	 */
-	public <R> R changeName(
-			EndpointNameUpdateCommand command,
+	public <R> R updateEndpoint(
+			EndpointUpdateCommand command,
 			ApplicationTranslator<Endpoint, R> translator) {
 		TenantId tenantId = TenantId.create(command.tenantId());
 		Optional<Tenant> tenant = this.tenantRepository.get(tenantId);
@@ -83,6 +85,8 @@ public class EndpointApplicationService {
 		
 		Endpoint endpoint = optEndpoint.get();
 		endpoint.changeEndpointName(command.endpointName(), command.userId());
+		endpoint.changeSubjectTemplate(command.subjectTemplate(), command.userId());
+		endpoint.changeMessageTemplate(command.messageTemplate(), command.userId());
 		this.endpointRepository.update(endpoint);
 		
 		return translator.translate(endpoint);
@@ -96,13 +100,10 @@ public class EndpointApplicationService {
 		TenantId tenantId = TenantId.create(command.tenantId());
 		EndpointId endpointId = EndpointId.create(command.endpointId());
 		
-		//:TODO Check Event
-		
 		Optional<Endpoint> optEndpoint = this.endpointRepository.get(tenantId, endpointId);
 		if (optEndpoint.isEmpty()) {
 			throw new DomainException("MSG20001");
 		}
-		
 		this.endpointRepository.remove(optEndpoint.get());
 	}
 }

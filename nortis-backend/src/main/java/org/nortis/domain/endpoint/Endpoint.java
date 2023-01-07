@@ -1,11 +1,15 @@
 package org.nortis.domain.endpoint;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.nortis.domain.endpoint.value.EndpointId;
+import org.nortis.domain.endpoint.value.SendMessage;
 import org.nortis.domain.tenant.value.TenantId;
+import org.nortis.infrastructure.ApplicationContextAccessor;
+import org.nortis.infrastructure.template.TemplateRender;
 import org.nortis.infrastructure.validation.Validations;
 import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
@@ -46,6 +50,18 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 	 */
 	@Column(name = "ENDPOINT_NAME")
 	private String endpointName;
+	
+	/**
+	 * サブジェクトテンプレート
+	 */
+	@Column(name = "SUBJECT_TEMPLATE")
+	private String subjectTemplate;
+	
+	/**
+	 * メッセージテンプレート
+	 */
+	@Column(name = "MESSAGE_TEMPLATE")
+	private String messageTemplate;
 	
 	/**
 	 * 作成者ID
@@ -92,6 +108,40 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 	}
 	
 	/**
+	 * サブジェクトテンプレート名を変更します
+	 * @param subjectTemplate サブジェクトテンプレート名
+	 * @param updateId 更新者ID
+	 */
+	public void changeSubjectTemplate(String subjectTemplate, String updateId) {
+		setSubjectTemplate(subjectTemplate);
+		setUpdateId(updateId);
+		setUpdateDt(LocalDateTime.now());
+	}
+
+	/**
+	 * メッセージテンプレート名を変更します
+	 * @param messageTemplate メッセージテンプレート名
+	 * @param updateId 更新者ID
+	 */
+	public void changeMessageTemplate(String messageTemplate, String updateId) {
+		setMessageTemplate(messageTemplate);
+		setUpdateId(updateId);
+		setUpdateDt(LocalDateTime.now());
+	}
+	
+	/**
+	 * 送信メッセージを構築します
+	 * @param parameter メッセージの引数
+	 * @return 送信メッセージ
+	 */
+	public SendMessage renderMessage(Map<String, Object> parameter) {
+		TemplateRender templateRender = ApplicationContextAccessor.getTemplateRender();
+		String subject = templateRender.render(this.endpointName, subjectTemplate, parameter);
+		String message = templateRender.render(this.endpointId.toString(), messageTemplate, parameter);
+		return new SendMessage(subject, message);
+	}
+	
+	/**
 	 * エンドポイントID
 	 * @param endpointId エンドポイントID
 	 */
@@ -117,6 +167,25 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 		Validations.hasText(endpointName, "エンドポイント名");
 		Validations.maxTextLength(endpointName, 50, "エンドポイント名");
 		this.endpointName = endpointName;
+	}
+	
+	/**
+	 * サブジェクトテンプレート
+	 * @param subjectTemplate サブジェクトテンプレート
+	 */
+	public void setSubjectTemplate(String subjectTemplate) {
+		Validations.hasText(subjectTemplate, "サブジェクトテンプレート");
+		Validations.maxTextLength(subjectTemplate, 100, "サブジェクトテンプレート");
+		this.subjectTemplate = subjectTemplate;
+	}
+	
+	/**
+	 * メッセージテンプレート
+	 * @param messageTemplate メッセージテンプレート
+	 */
+	public void setMessageTemplate(String messageTemplate) {
+		Validations.hasText(messageTemplate, "メッセージテンプレート");
+		this.messageTemplate = messageTemplate;
 	}
 
 	/**
@@ -150,6 +219,8 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 	 * @param endpointId エンドポイントID
 	 * @param tenantId テナントID
 	 * @param endpointName エンドポイント名
+	 * @param subjectTemplate サブジェクトテンプレート
+	 * @param messageTemplate メッセージテンプレート
 	 * @param createId 作成者ID
 	 * @return 作成したエンドポイント
 	 */
@@ -157,11 +228,15 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 			EndpointId endpointId, 
 			TenantId tenantId, 
 			String endpointName, 
+			String subjectTemplate,
+			String messageTemplate,
 			String createId) {
 		Endpoint entity = new Endpoint();
 		entity.setEndpointId(endpointId);
 		entity.setTenantId(tenantId);
 		entity.setEndpointName(endpointName);
+		entity.setSubjectTemplate(subjectTemplate);
+		entity.setMessageTemplate(messageTemplate);
 		entity.setCreateId(createId);
 		entity.setCreateDt(LocalDateTime.now());
 		entity.setVersion(1L);

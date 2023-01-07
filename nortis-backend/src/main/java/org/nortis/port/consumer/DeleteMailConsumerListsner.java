@@ -1,4 +1,4 @@
-package org.nortis.port.subscriber;
+package org.nortis.port.consumer;
 
 import lombok.AllArgsConstructor;
 import org.nortis.application.mail.MailConsumerApplicationService;

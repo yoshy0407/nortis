@@ -1,8 +1,8 @@
 package org.nortis.infrastructure.config;
 
 import lombok.AllArgsConstructor;
-import org.nortis.domain.mail.MailConsumerRepository;
-import org.nortis.domain.mail.MailSendDomainService;
+import org.nortis.domain.consumer.mail.MailConsumerRepository;
+import org.nortis.domain.consumer.mail.MailSendMessageConsumer;
 import org.nortis.infrastructure.mail.MailSendFailureHandler;
 import org.nortis.infrastructure.property.NortisMailProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -26,18 +26,18 @@ public class DomainServiceConfiguration {
 	private final NortisMailProperties nortisMailProperties;
 
 	/**
-	 * {@link MailSendDomainService}のBean
-	 * @param mailConsumerRepository {@link MailConsumerRepository}
+	 * {@link MailSendMessageConsumer}のBean
+	 * @param mailConsumerRepository {@link MailConsumerDao}
 	 * @param javaMailSender {@link JavaMailSender}
 	 * @param mailSendFailureHandler {@link MailSendFailureHandler}
-	 * @return {@link MailSendDomainService}
+	 * @return {@link MailSendMessageConsumer}
 	 */
 	@Bean
-	MailSendDomainService mailSendDomainService(
+	MailSendMessageConsumer mailSendDomainService(
 			MailConsumerRepository mailConsumerRepository,
 			JavaMailSender javaMailSender,
 			MailSendFailureHandler mailSendFailureHandler) {
-		return new MailSendDomainService(
+		return new MailSendMessageConsumer(
 				mailConsumerRepository, 
 				javaMailSender, 
 				mailSendFailureHandler, 
