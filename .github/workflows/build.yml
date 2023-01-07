@@ -56,7 +56,7 @@ jobs:
 
       - name: prepare package
         run: mkdir staging && cp nortis-backend/target/*.jar staging
-        if: always()
+        if: success()
 
       - uses: actions/upload-artifact@v3
         with:
