@@ -118,6 +118,16 @@ public class MailConsumer {
 	}
 	
 	/**
+	 * エンドポイントIDをリセットします
+	 * @param userId 更新者ID
+	 */
+	public void resetEndpointId(String userId) {
+		setEndpointId(null);
+		setUpdateId(userId);
+		setUpdateDt(LocalDateTime.now());
+	}
+	
+	/**
 	 * コンシューマIDを設定します
 	 * @param consumerId コンシューマID
 	 */
@@ -131,7 +141,6 @@ public class MailConsumer {
 	 * @param endppointId エンドポイントID
 	 */
 	public void setEndpointId(EndpointId endppointId) {
-		Validations.notNull(endppointId, "エンドポイントID");
 		this.endpointId = endppointId;
 	}
 

@@ -61,6 +61,22 @@ class MailConsumerTest {
 		assertThat(info.isRemove()).isTrue();
 		assertThat(mailConsumer.getMailList().get(0).isRemove()).isFalse();
 	}
+	
+	@Test
+	void testResetEndpointId() {
+		MailConsumer mailConsumer = MailConsumer.create(
+				EndpointId.create("TEST_ID"), 
+				Lists.list(
+						MailAddress.create("hoge@example.com"),
+						MailAddress.create("hoge2@example.com")), 
+				"userId");
+		
+		mailConsumer.resetEndpointId("TEST_ID");
+		
+		assertThat(mailConsumer.getEndpointId()).isNull();
+		assertThat(mailConsumer.getUpdateId()).isEqualTo("TEST_ID");
+		assertThat(mailConsumer.getUpdateDt()).isBefore(LocalDateTime.now());
+	}
 
 	@Test
 	void testCreate() {
@@ -90,13 +106,6 @@ class MailConsumerTest {
 		assertThat(mailConsumer.getUpdateId()).isNull();
 		assertThat(mailConsumer.getUpdateDt()).isNull();
 		assertThat(mailConsumer.getVersion()).isEqualTo(1L);
-	}
-
-	@Test
-	void testCreateEndpointIdNull() {
-		assertThrows(DomainException.class, () -> {
-			MailConsumer.create(null, Lists.list(MailAddress.create("hoge@example.com")), "userId");
-		}, "エンドポイントIDが未設定です");
 	}
 
 	@Test
