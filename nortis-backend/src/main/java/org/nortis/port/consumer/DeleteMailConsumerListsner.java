@@ -1,7 +1,8 @@
 package org.nortis.port.consumer;
 
 import lombok.AllArgsConstructor;
-import org.nortis.application.mail.MailConsumerApplicationService;
+
+import org.nortis.application.consumer.mail.MailConsumerApplicationService;
 import org.nortis.domain.tenant.event.TenantDeletedEvent;
 import org.springframework.stereotype.Component;
 

@@ -1,4 +1,4 @@
-package org.nortis.application.mail;
+package org.nortis.application.consumer.mail;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,9 +6,9 @@ import lombok.AllArgsConstructor;
 import org.nortis.domain.consumer.mail.MailConsumer;
 import org.nortis.domain.consumer.mail.MailConsumerDomainService;
 import org.nortis.domain.consumer.mail.MailConsumerRepository;
+import org.nortis.domain.consumer.mail.value.ConsumerId;
+import org.nortis.domain.consumer.mail.value.MailAddress;
 import org.nortis.domain.endpoint.value.EndpointId;
-import org.nortis.domain.mail.value.ConsumerId;
-import org.nortis.domain.mail.value.MailAddress;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.annotation.ApplicationService;
 import org.nortis.infrastructure.application.ApplicationTranslator;

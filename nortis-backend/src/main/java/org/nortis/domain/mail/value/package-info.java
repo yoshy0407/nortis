@@ -1,1 +1,0 @@
-package org.nortis.domain.mail.value;

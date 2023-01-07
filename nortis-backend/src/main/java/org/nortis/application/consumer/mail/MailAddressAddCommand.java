@@ -1,4 +1,4 @@
-package org.nortis.application.mail;
+package org.nortis.application.consumer.mail;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package org.nortis.domain.mail.value;
+package org.nortis.domain.consumer.mail.value;
 
 import java.util.UUID;
 import lombok.EqualsAndHashCode;

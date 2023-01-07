@@ -2,8 +2,8 @@ package org.nortis.domain.consumer.mail;
 
 import java.util.List;
 import java.util.Optional;
+import org.nortis.domain.consumer.mail.value.ConsumerId;
 import org.nortis.domain.endpoint.value.EndpointId;
-import org.nortis.domain.mail.value.ConsumerId;
 
 /**
  * メールコンシューマのリポジトリです

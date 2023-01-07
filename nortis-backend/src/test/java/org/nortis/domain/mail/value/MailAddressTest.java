@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nortis.domain.consumer.mail.value.MailAddress;
 import org.nortis.infrastructure.MessageSourceAccessor;
 import org.nortis.infrastructure.exception.DomainException;
 import org.springframework.beans.factory.annotation.Autowired;

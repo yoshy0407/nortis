@@ -1,6 +1,6 @@
 package org.nortis.application;
 
-import org.nortis.application.mail.MailConsumerApplicationService;
+import org.nortis.application.consumer.mail.MailConsumerApplicationService;
 import org.nortis.domain.consumer.mail.DomaMailConsumerRepository;
 import org.nortis.domain.consumer.mail.MailConsumerDomainService;
 import org.nortis.domain.consumer.mail.MailConsumerRepository;

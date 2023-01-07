@@ -1,4 +1,4 @@
-package org.nortis.domain.mail.value;
+package org.nortis.domain.consumer.mail.value;
 
 import lombok.EqualsAndHashCode;
 import org.nortis.infrastructure.validation.Validations;
