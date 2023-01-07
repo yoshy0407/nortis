@@ -54,12 +54,6 @@ jobs:
           name: checkstyle-report
           path: "**/checkstyle-result.xml"
 
-      - uses: jwgmeligmeyling/pmd-github-action@master
-        if: always()
-        with:
-          name: pmd-report
-          path: "**/pmd.xml"
-
       - name: prepare package
         run: mkdir staging && cp nortis-backend/target/*.jar staging
         if: always()

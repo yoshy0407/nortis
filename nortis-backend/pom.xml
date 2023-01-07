@@ -196,7 +196,7 @@
 					<failOnViolation>true</failOnViolation>
 					<violationSeverity>warning</violationSeverity>
 					<consoleOutput>true</consoleOutput>
-					<excludes>target/generated-sources/annotations/**</excludes>
+					<excludes>~target/generated-sources/annotations/**</excludes>
 				</configuration>
 				<executions>
 					<execution>
