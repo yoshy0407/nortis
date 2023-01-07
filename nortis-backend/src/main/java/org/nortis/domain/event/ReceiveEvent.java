@@ -1,5 +1,6 @@
 package org.nortis.domain.event;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,6 +8,8 @@ import lombok.ToString;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.event.value.EventId;
 import org.nortis.domain.tenant.value.TenantId;
+import org.nortis.infrastructure.ApplicationContextAccessor;
+import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.validation.Validations;
 import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
@@ -57,16 +60,10 @@ public class ReceiveEvent {
 	private boolean subscribed;
 	
 	/**
-	 * 件名
+	 * テンプレートパラメーター
 	 */
-	@Column(name = "SUBJECT")
-	private String subject;
-	
-	/**
-	 * メッセージ本体
-	 */
-	@Column(name = "MESSAGE_BODY")
-	private String messageBody;
+	@Column(name = "TEMPLATE_PARAMETER")
+	private String templateParameter;
 	
 	/**
 	 * 更新日付
@@ -120,44 +117,36 @@ public class ReceiveEvent {
 	}
 	
 	/**
-	 * 件名を設定します
-	 * @param subject 件名
+	 * テンプレートパラメーターを設定します
+	 * @param templateParameter テンプレートパラメーター
 	 */
-	public void setSubject(String subject) {
-		Validations.maxTextLength(subject, 100, "件名");
-		this.subject = subject;
-	}
-	
-	/**
-	 * メッセージ本部を設定します
-	 * @param messageBody メッセージ本文
-	 */
-	public void setMessageBody(String messageBody) {
-		Validations.maxTextLength(messageBody, 1000, "メッセージ本体");
-		this.messageBody = messageBody;
+	public void setTemplateParameter(String templateParameter) {
+		try {
+			ApplicationContextAccessor.getObjectMapper().readTree(templateParameter);
+		} catch (JsonProcessingException e) {
+			throw new DomainException("MSG40001", e);
+		}
+		this.templateParameter = templateParameter;
 	}
 	
 	/**
 	 * 受信イベントを新規作成します
 	 * @param tenantId テナントID
 	 * @param endpointId エンドポイントID
-	 * @param subject 件名
-	 * @param messageBody メッセージ本文
+	 * @param parameterJson テンプレートのパラメータのJSON
 	 * @return 受信イベント
 	 */
 	public static ReceiveEvent create(
 			TenantId tenantId,
 			EndpointId endpointId,
-			String subject,
-			String messageBody) {
+			String parameterJson) {
 		ReceiveEvent receiveEvent = new ReceiveEvent();
 		receiveEvent.setEventId(EventId.createNew());
 		receiveEvent.setTenantId(tenantId);
 		receiveEvent.setEndpointId(endpointId);
 		receiveEvent.setOccuredOn(LocalDateTime.now());
 		receiveEvent.setSubscribed(false);
-		receiveEvent.setSubject(subject);
-		receiveEvent.setMessageBody(messageBody);
+		receiveEvent.setTemplateParameter(parameterJson);
 		return receiveEvent;
 	}
 	

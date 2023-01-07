@@ -1,5 +1,6 @@
 package org.nortis.infrastructure;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.nortis.infrastructure.template.TemplateRender;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
@@ -37,6 +38,14 @@ public class ApplicationContextAccessor {
 	 */
 	public static TemplateRender getTemplateRender() {
 		return applicationContext.getBean(TemplateRender.class);
+	}
+	
+	/**
+	 * {@link ObjectMapper}を返却します
+	 * @return {@link ObjectMapper}
+	 */
+	public static ObjectMapper getObjectMapper() {
+		return applicationContext.getBean(ObjectMapper.class);
 	}
 
 }
