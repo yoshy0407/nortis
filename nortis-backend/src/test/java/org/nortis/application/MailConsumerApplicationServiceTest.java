@@ -126,5 +126,18 @@ class MailConsumerApplicationServiceTest {
 		assertThat(optMailConsumer).isEmpty();
 		
 	}
+	
+	@Test
+	void testRemoveEndpointIdByEndpointDeleted() {
+		this.applicationService
+			.removeEndpointIdByEndpointDeleted("TEST1", "TEST_ID");
+
+		Optional<MailConsumer> optMailConsumer1 = 
+				this.mailConsumerRepository.get(ConsumerId.create("68E75233-7C82-40A6-A34D-CD5FD858EFA6"));
+		assertThat(optMailConsumer1.get().getEndpointId()).isNull();
+		Optional<MailConsumer> optMailConsumer2 = 
+				this.mailConsumerRepository.get(ConsumerId.create("3AC62B43-D866-416C-B205-7EC601104F4A"));
+		assertThat(optMailConsumer2.get().getEndpointId()).isNull();
+	}
 
 }

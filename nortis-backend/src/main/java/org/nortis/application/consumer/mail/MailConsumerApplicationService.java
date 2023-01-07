@@ -134,4 +134,22 @@ public class MailConsumerApplicationService {
 		this.mailConsumerRepository.remove(optMailConsumer.get());
 	}
 	
+	/**
+	 * エンドポイント削除による対象レコードのエンドポイント設定を削除します
+	 * @param endpointId エンドポイントID
+	 * @param userId ユーザID
+	 */
+	public void removeEndpointIdByEndpointDeleted(String endpointId, String userId) {
+		EndpointId enId = EndpointId.create(endpointId);
+		List<MailConsumer> mailConsumers = this.mailConsumerRepository.getFromEndpoint(enId);
+		
+		if (mailConsumers.isEmpty()) {
+			return;
+		}
+		
+		mailConsumers.forEach(data -> {
+			data.resetEndpointId(userId);
+			this.mailConsumerRepository.update(data);
+		});
+	}
 }
