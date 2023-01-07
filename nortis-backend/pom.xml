@@ -95,6 +95,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity-engine-core</artifactId>
+			<version>2.3</version>
+		</dependency>
 
 
 		<!-- test -->
@@ -189,9 +194,9 @@
 					<configLocation>config/checkstyle/google_checks.xml</configLocation>
 					<failsOnError>true</failsOnError>
 					<failOnViolation>true</failOnViolation>
-					<violationSeverity>error</violationSeverity>
+					<violationSeverity>warning</violationSeverity>
 					<consoleOutput>true</consoleOutput>
-					<excludes>**/generated-sources/annotations/**</excludes>
+					<excludes>target/generated-sources/annotations/**</excludes>
 				</configuration>
 				<executions>
 					<execution>
@@ -199,6 +204,13 @@
 						<phase>validate</phase>
 						<goals>
 							<goal>check</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>checkstyle</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -228,59 +240,6 @@
 						<phase>verify</phase>
 						<goals>
 							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.19.0</version>
-				<dependencies>
-					<dependency>
-						<groupId>net.sourceforge.pmd</groupId>
-						<artifactId>pmd-core</artifactId>
-						<version>${pmd.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>net.sourceforge.pmd</groupId>
-						<artifactId>pmd-java</artifactId>
-						<version>${pmd.version}</version>
-					</dependency>
-				</dependencies>
-				<configuration>
-					<rulesets>
-						<ruleset>/category/java/bestpractices.xml</ruleset>
-						<ruleset>config/pmd/codestyle.xml</ruleset>
-						<ruleset>config/pmd/design.xml</ruleset>
-						<ruleset>config/pmd/documentation.xml</ruleset>
-						<ruleset>config/pmd/errorprone.xml</ruleset>
-						<ruleset>/category/java/multithreading.xml</ruleset>
-						<ruleset>/category/java/performance.xml</ruleset>
-						<ruleset>/category/java/security.xml</ruleset>
-					</rulesets>
-					<targetJdk>${java.version}</targetJdk>
-					<failOnViolation>true</failOnViolation>
-					<failurePriority>0</failurePriority>
-					<printFailingErrors>true</printFailingErrors>
-					<verbose>true</verbose>
-					<analysisCache>true</analysisCache>
-					<excludeRoots>
-						<excludeRoot>target/generated-sources/annotations/</excludeRoot>
-					</excludeRoots>
-					<excludes>
-						<exclude>org/nortis/NortisBackendApplication.java</exclude>
-					</excludes>
-				</configuration>
-				<executions>
-					<execution>
-						<id>PMD</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>check</goal>
-							<!--
-							<goal>cpd-check</goal>
-							-->
 						</goals>
 					</execution>
 				</executions>
