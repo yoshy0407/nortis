@@ -28,7 +28,7 @@ jobs:
 
       - name: build
         working-directory: ./nortis-backend
-        run: mvn clean compile source:jar verify
+        run: mvn clean verify
 
       - name: Test Reports
         uses: mikepenz/action-junit-report@v2
