@@ -1,14 +1,10 @@
-package org.nortis.application;
+package org.nortis.application.consumer.mail;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
-import org.nortis.application.consumer.mail.MailAddressAddCommand;
-import org.nortis.application.consumer.mail.MailAddressDeleteCommand;
-import org.nortis.application.consumer.mail.MailConsumerApplicationService;
-import org.nortis.application.consumer.mail.MailRegisterCommand;
 import org.nortis.domain.consumer.mail.MailConsumer;
 import org.nortis.domain.consumer.mail.MailConsumerRepository;
 import org.nortis.domain.consumer.mail.MailInfo;

@@ -20,8 +20,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.nortis.domain.consumer.ConsumeFailureException;
 import org.nortis.domain.consumer.Message;
-import org.nortis.domain.consumer.MessageFailureException;
 import org.nortis.domain.consumer.mail.value.MailAddress;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.tenant.value.TenantId;
@@ -130,7 +130,7 @@ class MailSendMessageConsumerTest {
 				"本文");
 
 
-		assertThrows(MessageFailureException.class, () -> {
+		assertThrows(ConsumeFailureException.class, () -> {
 			this.mailSendDomainService.consume(message);
 		}, "メールの送信に失敗しました");
 

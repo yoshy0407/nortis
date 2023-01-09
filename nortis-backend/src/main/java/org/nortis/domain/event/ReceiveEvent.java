@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.event.value.EventId;
+import org.nortis.domain.event.value.Subscribed;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.ApplicationContextAccessor;
 import org.nortis.infrastructure.exception.DomainException;
@@ -57,7 +58,7 @@ public class ReceiveEvent {
 	 */
 	@Setter
 	@Column(name = "SUBSCRIBED")
-	private boolean subscribed;
+	private Subscribed subscribed;
 	
 	/**
 	 * テンプレートパラメーター
@@ -76,7 +77,7 @@ public class ReceiveEvent {
 	 * 受信済みに設定します
 	 */
 	public void subscribe() {
-		setSubscribed(true);
+		setSubscribed(Subscribed.TRUE);
 		setUpdateDt(LocalDateTime.now());
 	}
 	
@@ -145,7 +146,7 @@ public class ReceiveEvent {
 		receiveEvent.setTenantId(tenantId);
 		receiveEvent.setEndpointId(endpointId);
 		receiveEvent.setOccuredOn(LocalDateTime.now());
-		receiveEvent.setSubscribed(false);
+		receiveEvent.setSubscribed(Subscribed.FALSE);
 		receiveEvent.setTemplateParameter(parameterJson);
 		return receiveEvent;
 	}

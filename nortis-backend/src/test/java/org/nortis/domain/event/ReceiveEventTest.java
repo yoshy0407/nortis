@@ -1,19 +1,17 @@
 package org.nortis.domain.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.nortis.domain.endpoint.value.EndpointId;
+import org.nortis.domain.event.value.Subscribed;
 import org.nortis.domain.tenant.value.TenantId;
-import org.nortis.infrastructure.ApplicationContextAccessor;
 import org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationContext;
 import test.BaseTestConfiguration;
+import test.MockApplicationContextAccessor;
 
 @SpringBootTest(classes = {
 		MessageSourceAutoConfiguration.class,
@@ -23,11 +21,8 @@ class ReceiveEventTest {
 
 	@BeforeEach
 	void setup() {
-		ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
-		Mockito.when(applicationContext.getBean(eq(ObjectMapper.class)))
-			.thenReturn(new ObjectMapper());
-		
-		ApplicationContextAccessor.set(applicationContext);
+		MockApplicationContextAccessor mockAccessor = new MockApplicationContextAccessor();
+		mockAccessor.mockGetObjectMapper(new ObjectMapper());
 	}
 	
 	@Test
@@ -37,9 +32,9 @@ class ReceiveEventTest {
 				EndpointId.create("endpoint1"), 
 				"{ \"name\": \"Taro\", \"age\": \"12\" }");
 		
-		assertThat(receiveEvent.isSubscribed()).isFalse();
+		assertThat(receiveEvent.getSubscribed()).isEqualTo(Subscribed.FALSE);
 		receiveEvent.subscribe();
-		assertThat(receiveEvent.isSubscribed()).isTrue();
+		assertThat(receiveEvent.getSubscribed()).isEqualTo(Subscribed.TRUE);
 	}
 
 	@Test

@@ -3,7 +3,7 @@ select
 from
 	RECEIVE_EVENT
 where
-	SUBSCRIBED = 'FALSE'
+	SUBSCRIBED = '0'
 	AND ENDPOINT_ID = /* endpointId */''
 order by
 	OCCURED_ON asc

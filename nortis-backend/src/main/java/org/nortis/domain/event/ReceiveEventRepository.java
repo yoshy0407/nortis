@@ -2,6 +2,7 @@ package org.nortis.domain.event;
 
 import java.util.List;
 import org.nortis.domain.endpoint.value.EndpointId;
+import org.seasar.doma.BatchUpdate;
 import org.seasar.doma.Dao;
 import org.seasar.doma.Delete;
 import org.seasar.doma.Insert;
@@ -49,6 +50,14 @@ public interface ReceiveEventRepository {
 	 */
 	@Update
 	int update(ReceiveEvent receiveEvent);
+	
+	/**
+	 * 複数レコードを更新します
+	 * @param receiveEvents 受信イベントのリスト
+	 * @return 更新件数
+	 */
+	@BatchUpdate
+	int[] updateAll(List<ReceiveEvent> receiveEvents);
 	
 	/**
 	 * 削除します

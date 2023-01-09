@@ -5,7 +5,7 @@ package org.nortis.domain.consumer;
  * @author yoshiokahiroshi
  * @version 1.0.0
  */
-public class MessageFailureException extends Exception {
+public class ConsumeFailureException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
@@ -14,7 +14,7 @@ public class MessageFailureException extends Exception {
 	 * @param message メッセージ
 	 * @param cause 例外クラス
 	 */
-	public MessageFailureException(String message, Throwable cause) {
+	public ConsumeFailureException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
@@ -22,7 +22,7 @@ public class MessageFailureException extends Exception {
 	 * 例外を構築します
 	 * @param message メッセージ
 	 */
-	public MessageFailureException(String message) {
+	public ConsumeFailureException(String message) {
 		super(message);
 	}
 

@@ -1,13 +1,9 @@
-package org.nortis.application;
+package org.nortis.application.endpoint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
-import org.nortis.application.endpoint.EndpointApplicationService;
-import org.nortis.application.endpoint.EndpointDeleteCommand;
-import org.nortis.application.endpoint.EndpointRegisterCommand;
-import org.nortis.application.endpoint.EndpointUpdateCommand;
 import org.nortis.domain.endpoint.Endpoint;
 import org.nortis.domain.endpoint.EndpointRepository;
 import org.nortis.domain.endpoint.value.EndpointId;

@@ -1,6 +1,5 @@
-package org.nortis.application;
+package org.nortis.application.tenant;
 
-import org.nortis.application.tenant.TenantApplicationService;
 import org.nortis.domain.tenant.TenantDomainService;
 import org.nortis.domain.tenant.TenantEntityListener;
 import org.nortis.domain.tenant.TenantRepository;

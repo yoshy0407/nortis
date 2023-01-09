@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+  <RECEIVE_EVENT
+      TENANT_ID="TEST1"
+      ENDPOINT_ID="ENDPOINT1"
+      SUBSCRIBED="0"
+      TEMPLATE_PARAMETER='{ "name": "John", "age": "34" }'
+  />
+</dataset>

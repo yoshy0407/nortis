@@ -10,8 +10,8 @@ public interface MessageConsumer {
 	/**
 	 * 受信イベントを消費します
 	 * @param message 送信メッセージ
-	 * @throws MessageFailureException 送信処理に失敗した場合
+	 * @throws ConsumeFailureException 受信処理に失敗した場合
 	 */
-	void consume(Message message) throws MessageFailureException;
+	void consume(Message message) throws ConsumeFailureException;
 	
 }

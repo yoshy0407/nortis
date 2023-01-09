@@ -3,6 +3,6 @@ select
 from
 	RECEIVE_EVENT
 where
-	SUBSCRIBED = 'FALSE'
+	SUBSCRIBED = '0'
 order by
 	OCCURED_ON asc
