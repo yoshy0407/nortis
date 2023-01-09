@@ -1,5 +1,6 @@
 package org.nortis.application.endpoint;
 
+import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.nortis.domain.endpoint.Endpoint;
@@ -104,6 +105,22 @@ public class EndpointApplicationService {
 		if (optEndpoint.isEmpty()) {
 			throw new DomainException("MSG20001");
 		}
-		this.endpointRepository.remove(optEndpoint.get());
+		Endpoint endpoint = optEndpoint.get();
+		endpoint.deleted(command.userId());
+		this.endpointRepository.remove(endpoint);
+	}
+	
+	/**
+	 * 指定されたテナントのエンドポイントを削除します
+	 * @param tenantId テナントID
+	 * @param userId ユーザID
+	 */
+	public void deleteFromTenantId(String tenantId, String userId) {
+		TenantId id = TenantId.create(tenantId);
+		List<Endpoint> endpointList = this.endpointRepository.getFromTenantId(id);
+		
+		endpointList.forEach(endpoint -> endpoint.deleted(userId));
+		
+		this.endpointRepository.removeAll(endpointList);
 	}
 }

@@ -1,8 +1,10 @@
 package org.nortis.port.consumer;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.nortis.application.consumer.mail.MailConsumerApplicationService;
-import org.nortis.domain.tenant.event.TenantDeletedEvent;
+import org.nortis.domain.endpoint.event.EndpointDeletedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 /**
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Component;
  * @author yoshiokahiroshi
  * @version 1.0.0
  */
+@Slf4j
 @AllArgsConstructor
 @Component
 public class DeleteMailConsumerListsner {
@@ -21,7 +24,14 @@ public class DeleteMailConsumerListsner {
 	 * イベントを受信します
 	 * @param event テナント削除イベント
 	 */
-	public void subscribe(TenantDeletedEvent event) {
-		
+	@EventListener
+	public void subscribe(EndpointDeletedEvent event) {
+		try {
+			this.mailConsumerApplicationService.removeEndpointIdByEndpointDeleted(
+					event.getTenantId().toString(), 
+					event.getUpdateUserId());
+		} catch (Exception ex) {
+			log.error("エンドポイント削除イベントの受信に失敗しました", ex);
+		}
 	}
 }

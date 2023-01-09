@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 
+import java.time.LocalDateTime;
 import org.apache.velocity.app.VelocityEngine;
 import org.assertj.core.util.Maps;
 import org.junit.jupiter.api.BeforeEach;
@@ -82,6 +83,18 @@ class EndpointTest {
 	}
 
 	@Test
+	void testDeleted() {
+		Endpoint endpoint = 
+				Endpoint.create(EndpointId.create("ENDPOINT"), 
+						TenantId.create("TEST"), "Test Endpoint", "Test ${name}", "Hello! ${name}", "TEST_ID");
+		
+		endpoint.deleted("USER_ID");
+		
+		assertThat(endpoint.getUpdateId()).isEqualTo("USER_ID");
+		assertThat(endpoint.getUpdateDt()).isBefore(LocalDateTime.now());
+	}
+	
+	@Test
 	void testCreate() {
 		Endpoint endpoint = Endpoint.create(EndpointId.create("ENDPOINT"), 
 				TenantId.create("TEST"), "Test Endpoint", "subject", "message", "TEST_ID");
@@ -89,6 +102,8 @@ class EndpointTest {
 		assertThat(endpoint.getEndpointId()).isEqualTo(EndpointId.create("ENDPOINT"));
 		assertThat(endpoint.getTenantId()).isEqualTo(TenantId.create("TEST"));
 		assertThat(endpoint.getEndpointName()).isEqualTo("Test Endpoint");
+		assertThat(endpoint.getSubjectTemplate()).isEqualTo("subject");
+		assertThat(endpoint.getMessageTemplate()).isEqualTo("message");
 		assertThat(endpoint.getCreateId()).isEqualTo("TEST_ID");
 		assertThat(endpoint.getCreateDt()).isNotNull();
 		assertThat(endpoint.getUpdateId()).isNull();

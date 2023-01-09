@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.nortis.domain.endpoint.Endpoint;
 import org.nortis.domain.endpoint.EndpointRepository;
+import org.nortis.domain.endpoint.event.EndpointDeletedEvent;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.config.DomaConfiguration;
@@ -13,6 +14,7 @@ import org.seasar.doma.boot.autoconfigure.DomaAutoConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.AutoConfigureDataJdbc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -33,6 +35,9 @@ import org.springframework.test.context.jdbc.Sql;
 	})
 class EndpointApplicationServiceTest {
 
+	@Autowired
+	ApplicationEvents applicationEvents;
+	
 	@Autowired
 	EndpointApplicationService endpointApplicationService;
 	
@@ -72,12 +77,36 @@ class EndpointApplicationServiceTest {
 	
 	@Test
 	void testDelete() {
-		EndpointDeleteCommand command = new EndpointDeleteCommand("TEST1", "ENDPOINT1");
+		EndpointDeleteCommand command = new EndpointDeleteCommand("TEST1", "ENDPOINT1", "TEST_ID");
 		endpointApplicationService.delete(command);
 
 		Optional<Endpoint> opt = this.endpointRepository.get(TenantId.create("TEST1"), EndpointId.create("ENDPOINT1"));
 		
 		assertThat(opt).isEmpty();
+		
+		applicationEvents.stream(EndpointDeletedEvent.class)
+			.forEach(event -> {
+				assertThat(event.getTenantId()).isEqualTo(TenantId.create("TEST1"));
+				assertThat(event.getEndpointId()).isEqualTo(EndpointId.create("ENDPOINT1"));
+				assertThat(event.getUpdateUserId()).isEqualTo("TEST_ID");
+			});
 	}
+	
+	@Test
+	void testDeleteFromTenantId() {
+		endpointApplicationService.deleteFromTenantId("TEST3", "USER_ID");
+
+		Optional<Endpoint> opt1 = this.endpointRepository.get(TenantId.create("TEST3"), EndpointId.create("ENDPOINT3"));		
+		assertThat(opt1).isEmpty();
+		Optional<Endpoint> opt2 = this.endpointRepository.get(TenantId.create("TEST3"), EndpointId.create("ENDPOINT4"));		
+		assertThat(opt2).isEmpty();
+		
+		applicationEvents.stream(EndpointDeletedEvent.class)
+			.forEach(event -> {
+				assertThat(event.getTenantId()).isEqualTo(TenantId.create("TEST3"));
+				assertThat(event.getEndpointId()).isNotNull();
+				assertThat(event.getUpdateUserId()).isEqualTo("USER_ID");
+			});
+}
 
 }

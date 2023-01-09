@@ -3,8 +3,11 @@ package org.nortis.domain.tenant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nortis.domain.endpoint.Endpoint;
+import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.MessageSourceAccessor;
 import org.nortis.infrastructure.exception.DomainException;
@@ -18,7 +21,7 @@ class TenantTest {
 
 	@Autowired
 	MessageSource messageSource;
-	
+
 	@BeforeEach
 	void setup() {
 		MessageSourceAccessor.set(messageSource);
@@ -41,6 +44,39 @@ class TenantTest {
 	}
 
 	@Test
+	void testCreateEndpoint() {
+		Tenant tenant = Tenant.create(TenantId.create("TEST1"), "TEST1 Tenant", "TEST_ID");
+
+		Endpoint endpoint = tenant.createEndpoint(
+				EndpointId.create("ENDPOINT"), 
+				"TEST_ENDPOINT", 
+				"subject", 
+				"body", 
+				"USER_ID");
+		
+		assertThat(endpoint.getEndpointId()).isEqualTo(EndpointId.create("ENDPOINT"));
+		assertThat(endpoint.getTenantId()).isEqualTo(TenantId.create("TEST1"));
+		assertThat(endpoint.getEndpointName()).isEqualTo("TEST_ENDPOINT");
+		assertThat(endpoint.getSubjectTemplate()).isEqualTo("subject");
+		assertThat(endpoint.getMessageTemplate()).isEqualTo("body");
+		assertThat(endpoint.getCreateId()).isEqualTo("USER_ID");
+		assertThat(endpoint.getCreateDt()).isNotNull();
+		assertThat(endpoint.getUpdateId()).isNull();
+		assertThat(endpoint.getUpdateDt()).isNull();
+		assertThat(endpoint.getVersion()).isEqualTo(1L);
+	}
+
+	@Test
+	void testDeleted() {
+		Tenant tenant = Tenant.create(TenantId.create("TEST1"), "TEST1 Tenant", "TEST_ID");
+
+		tenant.deleted("USER_ID");
+
+		assertThat(tenant.getUpdateId()).isEqualTo("USER_ID");
+		assertThat(tenant.getUpdateDt()).isBefore(LocalDateTime.now());
+	}
+
+	@Test
 	void testCreate() {
 		Tenant tenant = Tenant.create(TenantId.create("TEST"), "TEST TENANT", "TEST_ID");
 
@@ -57,7 +93,7 @@ class TenantTest {
 	void testCreateTenantIdNull() {
 		assertThrows(DomainException.class, () -> {
 			Tenant.create(null, "", "TEST_ID");
-			
+
 		}, "テナントIDが未設定です");
 	}
 
@@ -79,7 +115,7 @@ class TenantTest {
 	void testCreateTenantNameLength() {
 		assertThrows(DomainException.class, () -> {
 			Tenant.create(TenantId.create("TEST"), "123456789012345678901234567890123456789012345678901", "TEST_ID");
-			
+
 		}, "テナント名は50文字以内である必要があります");
 	}
 
@@ -87,7 +123,7 @@ class TenantTest {
 	void testCreateCreateIdNull() {
 		assertThrows(DomainException.class, () -> {
 			Tenant.create(TenantId.create("TEST"), "123456789012345678901234567890123456789012345678901", "");
-			
+
 		}, "作成者IDが未設定です");
 	}
 

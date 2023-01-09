@@ -6,10 +6,12 @@ package org.nortis.application.endpoint;
  * @author yoshiokahiroshi
  * @param tenantId テナントID
  * @param endpointId エンドポイントID
+ * @param userId 更新者ID
  * @version 1.0.0
  */
 public record EndpointDeleteCommand(
 		String tenantId,
-		String endpointId) {
+		String endpointId,
+		String userId) {
 
 }

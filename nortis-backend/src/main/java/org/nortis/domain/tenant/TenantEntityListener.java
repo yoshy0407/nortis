@@ -29,7 +29,9 @@ public class TenantEntityListener implements EntityListener<Tenant> {
 	 */
 	@Override
 	public void postDelete(Tenant entity, PostDeleteContext<Tenant> context) {
-		this.applicationEventPublisher.publishEvent(new TenantDeletedEvent(entity.getTenantId()));
+		this.applicationEventPublisher.publishEvent(new TenantDeletedEvent(
+				entity.getTenantId(), 
+				entity.getUpdateId()));
 	}
 	
 }

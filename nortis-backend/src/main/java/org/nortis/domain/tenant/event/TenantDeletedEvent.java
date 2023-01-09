@@ -16,5 +16,8 @@ public class TenantDeletedEvent {
 
 	/** テナントID */
 	private final TenantId tenantId;
+	
+	/** 更新者ID */
+	private final String updateUserId;
 
 }

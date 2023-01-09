@@ -142,6 +142,15 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 	}
 	
 	/**
+	 * 削除をマークします
+	 * @param userId ユーザID
+	 */
+	public void deleted(String userId) {
+		setUpdateId(userId);
+		setUpdateDt(LocalDateTime.now());
+	}
+	
+	/**
 	 * エンドポイントID
 	 * @param endpointId エンドポイントID
 	 */

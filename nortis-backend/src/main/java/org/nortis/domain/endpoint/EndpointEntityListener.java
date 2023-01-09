@@ -31,7 +31,8 @@ public class EndpointEntityListener implements EntityListener<Endpoint> {
 		applicationEventPublisher.publishEvent(
 				new EndpointDeletedEvent(
 						entity.getTenantId(), 
-						entity.getEndpointId()));
+						entity.getEndpointId(),
+						entity.getUpdateId()));
 	}
 
 }

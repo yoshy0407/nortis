@@ -20,4 +20,7 @@ public class EndpointDeletedEvent {
 	
 	/** エンドポイントID */
 	private final EndpointId endpointId;
+	
+	/** 更新者ID */
+	private final String updateUserId;
 }

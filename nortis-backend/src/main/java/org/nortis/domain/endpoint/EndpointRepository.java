@@ -1,8 +1,10 @@
 package org.nortis.domain.endpoint;
 
+import java.util.List;
 import java.util.Optional;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.tenant.value.TenantId;
+import org.seasar.doma.BatchDelete;
 import org.seasar.doma.Dao;
 import org.seasar.doma.Delete;
 import org.seasar.doma.Insert;
@@ -29,6 +31,14 @@ public interface EndpointRepository {
 	Optional<Endpoint> get(TenantId tenantId, EndpointId endpointId);
 	
 	/**
+	 * テナントIDからエンドポイントを取得します
+	 * @param tenantId テナントID
+	 * @return エンドポイントのリスト
+	 */
+	@Select
+	List<Endpoint> getFromTenantId(TenantId tenantId);
+	
+	/**
 	 * 保存します
 	 * @param endpoint 保存するオブジェクト
 	 * @return 更新件数
@@ -51,5 +61,13 @@ public interface EndpointRepository {
 	 */
 	@Delete
 	int remove(Endpoint endpoint);
+
+	/**
+	 * 複数オブジェクトを削除します
+	 * @param endpointList 削除するオブジェクトのリスト
+	 * @return 削除結果
+	 */
+	@BatchDelete
+	int[] removeAll(List<Endpoint> endpointList);
 
 }

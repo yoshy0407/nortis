@@ -1,7 +1,7 @@
 package org.nortis.application.event;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-
 import org.apache.velocity.app.VelocityEngine;
 import org.nortis.domain.consumer.MessageConsumer;
 import org.nortis.domain.consumer.MessageFactory;
@@ -22,7 +22,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @TestConfiguration
 class ReceiveEventApplicationServiceTestConfig implements ApplicationContextAware {

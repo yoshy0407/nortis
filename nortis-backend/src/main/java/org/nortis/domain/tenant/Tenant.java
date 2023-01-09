@@ -99,6 +99,15 @@ public class Tenant extends AbstractAggregateRoot<Tenant> {
 	}
 	
 	/**
+	 * 削除をマークします
+	 * @param userId ユーザID
+	 */
+	public void deleted(String userId) {
+		setUpdateId(userId);
+		setUpdateDt(LocalDateTime.now());
+	}
+	
+	/**
 	 * テナント名を設定します
 	 * @param tenantName テナント名
 	 */

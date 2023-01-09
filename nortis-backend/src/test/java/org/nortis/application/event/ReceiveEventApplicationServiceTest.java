@@ -2,8 +2,6 @@ package org.nortis.application.event;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 
 import java.util.List;
@@ -15,7 +13,6 @@ import org.mockito.Mockito;
 import org.nortis.domain.consumer.ConsumeFailureException;
 import org.nortis.domain.consumer.Message;
 import org.nortis.domain.consumer.MessageConsumer;
-import org.nortis.domain.consumer.MessageFactory;
 import org.nortis.domain.event.value.EventId;
 import org.nortis.infrastructure.config.DomaConfiguration;
 import org.seasar.doma.boot.autoconfigure.DomaAutoConfiguration;
@@ -25,7 +22,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.test.context.jdbc.Sql;
-
 import test.BaseTestConfiguration;
 import test.DbUnitConfiguration;
 import test.DbUnitTableAssert;
