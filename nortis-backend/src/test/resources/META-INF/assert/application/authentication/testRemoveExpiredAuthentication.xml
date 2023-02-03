@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+  <AUTHENTICATION
+      API_KEY="APIKEYTENANT1"
+      TENANT_ID="TEST"
+      USER_ID="null"
+  />
+  <AUTHENTICATION
+      API_KEY="APIKEYTENANT2"
+      TENANT_ID="TEST2"
+      USER_ID="null"
+  />
+  <AUTHENTICATION
+      API_KEY="APIKEYUSER2"
+      TENANT_ID="null"
+      USER_ID="0000000008"
+  />
+</dataset>

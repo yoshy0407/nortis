@@ -20,7 +20,7 @@ import org.nortis.domain.endpoint.Endpoint;
 import org.nortis.domain.endpoint.EndpointRepository;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.tenant.value.TenantId;
-import test.MockApplicationContextAccessor;
+import org.nortis.test.MockApplicationContextAccessor;
 
 class ReceiveEventConsumeDomainServiceTest {
 

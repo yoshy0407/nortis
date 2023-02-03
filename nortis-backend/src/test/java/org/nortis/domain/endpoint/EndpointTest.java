@@ -9,6 +9,7 @@ import org.apache.velocity.app.VelocityEngine;
 import org.assertj.core.util.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.endpoint.value.SendMessage;
@@ -18,13 +19,17 @@ import org.nortis.infrastructure.MessageSourceAccessor;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.template.TemplateRender;
 import org.nortis.infrastructure.template.VelocityTemplateRender;
+import org.nortis.test.NortisBaseTestConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringBootTest(classes = MessageSourceAutoConfiguration.class)
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {
+		NortisBaseTestConfiguration.class
+})
 class EndpointTest {
 
 	@Autowired

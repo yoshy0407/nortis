@@ -1,4 +1,4 @@
 /**
  * テストをサポートするパッケージです
  */
-package test;
+package org.nortis.test;

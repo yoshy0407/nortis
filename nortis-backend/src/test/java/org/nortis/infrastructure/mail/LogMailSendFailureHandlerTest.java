@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nortis.test.LogMockit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mail.MailSendException;
-import test.LogMockit;
 
 @SpringBootTest(classes = MessageSourceAutoConfiguration.class)
 class LogMailSendFailureHandlerTest {

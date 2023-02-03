@@ -15,6 +15,9 @@ import org.nortis.domain.consumer.Message;
 import org.nortis.domain.consumer.MessageConsumer;
 import org.nortis.domain.event.value.EventId;
 import org.nortis.infrastructure.config.DomaConfiguration;
+import org.nortis.test.DbUnitConfiguration;
+import org.nortis.test.DbUnitTableAssert;
+import org.nortis.test.NortisBaseTestConfiguration;
 import org.seasar.doma.boot.autoconfigure.DomaAutoConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.AutoConfigureDataJdbc;
@@ -22,9 +25,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.test.context.jdbc.Sql;
-import test.BaseTestConfiguration;
-import test.DbUnitConfiguration;
-import test.DbUnitTableAssert;
 
 @Sql(scripts = {
 		"/META-INF/ddl/dropReceiveEvent.sql",
@@ -42,7 +42,7 @@ import test.DbUnitTableAssert;
 @SpringBootTest(classes = { 
 		DomaAutoConfiguration.class, 
 		DomaConfiguration.class, 
-		BaseTestConfiguration.class,
+		NortisBaseTestConfiguration.class,
 		ReceiveEventApplicationServiceTestConfig.class,
 		DbUnitConfiguration.class
 })

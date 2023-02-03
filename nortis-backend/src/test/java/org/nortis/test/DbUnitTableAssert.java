@@ -1,4 +1,4 @@
-package test;
+package org.nortis.test;
 
 import java.io.IOException;
 import org.dbunit.Assertion;
@@ -45,7 +45,7 @@ public class DbUnitTableAssert {
 		IDataSet expectedDataSet;
 		try {
 			expectedDataSet = new FlatXmlDataSetBuilder().build(this.resourceLoader.getResource(xmlFilePath).getFile());
-			this.expect = expectedDataSet.getTable("RECEIVE_EVENT");
+			this.expect = expectedDataSet.getTable(tableName);
 		} catch (DataSetException | IOException e) {
 			throw new IllegalStateException("DBUnitで異常が発生しました", e);
 		}

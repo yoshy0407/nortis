@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.nortis.domain.endpoint.Endpoint;
 import org.nortis.domain.endpoint.EndpointRepository;
@@ -15,13 +16,13 @@ import org.nortis.domain.tenant.Tenant;
 import org.nortis.domain.tenant.TenantRepository;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.exception.DomainException;
-import org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import test.BaseTestConfiguration;
+import org.nortis.test.NortisBaseTestConfiguration;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringBootTest(classes = {
-		MessageSourceAutoConfiguration.class,
-		BaseTestConfiguration.class
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {
+		NortisBaseTestConfiguration.class
 })
 class ReceiveEventCheckDomainServiceTest {
 	

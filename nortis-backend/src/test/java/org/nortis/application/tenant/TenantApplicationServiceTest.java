@@ -5,6 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.nortis.domain.authentication.Authentication;
+import org.nortis.domain.authentication.AuthenticationRepository;
+import org.nortis.domain.authentication.value.ApiKey;
 import org.nortis.domain.tenant.Tenant;
 import org.nortis.domain.tenant.TenantRepository;
 import org.nortis.domain.tenant.event.TenantDeletedEvent;
@@ -20,7 +23,9 @@ import org.springframework.test.context.jdbc.Sql;
 
 @Sql(scripts = {
 		"/META-INF/ddl/dropTenant.sql",
+		"/META-INF/ddl/dropAuthentication.sql",
 		"/ddl/createTenant.sql",
+		"/ddl/createAuthentication.sql",
 		"/META-INF/data/application/del_ins_tenant.sql"
 })
 @RecordApplicationEvents
@@ -36,6 +41,9 @@ class TenantApplicationServiceTest {
 	
 	@Autowired
 	TenantRepository tenantRepository;
+	
+	@Autowired
+	AuthenticationRepository authenticationRepository;
 	
 	@Test
 	void testRegister() {
@@ -57,6 +65,20 @@ class TenantApplicationServiceTest {
 	}
 
 	@Test
+	void testCreateApiKey() {
+		ApiKey apiKey = tenantApplicationService.createApiKey("TEST2");
+		
+		Optional<Authentication> optAuth = authenticationRepository.get(apiKey);
+		assertThat(optAuth).isPresent();
+		
+		Authentication auth = optAuth.get();
+		assertThat(auth.getApiKey()).isNotNull();
+		assertThat(auth.getTenantId()).isEqualTo(TenantId.create("TEST2"));
+		assertThat(auth.getUserId()).isNull();
+		
+	}
+	
+	@Test
 	void testChangeName() {
 		TenantNameUpdateCommand command = new TenantNameUpdateCommand("TEST2", "テストテナント", "USER_ID");
 		TenantId tenantId = tenantApplicationService
@@ -77,12 +99,15 @@ class TenantApplicationServiceTest {
 		
 	@Test
 	void testDelete() {
-		tenantApplicationService.delete("TEST3");
+		tenantApplicationService.delete("TEST3", "USER_ID");
 
 		Optional<Tenant> optTenant = this.tenantRepository.get(TenantId.create("TEST3"));
 		assertThat(optTenant).isEmpty();	
 		
-		assertThat(this.applicationEvents.stream(TenantDeletedEvent.class).count()).isEqualTo(1);
+		this.applicationEvents.stream(TenantDeletedEvent.class).forEach(event -> {
+			assertThat(event.getTenantId()).isEqualTo(TenantId.create("TEST3"));
+			assertThat(event.getUpdateUserId()).isEqualTo("USER_ID");
+		});
 	}
 
 }

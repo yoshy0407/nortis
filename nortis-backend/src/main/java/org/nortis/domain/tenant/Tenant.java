@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.nortis.domain.authentication.Authentication;
 import org.nortis.domain.endpoint.Endpoint;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.tenant.value.TenantId;
@@ -96,6 +97,14 @@ public class Tenant extends AbstractAggregateRoot<Tenant> {
 	public Endpoint createEndpoint(EndpointId endpointId, String endpointName, 
 			String subjectTemplate, String templateText, String createId) {
 		return Endpoint.create(endpointId, this.tenantId, endpointName, subjectTemplate, templateText, createId);
+	}
+	
+	/**
+	 * APIキーを作成します
+	 * @return 認証
+	 */
+	public Authentication createApiKey() {
+		return Authentication.createFromTenant(this.tenantId);
 	}
 	
 	/**

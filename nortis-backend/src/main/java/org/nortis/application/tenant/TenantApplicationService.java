@@ -2,6 +2,8 @@ package org.nortis.application.tenant;
 
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import org.nortis.domain.authentication.AuthenticationDomainService;
+import org.nortis.domain.authentication.value.ApiKey;
 import org.nortis.domain.tenant.Tenant;
 import org.nortis.domain.tenant.TenantDomainService;
 import org.nortis.domain.tenant.TenantRepository;
@@ -25,6 +27,8 @@ public class TenantApplicationService {
 	/** テナントドメインサービス */
 	private final TenantDomainService tenantDomainService;
 	
+	private final AuthenticationDomainService authenticationDomainService;
+	
 	/**
 	 * テナントを登録します
 	 * @param <R> 結果クラス
@@ -43,6 +47,22 @@ public class TenantApplicationService {
 		this.tenantRepository.save(tenant);
 		
 		return translator.translate(tenant);
+	}
+	
+	/**
+	 * テナントのAPIキーを作成します
+	 * @param rawTenantId テナントID
+	 * @return APIキー
+	 */
+	public ApiKey createApiKey(String rawTenantId) {
+		TenantId tenantId = TenantId.create(rawTenantId);
+		
+		Optional<Tenant> optTenant = this.tenantRepository.get(tenantId);
+		if (optTenant.isEmpty()) {
+			throw new DomainException("MSG10003");
+		}
+		
+		return this.authenticationDomainService.createApiKeyOf(optTenant.get());
 	}
 	
 	/**
@@ -75,14 +95,17 @@ public class TenantApplicationService {
 	/**
 	 * テナントを削除します
 	 * @param rawTenantId テナントID
+	 * @param userId ユーザID
 	 */
-	public void delete(String rawTenantId) {
+	public void delete(String rawTenantId, String userId) {
 		TenantId tenantId = TenantId.create(rawTenantId);
 		
 		Optional<Tenant> optTenant = this.tenantRepository.get(tenantId);
 		if (optTenant.isEmpty()) {
 			throw new DomainException("MSG10003");
 		}
-		this.tenantRepository.remove(optTenant.get());
+		Tenant tenant = optTenant.get();
+		tenant.deleted(userId);
+		this.tenantRepository.remove(tenant);
 	}
 }

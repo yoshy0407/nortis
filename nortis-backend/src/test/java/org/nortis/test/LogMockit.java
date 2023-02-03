@@ -1,4 +1,4 @@
-package test;
+package org.nortis.test;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;

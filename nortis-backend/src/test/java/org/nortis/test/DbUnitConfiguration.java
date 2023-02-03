@@ -1,4 +1,4 @@
-package test;
+package org.nortis.test;
 
 import java.util.function.Supplier;
 import javax.sql.DataSource;

@@ -5,17 +5,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.event.value.Subscribed;
 import org.nortis.domain.tenant.value.TenantId;
-import org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import test.BaseTestConfiguration;
-import test.MockApplicationContextAccessor;
+import org.nortis.test.MockApplicationContextAccessor;
+import org.nortis.test.NortisBaseTestConfiguration;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringBootTest(classes = {
-		MessageSourceAutoConfiguration.class,
-		BaseTestConfiguration.class
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {
+		NortisBaseTestConfiguration.class
 })
 class ReceiveEventTest {
 

@@ -6,17 +6,23 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.nortis.domain.authentication.Authentication;
 import org.nortis.domain.endpoint.Endpoint;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.MessageSourceAccessor;
 import org.nortis.infrastructure.exception.DomainException;
+import org.nortis.test.NortisBaseTestConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringBootTest(classes = MessageSourceAutoConfiguration.class)
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {
+		NortisBaseTestConfiguration.class
+})
 class TenantTest {
 
 	@Autowired
@@ -87,6 +93,16 @@ class TenantTest {
 		assertThat(tenant.getUpdateDt()).isNull();
 		assertThat(tenant.getUpdateId()).isNull();
 		assertThat(tenant.getVersion()).isEqualTo(1L);
+	}
+	
+	@Test
+	void testCreateApiKey() {
+		Tenant tenant = Tenant.create(TenantId.create("TEST"), "TEST TENANT", "TEST_ID");
+		Authentication auth = tenant.createApiKey();
+		
+		assertThat(auth.getApiKey()).isNotNull();
+		assertThat(auth.getTenantId()).isEqualTo(TenantId.create("TEST"));
+		assertThat(auth.getUserId()).isNull();
 	}
 
 	@Test

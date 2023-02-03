@@ -11,7 +11,7 @@ import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.event.ReceiveEvent;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.template.VelocityTemplateRender;
-import test.MockApplicationContextAccessor;
+import org.nortis.test.MockApplicationContextAccessor;
 
 
 class MessageFactoryTest {

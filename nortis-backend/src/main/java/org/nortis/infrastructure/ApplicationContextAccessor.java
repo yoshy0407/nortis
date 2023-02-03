@@ -3,7 +3,9 @@ package org.nortis.infrastructure;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.nortis.infrastructure.template.TemplateRender;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * {@link ApplicationContext}のアクセッサークラスです
@@ -46,6 +48,22 @@ public class ApplicationContextAccessor {
 	 */
 	public static ObjectMapper getObjectMapper() {
 		return applicationContext.getBean(ObjectMapper.class);
+	}
+	
+	/**
+	 * {@link ApplicationEventPublisher}を返却します
+	 * @return {@link ApplicationEventPublisher}
+	 */
+	public static ApplicationEventPublisher getApplicationEventPublisher() {
+		return applicationContext;
+	}
+	
+	/**
+	 * {@link PasswordEncoder}を返却します
+	 * @return {@link PasswordEncoder}
+	 */
+	public static PasswordEncoder getPasswordEncoder() {
+		return applicationContext.getBean(PasswordEncoder.class);
 	}
 
 }
