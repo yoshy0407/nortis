@@ -55,6 +55,15 @@ public class NortisUser extends User implements NortisUserDetails {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		//Spotbugでエラーになるので、オーバーライドする
+		return super.hashCode();
+	}
+
+	/**
 	 * テナントの{@link NortisUser}を作成します
 	 * @param authentication 認証
 	 * @return {@link NortisUser}
