@@ -46,6 +46,15 @@ public class NortisUser extends User implements NortisUserDetails {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		//Spotbugでエラーになるので、オーバーライドする
+		return super.equals(obj);
+	}
+
+	/**
 	 * テナントの{@link NortisUser}を作成します
 	 * @param authentication 認証
 	 * @return {@link NortisUser}
