@@ -38,7 +38,7 @@ class AuthenticationDomainServiceTest {
 	AuthenticationRepository authenticationRepository;
 	
 	SuserRepository suserRepository;
-
+	
 	@BeforeEach
 	void setup() {
 		this.authenticationRepository = Mockito.mock(AuthenticationRepository.class);

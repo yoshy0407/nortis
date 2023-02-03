@@ -1,6 +1,7 @@
 package org.nortis.test;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.nortis.infrastructure.ApplicationContextAccessor;
 import org.nortis.infrastructure.MessageSourceAccessor;
 import org.springframework.beans.BeansException;
@@ -31,10 +32,17 @@ public class NortisBaseTestConfiguration implements ApplicationContextAware {
 	 */
 	@PostConstruct
 	public void init() {
-		ApplicationContextAccessor.set(null);
 		ApplicationContextAccessor.set(applicationContext);
-		MessageSourceAccessor.set(null);
 		MessageSourceAccessor.set(applicationContext);		
+	}
+	
+	/**
+	 * 削除します
+	 */
+	@PreDestroy
+	public void destory() {
+		ApplicationContextAccessor.set(null);
+		MessageSourceAccessor.set(null);		
 	}
 	
 	/**
