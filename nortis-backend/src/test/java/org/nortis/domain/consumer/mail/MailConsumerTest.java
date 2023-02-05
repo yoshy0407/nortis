@@ -5,35 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
 import org.assertj.core.util.Lists;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.nortis.domain.consumer.mail.value.MailAddress;
 import org.nortis.domain.endpoint.value.EndpointId;
-import org.nortis.infrastructure.MessageSourceAccessor;
 import org.nortis.infrastructure.exception.DomainException;
-import org.nortis.test.NortisBaseTestConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
-		NortisBaseTestConfiguration.class
-})
 class MailConsumerTest {
 
-	@Autowired
-	MessageSource messageSource;
-	
-	@BeforeEach
-	void setup() {
-		MessageSourceAccessor.set(messageSource);
-	}
-	
 	@Test
-	void testAddMailAddress() {
+	void testAddMailAddress() throws DomainException {
 		MailConsumer mailConsumer = MailConsumer.create(
 				EndpointId.create("TEST_ID"), 
 				Lists.list(
@@ -52,7 +32,7 @@ class MailConsumerTest {
 	}
 
 	@Test
-	void testRemoveMailAddress() {
+	void testRemoveMailAddress() throws DomainException {
 		MailConsumer mailConsumer = MailConsumer.create(
 				EndpointId.create("TEST_ID"), 
 				Lists.list(
@@ -68,7 +48,7 @@ class MailConsumerTest {
 	}
 	
 	@Test
-	void testResetEndpointId() {
+	void testResetEndpointId() throws DomainException {
 		MailConsumer mailConsumer = MailConsumer.create(
 				EndpointId.create("TEST_ID"), 
 				Lists.list(
@@ -84,7 +64,7 @@ class MailConsumerTest {
 	}
 
 	@Test
-	void testCreate() {
+	void testCreate() throws DomainException {
 		MailConsumer mailConsumer = MailConsumer.create(
 				EndpointId.create("TEST_ID"), 
 				Lists.list(

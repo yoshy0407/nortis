@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.nortis.infrastructure.exception.UnexpectedException;
+import org.nortis.infrastructure.message.MessageCodes;
 
 /**
  * Velocityで実装した{@link TemplateRender}の実装です
@@ -27,7 +28,7 @@ public class VelocityTemplateRender implements TemplateRender {
 			this.velocityEngine.evaluate(new VelocityContext(parameter), writer, endpointId, templateText);
 			return writer.toString();
 		} catch (IOException ex) {
-			throw new UnexpectedException("MSG90003", ex);
+			throw new UnexpectedException(MessageCodes.nortis90003(), ex);
 		}
 	}
 

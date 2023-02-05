@@ -3,6 +3,8 @@ package org.nortis.infrastructure.mail;
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.nortis.infrastructure.message.MessageCode;
+import org.nortis.infrastructure.message.MessageCodes;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mail.MailException;
@@ -27,10 +29,12 @@ public class LogMailSendFailureHandler implements MailSendFailureHandler {
 	@Override
 	public void handleMessageError(MessagingException exception) {
 		if (log.isErrorEnabled()) {
+			MessageCode code = MessageCodes.nortis90001();
 			log.error(
 					messageSource.getMessage(
-							"MSG90001", 
-							new Object[] {}, 
+							code.getCode(), 
+							code.getArgs(),
+							code.getDefaultMessage(),
 							LocaleContextHolder.getLocale()), 
 					exception);
 		}
@@ -42,10 +46,12 @@ public class LogMailSendFailureHandler implements MailSendFailureHandler {
 	@Override
 	public void handleSendError(MailException exception) {
 		if (log.isErrorEnabled()) {
+			MessageCode code = MessageCodes.nortis90002();
 			log.error(
 					messageSource.getMessage(
-							"MSG90002", 
-							new Object[] {}, 
+							code.getCode(), 
+							code.getArgs(),
+							code.getDefaultMessage(),
 							LocaleContextHolder.getLocale()),
 					exception);					
 		}

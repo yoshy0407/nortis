@@ -12,6 +12,7 @@ import org.nortis.domain.event.ReceiveEventRepository;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.annotation.ApplicationService;
 import org.nortis.infrastructure.application.ApplicationTranslator;
+import org.nortis.infrastructure.exception.DomainException;
 
 
 /**
@@ -39,10 +40,11 @@ public class ReceiveEventApplicationService {
 	 * @param command 登録コマンド
 	 * @param translator 変換処理
 	 * @return 処理結果
+	 * @throws DomainException ドメインロジックエラー
 	 */
 	public <R> R register(
 			ReceiveEventRegisterCommand command,
-			ApplicationTranslator<ReceiveEvent, R> translator) {
+			ApplicationTranslator<ReceiveEvent, R> translator) throws DomainException {
 		TenantId tenantId = TenantId.create(command.tenantId());
 		EndpointId endpointId = EndpointId.create(command.endpointId());
 		
@@ -74,9 +76,10 @@ public class ReceiveEventApplicationService {
 	/**
 	 * 削除されたエンドポイントのイベントを受信済みに設定します
 	 * @param endpointId エンドポイントID
+	 * @throws DomainException ドメインロジックエラー
 	 */
 	public void subscribedByEndpointDeleted(
-			String endpointId) {
+			String endpointId) throws DomainException {
 		EndpointId id = EndpointId.create(endpointId);
 		List<ReceiveEvent> events = this.receiveEventRepository.notSubscribedEndpoint(id);
 		if (events.isEmpty()) {

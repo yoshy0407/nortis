@@ -3,10 +3,9 @@ package org.nortis.infrastructure.validation;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.nortis.infrastructure.MessageSourceAccessor;
 import org.nortis.infrastructure.exception.DomainException;
+import org.nortis.infrastructure.message.MessageCodes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,11 +16,6 @@ class ValidationsTest {
 
 	@Autowired
 	MessageSource messageSource;
-	
-	@BeforeEach
-	void setup() {
-		MessageSourceAccessor.set(messageSource);
-	}
 	
 	@Test
 	void testHasText() {
@@ -75,28 +69,28 @@ class ValidationsTest {
 	@Test
 	void testRegex() {
 		assertDoesNotThrow(() -> {
-			Validations.regex("123-0033", "^[0-9]{3}-[0-9]{4}$", "MSG10001");
+			Validations.regex("123-0033", "^[0-9]{3}-[0-9]{4}$", MessageCodes.nortis10001());
 		});
 	}
 
 	@Test
 	void testRegexError() {
 		assertThrows(DomainException.class, () -> {
-			Validations.regex("1123-0033", "^[0-9]{3}-[0-9]{4}$", "MSG10001");
+			Validations.regex("1123-0033", "^[0-9]{3}-[0-9]{4}$", MessageCodes.nortis10001());
 		});
 	}
 	
 	@Test
 	void testContains() {
 		assertDoesNotThrow(() -> {
-			Validations.contains("1234567", "1234", "MSG10001");
+			Validations.contains("1234567", "1234", MessageCodes.nortis10001());
 		});
 	}
 
 	@Test
 	void testContainsError() {
 		assertThrows(DomainException.class, () -> {
-			Validations.contains("1234567", "QWE", "MSG10001");
+			Validations.contains("1234567", "QWE", MessageCodes.nortis10001());
 		});
 	}
 

@@ -9,6 +9,7 @@ import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.endpoint.value.SendMessage;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.ApplicationContextAccessor;
+import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.template.TemplateRender;
 import org.nortis.infrastructure.validation.Validations;
 import org.seasar.doma.Column;
@@ -100,8 +101,9 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 	 * エンドポイント名を変更します
 	 * @param endpointName エンドポイント名
 	 * @param updateId 更新者ID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void changeEndpointName(String endpointName, String updateId) {
+	public void changeEndpointName(String endpointName, String updateId) throws DomainException {
 		setEndpointName(endpointName);
 		setUpdateId(updateId);
 		setUpdateDt(LocalDateTime.now());
@@ -111,8 +113,9 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 	 * サブジェクトテンプレート名を変更します
 	 * @param subjectTemplate サブジェクトテンプレート名
 	 * @param updateId 更新者ID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void changeSubjectTemplate(String subjectTemplate, String updateId) {
+	public void changeSubjectTemplate(String subjectTemplate, String updateId) throws DomainException {
 		setSubjectTemplate(subjectTemplate);
 		setUpdateId(updateId);
 		setUpdateDt(LocalDateTime.now());
@@ -122,8 +125,9 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 	 * メッセージテンプレート名を変更します
 	 * @param messageTemplate メッセージテンプレート名
 	 * @param updateId 更新者ID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void changeMessageTemplate(String messageTemplate, String updateId) {
+	public void changeMessageTemplate(String messageTemplate, String updateId) throws DomainException {
 		setMessageTemplate(messageTemplate);
 		setUpdateId(updateId);
 		setUpdateDt(LocalDateTime.now());
@@ -153,8 +157,9 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 	/**
 	 * エンドポイントID
 	 * @param endpointId エンドポイントID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setEndpointId(EndpointId endpointId) {
+	public void setEndpointId(EndpointId endpointId) throws DomainException {
 		Validations.notNull(endpointId, "エンドポイントID");
 		this.endpointId = endpointId;
 	}
@@ -162,8 +167,9 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 	/**
 	 * テナントID
 	 * @param tenantId テナントID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setTenantId(TenantId tenantId) {
+	public void setTenantId(TenantId tenantId) throws DomainException {
 		Validations.notNull(tenantId, "テナントID");
 		this.tenantId = tenantId;
 	}
@@ -171,8 +177,9 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 	/**
 	 * エンドポイント名
 	 * @param endpointName エンドポイント名
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setEndpointName(String endpointName) {
+	public void setEndpointName(String endpointName) throws DomainException {
 		Validations.hasText(endpointName, "エンドポイント名");
 		Validations.maxTextLength(endpointName, 50, "エンドポイント名");
 		this.endpointName = endpointName;
@@ -181,8 +188,9 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 	/**
 	 * サブジェクトテンプレート
 	 * @param subjectTemplate サブジェクトテンプレート
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setSubjectTemplate(String subjectTemplate) {
+	public void setSubjectTemplate(String subjectTemplate) throws DomainException {
 		Validations.hasText(subjectTemplate, "サブジェクトテンプレート");
 		Validations.maxTextLength(subjectTemplate, 100, "サブジェクトテンプレート");
 		this.subjectTemplate = subjectTemplate;
@@ -191,8 +199,9 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 	/**
 	 * メッセージテンプレート
 	 * @param messageTemplate メッセージテンプレート
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setMessageTemplate(String messageTemplate) {
+	public void setMessageTemplate(String messageTemplate) throws DomainException {
 		Validations.hasText(messageTemplate, "メッセージテンプレート");
 		this.messageTemplate = messageTemplate;
 	}
@@ -200,8 +209,9 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 	/**
 	 * 作成者IDを設定します
 	 * @param createId 作成者ID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setCreateId(String createId) {
+	public void setCreateId(String createId) throws DomainException {
 		Validations.hasText(createId, "作成者ID");
 		this.createId = createId;
 	}
@@ -209,8 +219,9 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 	/**
 	 * 作成日付を設定します
 	 * @param createDt 作成日付
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setCreateDt(LocalDateTime createDt) {
+	public void setCreateDt(LocalDateTime createDt) throws DomainException {
 		Validations.notNull(createDt, "作成日付");
 		this.createDt = createDt;
 	}
@@ -232,6 +243,7 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 	 * @param messageTemplate メッセージテンプレート
 	 * @param createId 作成者ID
 	 * @return 作成したエンドポイント
+	 * @throws DomainException ドメインロジックエラー
 	 */
 	public static Endpoint create(
 			EndpointId endpointId, 
@@ -239,7 +251,7 @@ public class Endpoint extends AbstractAggregateRoot<Endpoint> {
 			String endpointName, 
 			String subjectTemplate,
 			String messageTemplate,
-			String createId) {
+			String createId) throws DomainException {
 		Endpoint entity = new Endpoint();
 		entity.setEndpointId(endpointId);
 		entity.setTenantId(tenantId);

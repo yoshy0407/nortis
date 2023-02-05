@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.nortis.domain.authentication.value.ApiKey;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.domain.user.value.UserId;
+import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.validation.Validations;
 import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
@@ -39,8 +40,9 @@ public class Authentication {
 	/**
 	 * APIキーを設定します
 	 * @param apiKey APIキーを設定します
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setApiKey(ApiKey apiKey) {
+	public void setApiKey(ApiKey apiKey) throws DomainException {
 		Validations.notNull(apiKey, "APIキー");
 		this.apiKey = apiKey;
 	}
@@ -73,8 +75,9 @@ public class Authentication {
 	 * テナント用の認証を作成します
 	 * @param tenantId テナントID
 	 * @return 認証
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public static Authentication createFromTenant(TenantId tenantId) {
+	public static Authentication createFromTenant(TenantId tenantId) throws DomainException {
 		Validations.notNull(tenantId, "テナントID");
 		ApiKey apiKey = ApiKey.newKey();
 		Authentication authentication = new Authentication();
@@ -87,8 +90,9 @@ public class Authentication {
 	 * ユーザ用の認証を作成します
 	 * @param userId ユーザID
 	 * @return 認証
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public static Authentication createFromUserId(UserId userId) {
+	public static Authentication createFromUserId(UserId userId) throws DomainException {
 		Validations.notNull(userId, "ユーザID");
 		ApiKey apiKey = ApiKey.newKey();
 		Authentication authentication = new Authentication();

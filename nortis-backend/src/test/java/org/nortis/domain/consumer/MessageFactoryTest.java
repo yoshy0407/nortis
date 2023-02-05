@@ -10,6 +10,7 @@ import org.nortis.domain.endpoint.Endpoint;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.event.ReceiveEvent;
 import org.nortis.domain.tenant.value.TenantId;
+import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.template.VelocityTemplateRender;
 import org.nortis.test.MockApplicationContextAccessor;
 
@@ -31,7 +32,7 @@ class MessageFactoryTest {
 	}
 	
 	@Test
-	void testCreateMessage() {
+	void testCreateMessage() throws DomainException {
 		Endpoint endpoint = Endpoint.create(
 				EndpointId.create("TEST1"), 
 				TenantId.create("TENANT1"), 

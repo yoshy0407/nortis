@@ -15,6 +15,7 @@ import org.nortis.domain.consumer.Message;
 import org.nortis.domain.consumer.MessageConsumer;
 import org.nortis.domain.event.value.EventId;
 import org.nortis.infrastructure.config.DomaConfiguration;
+import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.test.DbUnitConfiguration;
 import org.nortis.test.DbUnitTableAssert;
 import org.nortis.test.NortisBaseTestConfiguration;
@@ -58,7 +59,7 @@ class ReceiveEventApplicationServiceTest {
 	Supplier<DbUnitTableAssert> assertFactory;
 	
 	@Test
-	void testRegister() throws DatabaseUnitException {
+	void testRegister() throws DatabaseUnitException, DomainException {
 		ReceiveEventRegisterCommand command = new ReceiveEventRegisterCommand(
 				"TEST1", 
 				"ENDPOINT1", 
@@ -103,7 +104,7 @@ class ReceiveEventApplicationServiceTest {
 	}
 
 	@Test
-	void testSubscribedByEndpointDeleted() throws DatabaseUnitException {		
+	void testSubscribedByEndpointDeleted() throws DatabaseUnitException, DomainException {		
 		this.receiveEventApplicationService.subscribedByEndpointDeleted("ENDPOINT3");
 
 		this.assertFactory.get()

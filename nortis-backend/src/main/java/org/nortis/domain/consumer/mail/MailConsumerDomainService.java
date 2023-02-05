@@ -10,6 +10,7 @@ import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.annotation.DomainService;
 import org.nortis.infrastructure.exception.DomainException;
+import org.nortis.infrastructure.message.MessageCodes;
 
 /**
  * メールコンシューマのドメインサービス
@@ -31,13 +32,14 @@ public class MailConsumerDomainService {
 	 * @param addressList メールアドレスのリスト
 	 * @param userId ユーザID
 	 * @return メールコンシューマ
+	 * @throws DomainException ドメインロジックエラー
 	 */
 	public MailConsumer createMailConsumer(TenantId tenantId, EndpointId endpointId, 
-			List<MailAddress> addressList, String userId) {		
+			List<MailAddress> addressList, String userId) throws DomainException {		
 		Optional<Endpoint> optEndpoint = this.endpointRepository.get(tenantId, endpointId);
 		
 		if (optEndpoint.isEmpty()) {
-			throw new DomainException("MSG20001");
+			throw new DomainException(MessageCodes.nortis20001());
 		}
 		
 		return MailConsumer.create(endpointId, addressList, userId);

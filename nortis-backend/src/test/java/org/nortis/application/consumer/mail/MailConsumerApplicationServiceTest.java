@@ -12,6 +12,7 @@ import org.nortis.domain.consumer.mail.value.ConsumerId;
 import org.nortis.domain.consumer.mail.value.MailAddress;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.infrastructure.config.DomaConfiguration;
+import org.nortis.infrastructure.exception.DomainException;
 import org.seasar.doma.boot.autoconfigure.DomaAutoConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.AutoConfigureDataJdbc;
@@ -46,7 +47,7 @@ class MailConsumerApplicationServiceTest {
 	MailConsumerRepository mailConsumerRepository;
 	
 	@Test
-	void testRegister() {
+	void testRegister() throws DomainException {
 		MailRegisterCommand command = new MailRegisterCommand("TEST1", "ENDPOINT1", Lists.list("test1@example.com"), "TEST_ID");
 		MailConsumer result = this.applicationService.register(command, data -> {
 			return data;
@@ -67,7 +68,7 @@ class MailConsumerApplicationServiceTest {
 	}
 
 	@Test
-	void testAddMailAddress() {
+	void testAddMailAddress() throws DomainException {
 		MailAddressAddCommand command = new MailAddressAddCommand(
 				"68E75233-7C82-40A6-A34D-CD5FD858EFA6", 
 				Lists.list("test2@example.com"),
@@ -90,7 +91,7 @@ class MailConsumerApplicationServiceTest {
 	}
 	
 	@Test
-	void testDeleteMailAddress() {
+	void testDeleteMailAddress() throws DomainException {
 		MailAddressDeleteCommand command = new MailAddressDeleteCommand(
 				"7E7BC9C2-133A-49E5-9B34-F52078D6056D", 
 				Lists.list("hoge@example.com"), 
@@ -114,7 +115,7 @@ class MailConsumerApplicationServiceTest {
 	}
 
 	@Test
-	void testDelete() {
+	void testDelete() throws DomainException {
 		this.applicationService
 			.delete("3AC62B43-D866-416C-B205-7EC601104F4A");
 		
@@ -124,7 +125,7 @@ class MailConsumerApplicationServiceTest {
 	}
 	
 	@Test
-	void testRemoveEndpointIdByEndpointDeleted() {
+	void testRemoveEndpointIdByEndpointDeleted() throws DomainException {
 		this.applicationService
 			.removeEndpointIdByEndpointDeleted("TEST1", "TEST_ID");
 

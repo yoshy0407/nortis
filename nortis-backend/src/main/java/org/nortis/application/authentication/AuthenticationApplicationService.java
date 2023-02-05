@@ -12,6 +12,7 @@ import org.nortis.domain.authentication.value.ApiKey;
 import org.nortis.domain.user.value.UserId;
 import org.nortis.infrastructure.annotation.ApplicationService;
 import org.nortis.infrastructure.application.ApplicationTranslator;
+import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.security.user.NortisUserDetails;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -35,8 +36,12 @@ public class AuthenticationApplicationService {
 	 * @param password パスワード
 	 * @param translator 変換クラス
 	 * @return 任意の型
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public <R> R login(String userId, String password, ApplicationTranslator<Authentication, R> translator) {
+	public <R> R login(
+			String userId, 
+			String password, 
+			ApplicationTranslator<Authentication, R> translator) throws DomainException {
 		Authentication auth = 
 				this.authenticationDomainService.login(UserId.create(userId), password);
 		return translator.translate(auth);
@@ -45,8 +50,9 @@ public class AuthenticationApplicationService {
 	/**
 	 * ログアウトを実施します
 	 * @param userId ユーザID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void logout(String userId) {
+	public void logout(String userId) throws DomainException {
 		this.authenticationDomainService.logout(UserId.create(userId));
 	}
 	
@@ -58,7 +64,13 @@ public class AuthenticationApplicationService {
 	 * @throws AuthenticationFailureException 認証失敗の場合
 	 */
 	public NortisUserDetails authenticateOf(String apiKey) throws AuthenticationFailureException, AuthenticationExpiredException {
-		return this.authenticationDomainService.authorizeOfApiKey(ApiKey.create(apiKey));
+		try {
+			return this.authenticationDomainService.authorizeOfApiKey(ApiKey.create(apiKey));
+		} catch (DomainException e) {
+			//桁数とかみて認証エラーメッセージを表示するのはよくないので、
+			//このまま認証エラーとする
+			throw new AuthenticationFailureException();
+		}
 	}
 	
 	/**

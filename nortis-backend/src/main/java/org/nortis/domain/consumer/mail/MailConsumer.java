@@ -10,6 +10,7 @@ import org.nortis.domain.consumer.mail.value.ConsumerId;
 import org.nortis.domain.consumer.mail.value.MailAddress;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.infrastructure.exception.DomainException;
+import org.nortis.infrastructure.message.MessageCodes;
 import org.nortis.infrastructure.validation.Validations;
 import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
@@ -93,11 +94,12 @@ public class MailConsumer {
 	/**
 	 * メールアドレスを追加します
 	 * @param address メールアドレス
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void addMailAddress(MailAddress address) {
+	public void addMailAddress(MailAddress address) throws DomainException {
 		for (MailInfo mailInfo : this.mailList) {
 			if (mailInfo.getMailAddress().equals(address)) {
-				throw new DomainException("MSG30003", address.toString());
+				throw new DomainException(MessageCodes.nortis30003(address.toString()));
 			}
 		}
 		MailInfo mailInfo = new MailInfo(this.consumerId, this.mailList.size() + 1, address);
@@ -130,8 +132,9 @@ public class MailConsumer {
 	/**
 	 * コンシューマIDを設定します
 	 * @param consumerId コンシューマID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setConsumerId(ConsumerId consumerId) {
+	public void setConsumerId(ConsumerId consumerId) throws DomainException {
 		Validations.notNull(consumerId, "コンシューマID");
 		this.consumerId = consumerId;
 	}
@@ -147,8 +150,9 @@ public class MailConsumer {
 	/**
 	 *  作成者IDを設定します
 	 * @param createId 作成者ID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setCreateId(String createId) {
+	public void setCreateId(String createId) throws DomainException {
 		Validations.hasText(createId, "作成者ID");
 		this.createId = createId;
 	}
@@ -156,8 +160,9 @@ public class MailConsumer {
 	/**
 	 * 作成日付を設定します
 	 * @param createDt 作成日付
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setCreateDt(LocalDateTime createDt) {
+	public void setCreateDt(LocalDateTime createDt) throws DomainException {
 		Validations.notNull(createDt, "作成日付");
 		this.createDt = createDt;
 	}
@@ -168,14 +173,15 @@ public class MailConsumer {
 	 * @param addressList 登録するアドレス
 	 * @param createId 作成者
 	 * @return 作成したオブジェクト
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public static MailConsumer create(EndpointId endpointId, List<MailAddress> addressList, String createId) {
+	public static MailConsumer create(EndpointId endpointId, List<MailAddress> addressList, String createId) throws DomainException {
 		MailConsumer entity = new MailConsumer();
 		ConsumerId consumerId = ConsumerId.createNew();
 		entity.setConsumerId(consumerId);
 		entity.setEndpointId(endpointId);
 		if (addressList == null || addressList.isEmpty()) {
-			throw new DomainException("MSG30004");
+			throw new DomainException(MessageCodes.nortis30004());
 		}
 		for (MailAddress address : addressList) {
 			entity.addMailAddress(address);

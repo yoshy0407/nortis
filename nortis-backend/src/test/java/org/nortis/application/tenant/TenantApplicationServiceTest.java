@@ -13,6 +13,7 @@ import org.nortis.domain.tenant.TenantRepository;
 import org.nortis.domain.tenant.event.TenantDeletedEvent;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.config.DomaConfiguration;
+import org.nortis.infrastructure.exception.DomainException;
 import org.seasar.doma.boot.autoconfigure.DomaAutoConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.AutoConfigureDataJdbc;
@@ -46,7 +47,7 @@ class TenantApplicationServiceTest {
 	AuthenticationRepository authenticationRepository;
 	
 	@Test
-	void testRegister() {
+	void testRegister() throws DomainException {
 		TenantRegisterCommand command = new TenantRegisterCommand("TENANT1", "登録テナント", "TEST_ID");
 		TenantId tenantId = tenantApplicationService
 				.register(command, data -> data.getTenantId());
@@ -65,7 +66,7 @@ class TenantApplicationServiceTest {
 	}
 
 	@Test
-	void testCreateApiKey() {
+	void testCreateApiKey() throws DomainException {
 		ApiKey apiKey = tenantApplicationService.createApiKey("TEST2");
 		
 		Optional<Authentication> optAuth = authenticationRepository.get(apiKey);
@@ -79,7 +80,7 @@ class TenantApplicationServiceTest {
 	}
 	
 	@Test
-	void testChangeName() {
+	void testChangeName() throws DomainException {
 		TenantNameUpdateCommand command = new TenantNameUpdateCommand("TEST2", "テストテナント", "USER_ID");
 		TenantId tenantId = tenantApplicationService
 				.changeName(command, data -> data.getTenantId());
@@ -98,14 +99,14 @@ class TenantApplicationServiceTest {
 	}
 		
 	@Test
-	void testDelete() {
+	void testDelete() throws DomainException {
 		tenantApplicationService.delete("TEST3", "USER_ID");
 
 		Optional<Tenant> optTenant = this.tenantRepository.get(TenantId.create("TEST3"));
 		assertThat(optTenant).isEmpty();	
 		
 		this.applicationEvents.stream(TenantDeletedEvent.class).forEach(event -> {
-			assertThat(event.getTenantId()).isEqualTo(TenantId.create("TEST3"));
+			assertThat(event.getTenantId().toString()).isEqualTo("TEST3");
 			assertThat(event.getUpdateUserId()).isEqualTo("USER_ID");
 		});
 	}

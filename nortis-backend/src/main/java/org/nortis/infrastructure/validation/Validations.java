@@ -2,6 +2,8 @@ package org.nortis.infrastructure.validation;
 
 import java.util.regex.Pattern;
 import org.nortis.infrastructure.exception.DomainException;
+import org.nortis.infrastructure.message.MessageCode;
+import org.nortis.infrastructure.message.MessageCodes;
 import org.springframework.util.StringUtils;
 
 /**
@@ -24,9 +26,9 @@ public final class Validations {
 	 * @param valueName 値の名前
 	 * @throws DomainException 空文字の場合
 	 */
-	public static void hasText(String text, String valueName) {
+	public static void hasText(String text, String valueName) throws DomainException {
 		if (!StringUtils.hasText(text)) {
-			throw new DomainException("MSG00001", valueName);
+			throw new DomainException(MessageCodes.nortis00001(valueName));
 		}
 	}
 	
@@ -37,9 +39,9 @@ public final class Validations {
 	 * @param valueName 値の名前
 	 * @throws DomainException 文字数以上の場合
 	 */
-	public static void maxTextLength(String text, int length, String valueName) {
+	public static void maxTextLength(String text, int length, String valueName) throws DomainException {
 		if (text.length() > length) {
-			throw new DomainException("MSG00002", valueName, length);
+			throw new DomainException(MessageCodes.nortis00002(valueName, length));
 		}
 	}
 	
@@ -49,9 +51,9 @@ public final class Validations {
 	 * @param valueName 値の名前
 	 * @throws DomainException nullの場合
 	 */
-	public static void notNull(Object obj, String valueName) {
+	public static void notNull(Object obj, String valueName) throws DomainException {
 		if (obj == null) {
-			throw new DomainException("MSG00001", valueName);			
+			throw new DomainException(MessageCodes.nortis00001(valueName));			
 		}
 	}
 	
@@ -59,13 +61,12 @@ public final class Validations {
 	 * 正規表現によるチェックを実施します
 	 * @param text テキスト
 	 * @param regex 正規表現
-	 * @param messageId メッセージID
-	 * @param args 引数
+	 * @param messageCode {@link MessageCode}
 	 * @throws DomainException 正規表現に一致しない場合
 	 */
-	public static void regex(String text, String regex, String messageId, Object... args) {
+	public static void regex(String text, String regex, MessageCode messageCode) throws DomainException {
 		if (!Pattern.matches(regex, text)) {
-			throw new DomainException(messageId, args);
+			throw new DomainException(messageCode);
 		}
 	}
 	
@@ -73,13 +74,12 @@ public final class Validations {
 	 * 文字列が含まれているかチェックします
 	 * @param text テキスト
 	 * @param containText チェックする文字列
-	 * @param messageId メッセージID
-	 * @param args 引数
+	 * @param messageCode {@link MessageCode}
+	 * @throws DomainException 文字列が含まれない場合
 	 */
-	public static void contains(String text, String containText, 
-			String messageId, Object... args) {
+	public static void contains(String text, String containText, MessageCode messageCode) throws DomainException {
 		if (!text.contains(containText)) {
-			throw new DomainException(messageId, args);			
+			throw new DomainException(messageCode);			
 		}
 	}
 	

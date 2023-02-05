@@ -25,6 +25,7 @@ import org.nortis.domain.consumer.Message;
 import org.nortis.domain.consumer.mail.value.MailAddress;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.tenant.value.TenantId;
+import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.mail.MailSendFailureHandler;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -53,7 +54,7 @@ class MailSendMessageConsumerTest {
 	}
 
 	@Test
-	void testSend() throws MessagingException, IOException {
+	void testSend() throws MessagingException, IOException, DomainException {
 
 		List<MailConsumer> mailConsumerList = new ArrayList<>();
 		mailConsumerList.add(MailConsumer.create(
@@ -100,7 +101,7 @@ class MailSendMessageConsumerTest {
 	}
 
 	@Test
-	void testSendError() {		
+	void testSendError() throws DomainException {		
 		List<MailConsumer> mailConsumerList = new ArrayList<>();
 		mailConsumerList.add(MailConsumer.create(
 				EndpointId.create("ENDPOINT1"), 

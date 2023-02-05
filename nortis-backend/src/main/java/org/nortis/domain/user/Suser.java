@@ -13,6 +13,7 @@ import org.nortis.domain.user.value.LoginFlg;
 import org.nortis.domain.user.value.UserId;
 import org.nortis.infrastructure.ApplicationContextAccessor;
 import org.nortis.infrastructure.exception.DomainException;
+import org.nortis.infrastructure.message.MessageCodes;
 import org.nortis.infrastructure.utils.RandomString;
 import org.nortis.infrastructure.validation.Validations;
 import org.seasar.doma.Column;
@@ -77,8 +78,9 @@ public class Suser {
 	 * ユーザ名を変更します
 	 * @param username ユーザ名
 	 * @param userId 更新者ID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void changeUsername(String username, String userId) {
+	public void changeUsername(String username, String userId) throws DomainException {
 		setUsername(username);
 		setUpdateId(userId);
 		setUpdateDt(LocalDateTime.now());
@@ -88,8 +90,9 @@ public class Suser {
 	 * パスワードを変更します
 	 * @param password パスワード
 	 * @param userId 更新者ID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void changePassword(String password, String userId) {
+	public void changePassword(String password, String userId) throws DomainException {
 		setPassword(password);
 		setUpdateId(userId);
 		setUpdateDt(LocalDateTime.now());
@@ -99,8 +102,9 @@ public class Suser {
 	 * パスワードをリセットします
 	 * @param userId ユーザID
 	 * @return リセット後のパスワード
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public String resetPassword(String userId) {
+	public String resetPassword(String userId) throws DomainException {
 		String password = RandomString.of(15).build();
 		changePassword(
 				password,
@@ -111,8 +115,9 @@ public class Suser {
 	/**
 	 * ログインを実施します
 	 * @return ログインで発行した認証オブジェクト
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public Authentication login() {
+	public Authentication login() throws DomainException {
 		setLoginFlg(LoginFlg.LOGIN);
 		setUpdateId(this.userId.toString());
 		setUpdateDt(LocalDateTime.now());
@@ -121,8 +126,9 @@ public class Suser {
 
 	/**
 	 * ログアウトします
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void logout() {
+	public void logout() throws DomainException {
 		setLoginFlg(LoginFlg.NOT_LOGIN);
 		setUpdateId(this.updateId);
 		setUpdateDt(LocalDateTime.now());
@@ -131,8 +137,9 @@ public class Suser {
 	/**
 	 * ユーザIDを設定します
 	 * @param userId ユーザID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setUserId(UserId userId) {
+	public void setUserId(UserId userId) throws DomainException {
 		Validations.notNull(userId, "ユーザID");
 		this.userId = userId;
 	}
@@ -140,21 +147,23 @@ public class Suser {
 	/**
 	 * APIキーを作成します
 	 * @return 認証オブジェクト
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public Authentication createApiKey() {
+	public Authentication createApiKey() throws DomainException {
 		return Authentication.createFromUserId(this.userId);
 	}
 
 	/**
 	 * テナント権限を追加します
 	 * @param tenantId テナントID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void grantTenantAccressOf(TenantId tenantId) {
+	public void grantTenantAccressOf(TenantId tenantId) throws DomainException {
 		Optional<TenantUser> result = this.tenantUserList.stream()
 				.filter(tenant -> tenant.getTenantId().equals(tenantId))
 				.findFirst();
 		if (result.isPresent()) {
-			throw new DomainException("MSG50001", tenantId.toString());
+			throw new DomainException(MessageCodes.nortis50001(tenantId.toString()));
 		}
 		TenantUser tenantUser = new TenantUser(this.userId, tenantId);
 		tenantUser.setInsert(true);
@@ -164,13 +173,14 @@ public class Suser {
 	/**
 	 * テナント権限を削除します
 	 * @param tenantId テナントID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void revokeTenantAccessOf(TenantId tenantId) {
+	public void revokeTenantAccessOf(TenantId tenantId) throws DomainException {
 		Optional<TenantUser> result = this.tenantUserList.stream()
 				.filter(tenant -> tenant.getTenantId().equals(tenantId))
 				.findFirst();
 		if (result.isEmpty()) {
-			throw new DomainException("MSG50002", tenantId.toString());
+			throw new DomainException(MessageCodes.nortis50002(tenantId.toString()));
 		}
 		result.get().setDeleted(true);
 	}
@@ -178,8 +188,9 @@ public class Suser {
 	/**
 	 * ユーザ名を設定します
 	 * @param username ユーザ名
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setUsername(String username) {
+	public void setUsername(String username) throws DomainException {
 		Validations.hasText(username, "ユーザ名");
 		Validations.maxTextLength(username, 50, "ユーザ名");
 		this.username = username;
@@ -188,8 +199,9 @@ public class Suser {
 	/**
 	 * パスワードを設定します
 	 * @param encodedPassword パスワード
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setEncodedPassword(String encodedPassword) {
+	public void setEncodedPassword(String encodedPassword) throws DomainException {
 		Validations.hasText(encodedPassword, "パスワード");
 		this.encodedPassword = encodedPassword;
 	}
@@ -197,8 +209,9 @@ public class Suser {
 	/**
 	 * パスワードを設定します
 	 * @param password パスワード
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	protected void setPassword(String password) {
+	protected void setPassword(String password) throws DomainException {
 		Validations.hasText(password, "パスワード");
 		String encodedPassword = ApplicationContextAccessor.getPasswordEncoder().encode(password);
 		setEncodedPassword(encodedPassword);
@@ -207,8 +220,9 @@ public class Suser {
 	/**
 	 * 管理者フラグを設定します
 	 * @param adminFlg 管理者フラグ
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setAdminFlg(AdminFlg adminFlg) {
+	public void setAdminFlg(AdminFlg adminFlg) throws DomainException {
 		Validations.notNull(adminFlg, "管理者フラグ");
 		this.adminFlg = adminFlg;
 	}
@@ -216,8 +230,9 @@ public class Suser {
 	/**
 	 * ログインフラグを設定します
 	 * @param loginFlg ログインフラグ
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setLoginFlg(LoginFlg loginFlg) {
+	public void setLoginFlg(LoginFlg loginFlg) throws DomainException {
 		Validations.notNull(loginFlg, "ログインフラグ");
 		this.loginFlg = loginFlg;
 	}
@@ -225,8 +240,9 @@ public class Suser {
 	/**
 	 * 作成者IDを設定します
 	 * @param createId 作成者ID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setCreateId(String createId) {
+	public void setCreateId(String createId) throws DomainException {
 		Validations.hasText(encodedPassword, "作成者ID");
 		this.createId = createId;
 	}
@@ -234,8 +250,9 @@ public class Suser {
 	/**
 	 * 作成時刻を設定します
 	 * @param createDt 作成時刻
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setCreateDt(LocalDateTime createDt) {
+	public void setCreateDt(LocalDateTime createDt) throws DomainException {
 		Validations.notNull(createDt, "作成時刻");
 		this.createDt = createDt;
 	}
@@ -248,13 +265,14 @@ public class Suser {
 	 * @param tenantIds 紐付けるテナントのID
 	 * @param createUserId 作成者ID
 	 * @return ユーザ
+	 * @throws DomainException ドメインロジックエラー
 	 */
 	public static Suser createMember(
 			UserId userId,
 			String username,
 			String password,
 			List<TenantId> tenantIds,
-			String createUserId) {
+			String createUserId) throws DomainException {
 		Suser suser = new Suser();
 		suser.setUserId(userId);
 		suser.setUsername(username);
@@ -277,12 +295,13 @@ public class Suser {
 	 * @param password パスワード
 	 * @param createUserId 作成者ID
 	 * @return ユーザ
+	 * @throws DomainException ドメインロジックエラー
 	 */
 	public static Suser createAdmin(
 			UserId userId,
 			String username,
 			String password,
-			String createUserId) {
+			String createUserId) throws DomainException {
 		Suser suser = new Suser();
 		suser.setUserId(userId);
 		suser.setUsername(username);

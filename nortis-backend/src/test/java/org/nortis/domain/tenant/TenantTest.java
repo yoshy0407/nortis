@@ -4,37 +4,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.nortis.domain.authentication.Authentication;
 import org.nortis.domain.endpoint.Endpoint;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.tenant.value.TenantId;
-import org.nortis.infrastructure.MessageSourceAccessor;
 import org.nortis.infrastructure.exception.DomainException;
-import org.nortis.test.NortisBaseTestConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
-		NortisBaseTestConfiguration.class
-})
 class TenantTest {
 
 	@Autowired
 	MessageSource messageSource;
 
-	@BeforeEach
-	void setup() {
-		MessageSourceAccessor.set(messageSource);
-	}
-
 	@Test
-	void testChangeTenantName() {
+	void testChangeTenantName() throws DomainException {
 		Tenant tenant = Tenant.create(TenantId.create("TEST1"), "TEST1 Tenant", "TEST_ID");
 
 		tenant.changeTenantName("TEST11 Tenant", "TEST_ID2");
@@ -50,7 +35,7 @@ class TenantTest {
 	}
 
 	@Test
-	void testCreateEndpoint() {
+	void testCreateEndpoint() throws DomainException {
 		Tenant tenant = Tenant.create(TenantId.create("TEST1"), "TEST1 Tenant", "TEST_ID");
 
 		Endpoint endpoint = tenant.createEndpoint(
@@ -73,7 +58,7 @@ class TenantTest {
 	}
 
 	@Test
-	void testDeleted() {
+	void testDeleted() throws DomainException {
 		Tenant tenant = Tenant.create(TenantId.create("TEST1"), "TEST1 Tenant", "TEST_ID");
 
 		tenant.deleted("USER_ID");
@@ -83,7 +68,7 @@ class TenantTest {
 	}
 
 	@Test
-	void testCreate() {
+	void testCreate() throws DomainException {
 		Tenant tenant = Tenant.create(TenantId.create("TEST"), "TEST TENANT", "TEST_ID");
 
 		assertThat(tenant.getTenantId()).isEqualTo(TenantId.create("TEST"));
@@ -96,7 +81,7 @@ class TenantTest {
 	}
 	
 	@Test
-	void testCreateApiKey() {
+	void testCreateApiKey() throws DomainException {
 		Tenant tenant = Tenant.create(TenantId.create("TEST"), "TEST TENANT", "TEST_ID");
 		Authentication auth = tenant.createApiKey();
 		

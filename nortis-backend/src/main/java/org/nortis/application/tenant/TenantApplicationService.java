@@ -11,6 +11,7 @@ import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.annotation.ApplicationService;
 import org.nortis.infrastructure.application.ApplicationTranslator;
 import org.nortis.infrastructure.exception.DomainException;
+import org.nortis.infrastructure.message.MessageCodes;
 
 /**
  * テナントのアプリケーションサービスです
@@ -35,10 +36,11 @@ public class TenantApplicationService {
 	 * @param command 登録コマンド
 	 * @param translator 変換処理
 	 * @return 処理結果
+	 * @throws DomainException ドメインロジックエラー
 	 */
 	public <R> R register(
 			TenantRegisterCommand command,
-			ApplicationTranslator<Tenant, R> translator) {
+			ApplicationTranslator<Tenant, R> translator) throws DomainException {
 		
 		TenantId tenantId = TenantId.create(command.tenantId());
 		Tenant tenant = this.tenantDomainService.createTenant(
@@ -53,13 +55,14 @@ public class TenantApplicationService {
 	 * テナントのAPIキーを作成します
 	 * @param rawTenantId テナントID
 	 * @return APIキー
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public ApiKey createApiKey(String rawTenantId) {
+	public ApiKey createApiKey(String rawTenantId) throws DomainException {
 		TenantId tenantId = TenantId.create(rawTenantId);
 		
 		Optional<Tenant> optTenant = this.tenantRepository.get(tenantId);
 		if (optTenant.isEmpty()) {
-			throw new DomainException("MSG10003");
+			throw new DomainException(MessageCodes.nortis10003());
 		}
 		
 		return this.authenticationDomainService.createApiKeyOf(optTenant.get());
@@ -71,16 +74,17 @@ public class TenantApplicationService {
 	 * @param command テナント名更新のコマンド
 	 * @param translator 変換処理
 	 * @return 処理結果
+	 * @throws DomainException ドメインロジックエラー
 	 */
 	public <R> R changeName(
 			TenantNameUpdateCommand command,
-			ApplicationTranslator<Tenant, R> translator) {
+			ApplicationTranslator<Tenant, R> translator) throws DomainException {
 		
 		TenantId tenantId = TenantId.create(command.tenantId());
 
 		Optional<Tenant> optTenant = this.tenantRepository.get(tenantId);
 		if (optTenant.isEmpty()) {
-			throw new DomainException("MSG10003");
+			throw new DomainException(MessageCodes.nortis10003());
 		}
 		
 		Tenant tenant = optTenant.get();
@@ -96,13 +100,14 @@ public class TenantApplicationService {
 	 * テナントを削除します
 	 * @param rawTenantId テナントID
 	 * @param userId ユーザID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void delete(String rawTenantId, String userId) {
+	public void delete(String rawTenantId, String userId) throws DomainException {
 		TenantId tenantId = TenantId.create(rawTenantId);
 		
 		Optional<Tenant> optTenant = this.tenantRepository.get(tenantId);
 		if (optTenant.isEmpty()) {
-			throw new DomainException("MSG10003");
+			throw new DomainException(MessageCodes.nortis10003());
 		}
 		Tenant tenant = optTenant.get();
 		tenant.deleted(userId);

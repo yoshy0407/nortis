@@ -16,7 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class UserIdTest {
 
 	@Test
-	void testHashCodeTrue() {
+	void testHashCodeTrue() throws DomainException {
 		UserId userId1 = UserId.create("0000000001");
 		UserId userId2 = UserId.create("0000000001");
 		
@@ -24,7 +24,7 @@ class UserIdTest {
 	}
 
 	@Test
-	void testHashCodeFalse() {
+	void testHashCodeFalse() throws DomainException {
 		UserId userId1 = UserId.create("0000000001");
 		UserId userId2 = UserId.create("0000000010");
 		
@@ -32,7 +32,7 @@ class UserIdTest {
 	}
 
 	@Test
-	void testToString() {
+	void testToString() throws DomainException {
 		assertThat(UserId.create("0000000001").toString()).isEqualTo("0000000001");
 	}
 
@@ -58,7 +58,7 @@ class UserIdTest {
 	}
 
 	@Test
-	void testEqualsTrue() {
+	void testEqualsTrue() throws DomainException {
 		UserId userId1 = UserId.create("0000000001");
 		UserId userId2 = UserId.create("0000000001");
 		
@@ -66,7 +66,7 @@ class UserIdTest {
 	}
 
 	@Test
-	void testEqualsFalse() {
+	void testEqualsFalse() throws DomainException {
 		UserId userId1 = UserId.create("0000000001");
 		UserId userId2 = UserId.create("0000000010");
 		

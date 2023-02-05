@@ -10,6 +10,7 @@ import org.nortis.domain.tenant.TenantRepository;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.annotation.DomainService;
 import org.nortis.infrastructure.exception.DomainException;
+import org.nortis.infrastructure.message.MessageCodes;
 
 
 /**
@@ -30,11 +31,12 @@ public class ReceiveEventCheckDomainService {
 	 * 登録前のチェック処理を実施します
 	 * @param tenantId テナントID
 	 * @param endpointId エンドポイントID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void checkBeforeRegister(TenantId tenantId, EndpointId endpointId) {
+	public void checkBeforeRegister(TenantId tenantId, EndpointId endpointId) throws DomainException {
 		Optional<Tenant> tenant = this.tenantRepository.get(tenantId);
 		if (tenant.isEmpty()) {
-			throw new DomainException("MSG10003");
+			throw new DomainException(MessageCodes.nortis10003());
 		}
 		Optional<Endpoint> endpoint = this.endpointRepository.get(tenantId, endpointId);
 		if (endpoint.isEmpty()) {

@@ -12,6 +12,7 @@ import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.domain.user.value.AdminFlg;
 import org.nortis.domain.user.value.LoginFlg;
 import org.nortis.domain.user.value.UserId;
+import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.test.MockApplicationContextAccessor;
 
 class SuserTest {
@@ -23,7 +24,7 @@ class SuserTest {
 	}
 	
 	@Test
-	void testChangeUsername() {
+	void testChangeUsername() throws DomainException {
 		Suser suser = Suser.createMember(
 				UserId.create("0000000001"), 
 				"テストユーザ",
@@ -42,7 +43,7 @@ class SuserTest {
 	}
 
 	@Test
-	void testChangePassword() {
+	void testChangePassword() throws DomainException {
 		Suser suser = Suser.createMember(
 				UserId.create("0000000001"), 
 				"テストユーザ",
@@ -61,7 +62,7 @@ class SuserTest {
 	}
 
 	@Test
-	void testResetPassword() {
+	void testResetPassword() throws DomainException {
 		Suser suser = Suser.createMember(
 				UserId.create("0000000001"), 
 				"テストユーザ",
@@ -81,7 +82,7 @@ class SuserTest {
 	}
 
 	@Test
-	void testLogin() {
+	void testLogin() throws DomainException {
 		Suser suser = Suser.createMember(
 				UserId.create("0000000001"), 
 				"テストユーザ",
@@ -101,7 +102,7 @@ class SuserTest {
 	}
 
 	@Test
-	void testLogout() {
+	void testLogout() throws DomainException {
 		Suser suser = Suser.createMember(
 				UserId.create("0000000001"), 
 				"テストユーザ",
@@ -119,7 +120,7 @@ class SuserTest {
 	}
 
 	@Test
-	void testCreateApiKey() {
+	void testCreateApiKey() throws DomainException {
 		Suser suser = Suser.createMember(
 				UserId.create("0000000001"), 
 				"テストユーザ",
@@ -135,7 +136,7 @@ class SuserTest {
 	}
 
 	@Test
-	void testGrantTenantAccressOf() {
+	void testGrantTenantAccressOf() throws DomainException {
 		Suser suser = Suser.createMember(
 				UserId.create("0000000001"), 
 				"テストユーザ",
@@ -147,7 +148,7 @@ class SuserTest {
 
 		assertThat(suser.getTenantUserList()).hasSize(3);
 		Optional<TenantUser> optTenantUser = suser.getTenantUserList().stream()
-				.filter(data -> data.getTenantId().equals(TenantId.create("TEST4")))
+				.filter(data -> data.getTenantId().toString().equals("TEST4"))
 				.findFirst();
 		
 		assertThat(optTenantUser).isPresent();
@@ -157,7 +158,7 @@ class SuserTest {
 	}
 
 	@Test
-	void testRevokeTenantAccessOf() {
+	void testRevokeTenantAccessOf() throws DomainException {
 		Suser suser = Suser.createMember(
 				UserId.create("0000000001"), 
 				"テストユーザ",
@@ -170,7 +171,7 @@ class SuserTest {
 		assertThat(suser.getTenantUserList()).hasSize(2);
 
 		Optional<TenantUser> optTenantUser = suser.getTenantUserList().stream()
-				.filter(data -> data.getTenantId().equals(TenantId.create("TEST2")))
+				.filter(data -> data.getTenantId().toString().equals("TEST2"))
 				.findFirst();
 		
 		assertThat(optTenantUser).isPresent();
@@ -178,7 +179,7 @@ class SuserTest {
 	}
 
 	@Test
-	void testCreateMember() {
+	void testCreateMember() throws DomainException {
 		Suser suser = Suser.createMember(
 				UserId.create("0000000001"), 
 				"テストユーザ",
@@ -209,7 +210,7 @@ class SuserTest {
 	}
 
 	@Test
-	void testCreateAdmin() {
+	void testCreateAdmin() throws DomainException {
 		Suser suser = Suser.createAdmin(
 				UserId.create("0000000001"), 
 				"テストユーザ",

@@ -3,10 +3,8 @@ package org.nortis.domain.tenant.value;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.nortis.infrastructure.MessageSourceAccessor;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.test.NortisBaseTestConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +21,8 @@ class TenantIdTest {
 	@Autowired
 	MessageSource messageSource;
 	
-	@BeforeEach
-	void setup() {
-		MessageSourceAccessor.set(messageSource);
-	}
-	
 	@Test
-	void testHashCodeEqual() {
+	void testHashCodeEqual() throws DomainException {
 		TenantId id1 = TenantId.create("TEST1");
 		TenantId id2 = TenantId.create("TEST1");
 		
@@ -37,7 +30,7 @@ class TenantIdTest {
 	}
 
 	@Test
-	void testHashCodeNotEqual() {
+	void testHashCodeNotEqual() throws DomainException {
 		TenantId id1 = TenantId.create("TEST1");
 		TenantId id2 = TenantId.create("TEST2");
 		
@@ -45,14 +38,14 @@ class TenantIdTest {
 	}
 
 	@Test
-	void testToString() {
+	void testToString() throws DomainException {
 		TenantId id1 = TenantId.create("TEST1");
 	
 		assertThat(id1.toString()).isEqualTo("TEST1");
 	}
 
 	@Test
-	void testEquals() {
+	void testEquals() throws DomainException {
 		TenantId id1 = TenantId.create("TEST1");
 		TenantId id2 = TenantId.create("TEST1");
 		
@@ -60,7 +53,7 @@ class TenantIdTest {
 	}
 
 	@Test
-	void testNotEquals() {
+	void testNotEquals() throws DomainException {
 		TenantId id1 = TenantId.create("TEST1");
 		TenantId id2 = TenantId.create("TEST2");
 		

@@ -5,11 +5,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.domain.user.value.UserId;
+import org.nortis.infrastructure.exception.DomainException;
 
 class AuthenticationTest {
 
 	@Test
-	void testCreateFromTenant() {
+	void testCreateFromTenant() throws DomainException {
 		Authentication auth = Authentication.createFromTenant(TenantId.create("TEST1"));
 		
 		assertThat(auth.getApiKey()).isNotNull();
@@ -18,7 +19,7 @@ class AuthenticationTest {
 	}
 
 	@Test
-	void testCreateFromUserId() {
+	void testCreateFromUserId() throws DomainException {
 		Authentication auth = Authentication.createFromUserId(UserId.create("23456"));
 		
 		assertThat(auth.getApiKey()).isNotNull();

@@ -3,6 +3,7 @@ package org.nortis.port.event;
 import lombok.AllArgsConstructor;
 import org.nortis.application.event.ReceiveEventApplicationService;
 import org.nortis.application.event.ReceiveEventRegisterCommand;
+import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.security.user.NortisUserDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,13 +32,14 @@ public class ReceiveEventRestController {
 	 * @param jsonBody パラメータのJSON
 	 * @param user 認証済みユーザ
 	 * @return 登録情報レスポンス
+	 * @throws DomainException ドメインロジックエラー
 	 */
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping("/{endpointId}")
 	public EventRegisterResponse register(
 			@PathVariable("endpointId") String endpointId,
 			@RequestBody String jsonBody,
-			@AuthenticationPrincipal NortisUserDetails user) {
+			@AuthenticationPrincipal NortisUserDetails user) throws DomainException {
 		//:TODO ここで
 		ReceiveEventRegisterCommand command = 
 				new ReceiveEventRegisterCommand(user.getTenantId()[0], endpointId, jsonBody);

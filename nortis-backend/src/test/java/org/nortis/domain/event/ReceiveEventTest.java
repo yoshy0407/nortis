@@ -5,19 +5,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.event.value.Subscribed;
 import org.nortis.domain.tenant.value.TenantId;
+import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.test.MockApplicationContextAccessor;
-import org.nortis.test.NortisBaseTestConfiguration;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
-		NortisBaseTestConfiguration.class
-})
 class ReceiveEventTest {
 
 	@BeforeEach
@@ -27,7 +20,7 @@ class ReceiveEventTest {
 	}
 	
 	@Test
-	void testSubscribed() {
+	void testSubscribed() throws DomainException {
 		ReceiveEvent receiveEvent = ReceiveEvent.create(
 				TenantId.create("tenantId"), 
 				EndpointId.create("endpoint1"), 
@@ -39,7 +32,7 @@ class ReceiveEventTest {
 	}
 
 	@Test
-	void testCreate() {
+	void testCreate() throws DomainException {
 		ReceiveEvent receiveEvent = ReceiveEvent.create(
 				TenantId.create("tenantId"), 
 				EndpointId.create("endpoint1"), 

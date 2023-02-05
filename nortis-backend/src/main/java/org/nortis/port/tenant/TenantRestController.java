@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.nortis.application.tenant.TenantApplicationService;
 import org.nortis.application.tenant.TenantNameUpdateCommand;
 import org.nortis.application.tenant.TenantRegisterCommand;
+import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.security.user.NortisUserDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -49,12 +50,13 @@ public class TenantRestController {
 	 * @param req リクエストボディ
 	 * @param userDetails 認証済みユーザ
 	 * @return 作成したテナントリソース
+	 * @throws DomainException ドメインロジックエラー
 	 */
 	@ResponseStatus(code = HttpStatus.CREATED)
 	@PostMapping
 	public TenantResource post(
 			@RequestBody TenantRequest req, 
-			@AuthenticationPrincipal NortisUserDetails userDetails) {
+			@AuthenticationPrincipal NortisUserDetails userDetails) throws DomainException {
 		TenantRegisterCommand command = new TenantRegisterCommand(req.tenantId(), req.tenantName(), userDetails.getUsername());
 		return this.tenantApplicationService.register(command, data -> {
 			return new TenantResource(data.getTenantId().toString(), data.getTenantName());
@@ -66,11 +68,12 @@ public class TenantRestController {
 	 * @param tenantId テナントID
 	 * @param req リクエストボディ
 	 * @return 変更したテナントリソース
+	 * @throws DomainException ドメインロジックエラー
 	 */
 	@PatchMapping("{tenantId}")
 	public TenantResource patch(
 			@PathVariable(name = "tenantId", required = true) String tenantId,
-			@RequestBody TenantPatchRequest req) {
+			@RequestBody TenantPatchRequest req) throws DomainException {
 		TenantNameUpdateCommand command = new TenantNameUpdateCommand(tenantId, req.name(), null);
 		return this.tenantApplicationService.changeName(command, data -> {
 			return new TenantResource(data.getTenantId().toString(), data.getTenantName());
@@ -80,10 +83,11 @@ public class TenantRestController {
 	/**
 	 * テナントを削除します
 	 * @param tenantId テナントID
+	 * @throws DomainException ドメインロジックエラー
 	 */
 	@ResponseStatus(code = HttpStatus.NO_CONTENT)
 	@DeleteMapping
-	public void delete(@PathVariable(name = "tenantId", required = true) String tenantId) {
+	public void delete(@PathVariable(name = "tenantId", required = true) String tenantId) throws DomainException {
 		this.tenantApplicationService.delete(tenantId, null);
 	}
 	

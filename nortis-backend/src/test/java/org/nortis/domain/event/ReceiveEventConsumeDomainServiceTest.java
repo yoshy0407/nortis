@@ -20,6 +20,7 @@ import org.nortis.domain.endpoint.Endpoint;
 import org.nortis.domain.endpoint.EndpointRepository;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.tenant.value.TenantId;
+import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.test.MockApplicationContextAccessor;
 
 class ReceiveEventConsumeDomainServiceTest {
@@ -51,7 +52,7 @@ class ReceiveEventConsumeDomainServiceTest {
 	}
 	
 	@Test
-	void testConsumeEvent() throws ConsumeFailureException {
+	void testConsumeEvent() throws ConsumeFailureException, DomainException {
 		Endpoint endpoint = Endpoint.create(
 				EndpointId.create("TEST1"), 
 				TenantId.create("TENANT1"), 

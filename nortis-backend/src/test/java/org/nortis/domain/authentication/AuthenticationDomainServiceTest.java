@@ -12,7 +12,6 @@ import java.util.Optional;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.nortis.domain.authentication.value.ApiKey;
@@ -22,14 +21,11 @@ import org.nortis.domain.user.Suser;
 import org.nortis.domain.user.SuserRepository;
 import org.nortis.domain.user.value.UserId;
 import org.nortis.infrastructure.exception.DomainException;
-import org.nortis.test.NortisBaseTestConfiguration;
+import org.nortis.test.MockApplicationContextAccessor;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = NortisBaseTestConfiguration.class)
+
 @SuppressWarnings("deprecation")
 class AuthenticationDomainServiceTest {
 
@@ -41,6 +37,9 @@ class AuthenticationDomainServiceTest {
 	
 	@BeforeEach
 	void setup() {
+		MockApplicationContextAccessor accessor = new MockApplicationContextAccessor();
+		accessor.mockTestPasswordEncoder();
+
 		this.authenticationRepository = Mockito.mock(AuthenticationRepository.class);
 		this.suserRepository = Mockito.mock(SuserRepository.class);
 		this.domainService = new AuthenticationDomainService(
@@ -51,7 +50,7 @@ class AuthenticationDomainServiceTest {
 	}
 
 	@Test
-	void testCreateApiKeyOfTenant() {
+	void testCreateApiKeyOfTenant() throws DomainException {
 		Tenant tenant = Tenant.create(
 				TenantId.create("TEST"), 
 				"Test Tenant", 
@@ -75,7 +74,7 @@ class AuthenticationDomainServiceTest {
 	}
 
 	@Test
-	void testCreateApiKeyOfTenantPresent() {
+	void testCreateApiKeyOfTenantPresent() throws DomainException {
 		Tenant tenant = Tenant.create(
 				TenantId.create("TEST"), 
 				"Test Tenant", 
@@ -102,7 +101,7 @@ class AuthenticationDomainServiceTest {
 	}
 
 	@Test
-	void testCreateApiKeyOfSuser() {
+	void testCreateApiKeyOfSuser() throws DomainException {
 		Suser suser = Suser.createMember(
 				UserId.create("1000000001"), 
 				"Test User", 
@@ -128,7 +127,7 @@ class AuthenticationDomainServiceTest {
 	}
 
 	@Test
-	void testCreateApiKeyOfSuserPresent() {
+	void testCreateApiKeyOfSuserPresent() throws DomainException {
 		Suser suser = Suser.createMember(
 				UserId.create("1000000001"), 
 				"Test User", 
@@ -157,34 +156,34 @@ class AuthenticationDomainServiceTest {
 	}
 
 	@Test
-	void testCheckExpiredTenant() {
+	void testCheckExpiredTenant() throws DomainException {
 		Authentication auth = Authentication.createFromTenant(TenantId.create("TENANT"));
 		auth.setLastAccessDatetime(LocalDateTime.now());
 		assertThat(this.domainService.checkExpired(auth, LocalDateTime.now())).isFalse();
 	}
 
 	@Test
-	void testCheckExpiredUserNotExpire() {
+	void testCheckExpiredUserNotExpire() throws DomainException {
 		Authentication auth = Authentication.createFromUserId(UserId.create("0000000001"));
 		auth.setLastAccessDatetime(LocalDateTime.now());		
 		assertThat(this.domainService.checkExpired(auth, LocalDateTime.now())).isFalse();
 	}
 
 	@Test
-	void testCheckExpiredUserExpire() {
+	void testCheckExpiredUserExpire() throws DomainException {
 		Authentication auth = Authentication.createFromUserId(UserId.create("0000000001"));
 		auth.setLastAccessDatetime(LocalDateTime.now().minusSeconds(1200));		
 		assertThat(this.domainService.checkExpired(auth, LocalDateTime.now())).isTrue();
 	}
 
 	@Test
-	void testCheckExpiredNull() {
+	void testCheckExpiredNull() throws DomainException {
 		Authentication auth = Authentication.createFromUserId(UserId.create("0000000001"));
 		assertThat(this.domainService.checkExpired(auth, LocalDateTime.now())).isFalse();
 	}
 
 	@Test
-	void testAuthorizeOfUserSuccess() {
+	void testAuthorizeOfUserSuccess() throws DomainException {
 		UserId userId = UserId.create("0000000001");
 		Authentication auth = Authentication.createFromUserId(userId);
 
@@ -204,7 +203,7 @@ class AuthenticationDomainServiceTest {
 	}
 
 	@Test
-	void testAuthorizeOfUserFailure() {
+	void testAuthorizeOfUserFailure() throws DomainException {
 		ApiKey apiKey = ApiKey.newKey();
 		when(this.authenticationRepository.get(eq(apiKey)))
 		.thenReturn(Optional.empty());
@@ -215,7 +214,7 @@ class AuthenticationDomainServiceTest {
 	}
 
 	@Test
-	void testAuthorizeOfTenantSuccess() {
+	void testAuthorizeOfTenantSuccess() throws DomainException {
 		Authentication auth = Authentication.createFromTenant(TenantId.create("TEST"));
 
 		when(this.authenticationRepository.get(eq(auth.getApiKey())))
@@ -228,7 +227,7 @@ class AuthenticationDomainServiceTest {
 	}
 
 	@Test
-	void testAuthorizeOfUserExpiredFailure() {
+	void testAuthorizeOfUserExpiredFailure() throws DomainException {
 		Authentication auth = Authentication.createFromUserId(UserId.create("0000000001"));
 		auth.setLastAccessDatetime(LocalDateTime.now().minusSeconds(1200));
 
@@ -241,7 +240,7 @@ class AuthenticationDomainServiceTest {
 	}
 	
 	@Test
-	void testLogin() {
+	void testLogin() throws DomainException {
 		UserId userId = UserId.create("0000000001");
 		Suser suser = Suser.createMember(
 				userId, 
@@ -262,7 +261,7 @@ class AuthenticationDomainServiceTest {
 	}
 	
 	@Test
-	void testLoginUserNotFound() {
+	void testLoginUserNotFound() throws DomainException {
 		UserId userId = UserId.create("0000000001");
 		
 		when(this.suserRepository.get(Mockito.eq(userId)))
@@ -272,11 +271,11 @@ class AuthenticationDomainServiceTest {
 			domainService.login(UserId.create("0000000001"), "password");			
 		});
 		
-		assertThat(ex.getMessageId()).isEqualTo("MSG50004");
+		assertThat(ex.getMessageId()).isEqualTo("NORTIS50004");
 	}
 
 	@Test
-	void testLoginPasswordNotMatch() {
+	void testLoginPasswordNotMatch() throws DomainException {
 		UserId userId = UserId.create("0000000001");
 		Suser suser = Suser.createMember(
 				userId, 
@@ -291,11 +290,11 @@ class AuthenticationDomainServiceTest {
 			domainService.login(UserId.create("0000000001"), "password");			
 		});
 		
-		assertThat(ex.getMessageId()).isEqualTo("MSG50004");
+		assertThat(ex.getMessageId()).isEqualTo("NORTIS50004");
 	}
 	
 	@Test
-	void testLogout() {
+	void testLogout() throws DomainException {
 		UserId userId = UserId.create("0000000001");
 		Suser suser = Suser.createMember(
 				userId, 
@@ -319,7 +318,7 @@ class AuthenticationDomainServiceTest {
 	}
 	
 	@Test
-	void testLogoutUserNotFound() {
+	void testLogoutUserNotFound() throws DomainException {
 		UserId userId = UserId.create("0000000001");
 		when(this.suserRepository.get(Mockito.eq(userId)))
 			.thenReturn(Optional.empty());
@@ -328,7 +327,7 @@ class AuthenticationDomainServiceTest {
 			domainService.logout(userId);			
 		});
 		
-		assertThat(ex.getMessageId()).isEqualTo("MSG00003");
+		assertThat(ex.getMessageId()).isEqualTo("NORTIS00003");
 	}
 
 }

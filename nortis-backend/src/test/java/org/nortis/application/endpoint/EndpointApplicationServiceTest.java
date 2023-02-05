@@ -10,6 +10,7 @@ import org.nortis.domain.endpoint.event.EndpointDeletedEvent;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.config.DomaConfiguration;
+import org.nortis.infrastructure.exception.DomainException;
 import org.seasar.doma.boot.autoconfigure.DomaAutoConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.AutoConfigureDataJdbc;
@@ -45,7 +46,7 @@ class EndpointApplicationServiceTest {
 	EndpointRepository endpointRepository;
 	
 	@Test
-	void testRegisterEndpoint() {
+	void testRegisterEndpoint() throws DomainException {
 		EndpointRegisterCommand command = 
 				new EndpointRegisterCommand("TEST1", "test-point", "エンドポイント", "${name}!!", "Hello! ${name}", "TEST_ID");
 		Endpoint endpoint = endpointApplicationService.registerEndpoint(command, data -> {
@@ -62,7 +63,7 @@ class EndpointApplicationServiceTest {
 	}
 
 	@Test
-	void testUpdate() {
+	void testUpdate() throws DomainException {
 		EndpointUpdateCommand command = 
 				new EndpointUpdateCommand("TEST2", "ENDPOINT2", "TEST POINT", "件名", "本文", "TEST_ID");
 		endpointApplicationService.updateEndpoint(command, data -> {
@@ -76,7 +77,7 @@ class EndpointApplicationServiceTest {
 	}
 	
 	@Test
-	void testDelete() {
+	void testDelete() throws DomainException {
 		EndpointDeleteCommand command = new EndpointDeleteCommand("TEST1", "ENDPOINT1", "TEST_ID");
 		endpointApplicationService.delete(command);
 
@@ -86,14 +87,14 @@ class EndpointApplicationServiceTest {
 		
 		applicationEvents.stream(EndpointDeletedEvent.class)
 			.forEach(event -> {
-				assertThat(event.getTenantId()).isEqualTo(TenantId.create("TEST1"));
-				assertThat(event.getEndpointId()).isEqualTo(EndpointId.create("ENDPOINT1"));
+				assertThat(event.getTenantId().toString()).isEqualTo("TEST1");
+				assertThat(event.getEndpointId().toString()).isEqualTo("ENDPOINT1");
 				assertThat(event.getUpdateUserId()).isEqualTo("TEST_ID");
 			});
 	}
 	
 	@Test
-	void testDeleteFromTenantId() {
+	void testDeleteFromTenantId() throws DomainException {
 		endpointApplicationService.deleteFromTenantId("TEST3", "USER_ID");
 
 		Optional<Endpoint> opt1 = this.endpointRepository.get(TenantId.create("TEST3"), EndpointId.create("ENDPOINT3"));		
@@ -103,7 +104,7 @@ class EndpointApplicationServiceTest {
 		
 		applicationEvents.stream(EndpointDeletedEvent.class)
 			.forEach(event -> {
-				assertThat(event.getTenantId()).isEqualTo(TenantId.create("TEST3"));
+				assertThat(event.getTenantId().toString()).isEqualTo("TEST3");
 				assertThat(event.getEndpointId()).isNotNull();
 				assertThat(event.getUpdateUserId()).isEqualTo("USER_ID");
 			});

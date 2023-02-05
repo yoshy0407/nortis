@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.nortis.domain.endpoint.Endpoint;
 import org.nortis.domain.endpoint.EndpointRepository;
@@ -16,14 +15,7 @@ import org.nortis.domain.tenant.Tenant;
 import org.nortis.domain.tenant.TenantRepository;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.exception.DomainException;
-import org.nortis.test.NortisBaseTestConfiguration;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
-		NortisBaseTestConfiguration.class
-})
 class ReceiveEventCheckDomainServiceTest {
 	
 	ReceiveEventCheckDomainService domainService;
@@ -40,7 +32,7 @@ class ReceiveEventCheckDomainServiceTest {
 	}
 	
 	@Test
-	void testCheckBeforeRegisterSuccess() {
+	void testCheckBeforeRegisterSuccess() throws DomainException {
 		TenantId tenantId = TenantId.create("TENANT1");
 		EndpointId endpointId = EndpointId.create("TEST1");
 		
@@ -56,7 +48,7 @@ class ReceiveEventCheckDomainServiceTest {
 	}
 
 	@Test
-	void testCheckBeforeRegisterTenantNotFound() {
+	void testCheckBeforeRegisterTenantNotFound() throws DomainException {
 		TenantId tenantId = TenantId.create("TENANT1");
 		EndpointId endpointId = EndpointId.create("TEST1");
 		
@@ -72,7 +64,7 @@ class ReceiveEventCheckDomainServiceTest {
 	}
 
 	@Test
-	void testCheckBeforeRegisterEndpointNotFound() {
+	void testCheckBeforeRegisterEndpointNotFound() throws DomainException {
 		TenantId tenantId = TenantId.create("TENANT1");
 		EndpointId endpointId = EndpointId.create("TEST1");
 		

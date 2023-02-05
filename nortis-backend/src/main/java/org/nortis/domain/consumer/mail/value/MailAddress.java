@@ -1,6 +1,9 @@
 package org.nortis.domain.consumer.mail.value;
 
 import lombok.EqualsAndHashCode;
+import org.nortis.infrastructure.exception.DomainException;
+import org.nortis.infrastructure.exception.UnexpectedException;
+import org.nortis.infrastructure.message.MessageCodes;
 import org.nortis.infrastructure.validation.Validations;
 import org.seasar.doma.Domain;
 
@@ -9,7 +12,7 @@ import org.seasar.doma.Domain;
  * @author yoshiokahiroshi
  * @version 1.0.0
  */
-@Domain(valueType = String.class, factoryMethod = "create", accessorMethod = "toString")
+@Domain(valueType = String.class, factoryMethod = "createOfDoma", accessorMethod = "toString")
 @EqualsAndHashCode
 public final class MailAddress {
 
@@ -18,9 +21,9 @@ public final class MailAddress {
 	 */
 	private final String value;
 	
-	private MailAddress(final String value) {
+	private MailAddress(final String value) throws DomainException {
 		Validations.hasText(value, "メールアドレス");
-		Validations.contains(value, "@", "MSG30001");
+		Validations.contains(value, "@", MessageCodes.nortis30001());
 		this.value = value;
 	}
 	
@@ -36,9 +39,24 @@ public final class MailAddress {
 	 * メールアドレスを構築します
 	 * @param mailAddress メールアドレス
 	 * @return {@link MailAddress}
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public static MailAddress create(final String mailAddress) {
+	public static MailAddress create(final String mailAddress) throws DomainException {
 		return new MailAddress(mailAddress);
 	}
-	
+
+	/**
+	 * Domaのファクトリメソッドです
+	 * @param mailAddress メールアドレス
+	 * @return {@link MailAddress}
+	 * @throws DomainException ドメインロジックエラー
+	 */
+	public static MailAddress createOfDoma(final String mailAddress) {
+		try {
+			return create(mailAddress);
+		} catch (DomainException e) {
+			throw UnexpectedException.convertDomainException(e);
+		}
+	}
+
 }

@@ -13,6 +13,7 @@ import org.nortis.domain.authentication.value.ApiKey;
 import org.nortis.domain.user.value.AdminFlg;
 import org.nortis.domain.user.value.UserId;
 import org.nortis.infrastructure.config.DomaConfiguration;
+import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.security.user.NortisUserDetails;
 import org.seasar.doma.boot.autoconfigure.DomaAutoConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ class AuthenticationApplicationServiceTest {
 	AuthenticationRepository authenticationRepository;
 	
 	@Test
-	void testLogin() {
+	void testLogin() throws DomainException {
 		ApiKey apiKey = this.applicationService.login("0000000001", "password", auth -> auth.getApiKey());
 		
 		Optional<Authentication> optAuth = this.authenticationRepository.get(apiKey);
@@ -54,7 +55,7 @@ class AuthenticationApplicationServiceTest {
 	}
 
 	@Test
-	void testLogout() {
+	void testLogout() throws DomainException {
 		this.applicationService.logout("0000000009");
 
 		Optional<Authentication> optAuth = 
@@ -102,8 +103,8 @@ class AuthenticationApplicationServiceTest {
 		List<Authentication> list = this.authenticationRepository.getUserAuthentication();
 		
 		assertThat(list).hasSize(2);
-		assertThat(list.get(0).getApiKey()).isEqualTo(ApiKey.create("APIKEYUSER2"));
-		assertThat(list.get(1).getApiKey()).isEqualTo(ApiKey.create("APIKEYUSER3"));
+		assertThat(list.get(0).getApiKey().toString()).isEqualTo("APIKEYUSER2");
+		assertThat(list.get(1).getApiKey().toString()).isEqualTo("APIKEYUSER3");
 	}
 
 }

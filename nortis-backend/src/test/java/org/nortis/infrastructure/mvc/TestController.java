@@ -13,13 +13,13 @@ class TestController {
 	public static final String UNEXPECTED_ID = "unexpectedId";
 
 	@GetMapping("/test1")
-	public void domain() {
-		throw new DomainException(DOMAIN_ID);
+	public void domain() throws DomainException {
+		throw new DomainException("test", DOMAIN_ID);
 	}
 
 	@GetMapping("/test2")
 	public void unexpected() {
-		throw new UnexpectedException(UNEXPECTED_ID);
+		throw new UnexpectedException("test", UNEXPECTED_ID);
 	}
 	
 }

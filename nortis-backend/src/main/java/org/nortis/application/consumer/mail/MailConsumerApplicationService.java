@@ -1,5 +1,6 @@
 package org.nortis.application.consumer.mail;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.annotation.ApplicationService;
 import org.nortis.infrastructure.application.ApplicationTranslator;
 import org.nortis.infrastructure.exception.DomainException;
+import org.nortis.infrastructure.message.MessageCodes;
 
 /**
  * メールコンシューマのアプリケーションサービスです
@@ -35,16 +37,18 @@ public class MailConsumerApplicationService {
 	 * @param command メールコンシューマの登録コマンド
 	 * @param translator 変換処理
 	 * @return 処理結果
+	 * @throws DomainException ドメインロジックエラー
 	 */
 	public <R> R register(
 			MailRegisterCommand command,
-			ApplicationTranslator<MailConsumer, R> translator) {
+			ApplicationTranslator<MailConsumer, R> translator) throws DomainException {
 		
 		TenantId tenantId = TenantId.create(command.tenantId());
 		EndpointId endpointId = EndpointId.create(command.endpointId());
-		List<MailAddress> mailAddressList = command.mailAddressList().stream()
-					.map(str -> MailAddress.create(str))
-					.toList();
+		List<MailAddress> mailAddressList = new ArrayList<>();
+		for (String mailAddress : command.mailAddressList()) {
+			mailAddressList.add(MailAddress.create(mailAddress));
+		}
 		
 		MailConsumer mailConsumer = this.mailConsumerDomainService.createMailConsumer(
 				tenantId, endpointId, mailAddressList, command.userId());
@@ -60,26 +64,25 @@ public class MailConsumerApplicationService {
 	 * @param command メールアドレス変更コマンド
 	 * @param translator 変換処理
 	 * @return 処理結果
+	 * @throws DomainException ドメインロジックエラー
 	 */
 	public <R> R addMailAddress(
 			MailAddressAddCommand command,
-			ApplicationTranslator<MailConsumer, R> translator) {
+			ApplicationTranslator<MailConsumer, R> translator) throws DomainException {
 		ConsumerId consumerId = ConsumerId.create(command.consumerId());
 		
 		Optional<MailConsumer> optMailConsumer = 
 				this.mailConsumerRepository.get(consumerId);
 		
 		if (optMailConsumer.isEmpty()) {
-			throw new DomainException("MSG30005");
+			throw new DomainException(MessageCodes.nortis30005());
 		}
 		
 		MailConsumer mailConsumer = optMailConsumer.get();
 		
-		command.mailAddressList().stream()
-				.map(str -> MailAddress.create(str))
-				.forEach(address -> {
-					mailConsumer.addMailAddress(address);
-				});
+		for (String mailAddress : command.mailAddressList()) {
+			mailConsumer.addMailAddress(MailAddress.create(mailAddress));
+		}
 		
 		this.mailConsumerRepository.update(mailConsumer);
 		
@@ -92,26 +95,25 @@ public class MailConsumerApplicationService {
 	 * @param command メールアドレス削除コマンド
 	 * @param translator 変換処理
 	 * @return 処理結果
+	 * @throws DomainException ドメインロジックエラー
 	 */
 	public <R> R deleteMailAddress(
 			MailAddressDeleteCommand command,
-			ApplicationTranslator<MailConsumer, R> translator) {
+			ApplicationTranslator<MailConsumer, R> translator) throws DomainException {
 		ConsumerId consumerId = ConsumerId.create(command.consumerId());
 		
 		Optional<MailConsumer> optMailConsumer = 
 				this.mailConsumerRepository.get(consumerId);
 		
 		if (optMailConsumer.isEmpty()) {
-			throw new DomainException("MSG30005");
+			throw new DomainException(MessageCodes.nortis30005());
 		}
 		
 		MailConsumer mailConsumer = optMailConsumer.get();
 		
-		command.mailAddressList().stream()
-				.map(str -> MailAddress.create(str))
-				.forEach(address -> {
-					mailConsumer.removeMailAddress(address);
-				});
+		for (String mailAddress : command.mailAddressList()) {
+			mailConsumer.removeMailAddress(MailAddress.create(mailAddress));
+		}
 		
 		this.mailConsumerRepository.update(mailConsumer);
 		
@@ -121,15 +123,16 @@ public class MailConsumerApplicationService {
 	/**
 	 * 削除します
 	 * @param rawConsumerId コンシューマID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void delete(String rawConsumerId) {
+	public void delete(String rawConsumerId) throws DomainException {
 		ConsumerId consumerId = ConsumerId.create(rawConsumerId);
 		
 		Optional<MailConsumer> optMailConsumer = 
 				this.mailConsumerRepository.get(consumerId);
 		
 		if (optMailConsumer.isEmpty()) {
-			throw new DomainException("MSG30002");
+			throw new DomainException(MessageCodes.nortis30002());
 		}
 		this.mailConsumerRepository.remove(optMailConsumer.get());
 	}
@@ -138,8 +141,9 @@ public class MailConsumerApplicationService {
 	 * エンドポイント削除による対象レコードのエンドポイント設定を削除します
 	 * @param endpointId エンドポイントID
 	 * @param userId ユーザID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void removeEndpointIdByEndpointDeleted(String endpointId, String userId) {
+	public void removeEndpointIdByEndpointDeleted(String endpointId, String userId) throws DomainException {
 		EndpointId enId = EndpointId.create(endpointId);
 		List<MailConsumer> mailConsumers = this.mailConsumerRepository.getFromEndpoint(enId);
 		

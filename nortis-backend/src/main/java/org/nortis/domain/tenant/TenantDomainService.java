@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.annotation.DomainService;
 import org.nortis.infrastructure.exception.DomainException;
+import org.nortis.infrastructure.message.MessageCodes;
 
 /**
  * テナントに関するドメインサービスです
@@ -26,13 +27,14 @@ public class TenantDomainService {
 	 * @param tenantName テナント名
 	 * @param createId 作成者ID
 	 * @return テナント
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public Tenant createTenant(TenantId tenantId, String tenantName, String createId) {
+	public Tenant createTenant(TenantId tenantId, String tenantName, String createId) throws DomainException {
 		
 		Optional<Tenant> tenant = this.tenantRepository.get(tenantId);
 		
 		if (tenant.isPresent()) {
-			throw new DomainException("MSG10001");
+			throw new DomainException(MessageCodes.nortis10001());
 		}
 		
 		return Tenant.create(tenantId, tenantName, createId);

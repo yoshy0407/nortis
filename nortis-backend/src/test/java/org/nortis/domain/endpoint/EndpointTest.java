@@ -9,36 +9,20 @@ import org.apache.velocity.app.VelocityEngine;
 import org.assertj.core.util.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.endpoint.value.SendMessage;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.ApplicationContextAccessor;
-import org.nortis.infrastructure.MessageSourceAccessor;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.template.TemplateRender;
 import org.nortis.infrastructure.template.VelocityTemplateRender;
-import org.nortis.test.NortisBaseTestConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.MessageSource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
-		NortisBaseTestConfiguration.class
-})
 class EndpointTest {
 
-	@Autowired
-	MessageSource messageSource;
-	
 	@BeforeEach
-	void setup() {
-		MessageSourceAccessor.set(messageSource);
-		
+	void setup() {		
 		ApplicationContext context = Mockito.mock(ApplicationContext.class);
 		VelocityEngine ve = new VelocityEngine();
 		ve.init();
@@ -47,7 +31,7 @@ class EndpointTest {
 	}
 
 	@Test
-	void testChangeEndpointName() {
+	void testChangeEndpointName() throws DomainException {
 		Endpoint endpoint = Endpoint.create(EndpointId.create("ENDPOINT"), 
 				TenantId.create("TEST"), "Test Endpoint", "subject", "message", "TEST_ID");
 		endpoint.changeEndpointName("Endpoint", "TEST_ID");
@@ -57,7 +41,7 @@ class EndpointTest {
 	}
 
 	@Test
-	void testChangeSubjectTemplate() {
+	void testChangeSubjectTemplate() throws DomainException {
 		Endpoint endpoint = Endpoint.create(EndpointId.create("ENDPOINT"), 
 				TenantId.create("TEST"), "Test Endpoint", "subject", "message", "TEST_ID");
 		endpoint.changeSubjectTemplate("updated!", "TEST_ID");
@@ -67,7 +51,7 @@ class EndpointTest {
 	}
 
 	@Test
-	void testChangeMessageTemplate() {
+	void testChangeMessageTemplate() throws DomainException {
 		Endpoint endpoint = Endpoint.create(EndpointId.create("ENDPOINT"), 
 				TenantId.create("TEST"), "Test Endpoint", "subject", "message", "TEST_ID");
 		endpoint.changeMessageTemplate("Test Message", "TEST_ID");
@@ -77,7 +61,7 @@ class EndpointTest {
 	}
 
 	@Test
-	void testRenderMessage() {
+	void testRenderMessage() throws DomainException {
 		Endpoint endpoint = 
 				Endpoint.create(EndpointId.create("ENDPOINT"), 
 						TenantId.create("TEST"), "Test Endpoint", "Test ${name}", "Hello! ${name}", "TEST_ID");
@@ -88,7 +72,7 @@ class EndpointTest {
 	}
 
 	@Test
-	void testDeleted() {
+	void testDeleted() throws DomainException {
 		Endpoint endpoint = 
 				Endpoint.create(EndpointId.create("ENDPOINT"), 
 						TenantId.create("TEST"), "Test Endpoint", "Test ${name}", "Hello! ${name}", "TEST_ID");
@@ -100,7 +84,7 @@ class EndpointTest {
 	}
 	
 	@Test
-	void testCreate() {
+	void testCreate() throws DomainException {
 		Endpoint endpoint = Endpoint.create(EndpointId.create("ENDPOINT"), 
 				TenantId.create("TEST"), "Test Endpoint", "subject", "message", "TEST_ID");
 		

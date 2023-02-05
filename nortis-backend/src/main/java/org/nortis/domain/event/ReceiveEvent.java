@@ -11,6 +11,7 @@ import org.nortis.domain.event.value.Subscribed;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.ApplicationContextAccessor;
 import org.nortis.infrastructure.exception.DomainException;
+import org.nortis.infrastructure.message.MessageCodes;
 import org.nortis.infrastructure.validation.Validations;
 import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
@@ -84,8 +85,9 @@ public class ReceiveEvent {
 	/**
 	 * イベントIDを設定します
 	 * @param eventId イベントID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setEventId(EventId eventId) {
+	public void setEventId(EventId eventId) throws DomainException {
 		Validations.notNull(eventId, "イベントID");
 		this.eventId = eventId;
 	}
@@ -93,8 +95,9 @@ public class ReceiveEvent {
 	/**
 	 * テナントIDを設定します
 	 * @param tenantId テナントID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setTenantId(TenantId tenantId) {
+	public void setTenantId(TenantId tenantId) throws DomainException {
 		Validations.notNull(tenantId, "テナントID");
 		this.tenantId = tenantId;
 	}
@@ -102,8 +105,9 @@ public class ReceiveEvent {
 	/**
 	 * エンドポイントIDを設定します
 	 * @param endpointId エンドポイントID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setEndpointId(EndpointId endpointId) {
+	public void setEndpointId(EndpointId endpointId) throws DomainException {
 		Validations.notNull(endpointId, "エンドポイントID");
 		this.endpointId = endpointId;
 	}
@@ -111,8 +115,9 @@ public class ReceiveEvent {
 	/**
 	 * 発生時刻を設定します
 	 * @param occuredOn 発生時刻
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setOccuredOn(LocalDateTime occuredOn) {
+	public void setOccuredOn(LocalDateTime occuredOn) throws DomainException {
 		Validations.notNull(occuredOn, "発生時刻");
 		this.occuredOn = occuredOn;
 	}
@@ -120,12 +125,13 @@ public class ReceiveEvent {
 	/**
 	 * テンプレートパラメーターを設定します
 	 * @param templateParameter テンプレートパラメーター
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setTemplateParameter(String templateParameter) {
+	public void setTemplateParameter(String templateParameter) throws DomainException {
 		try {
 			ApplicationContextAccessor.getObjectMapper().readTree(templateParameter);
 		} catch (JsonProcessingException e) {
-			throw new DomainException("MSG40001", e);
+			throw new DomainException(MessageCodes.nortis40001(), e);
 		}
 		this.templateParameter = templateParameter;
 	}
@@ -136,11 +142,12 @@ public class ReceiveEvent {
 	 * @param endpointId エンドポイントID
 	 * @param parameterJson テンプレートのパラメータのJSON
 	 * @return 受信イベント
+	 * @throws DomainException ドメインロジックエラー
 	 */
 	public static ReceiveEvent create(
 			TenantId tenantId,
 			EndpointId endpointId,
-			String parameterJson) {
+			String parameterJson) throws DomainException {
 		ReceiveEvent receiveEvent = new ReceiveEvent();
 		receiveEvent.setEventId(EventId.createNew());
 		receiveEvent.setTenantId(tenantId);

@@ -9,6 +9,7 @@ import org.nortis.domain.endpoint.Endpoint;
 import org.nortis.domain.event.ReceiveEvent;
 import org.nortis.infrastructure.annotation.DomainService;
 import org.nortis.infrastructure.exception.UnexpectedException;
+import org.nortis.infrastructure.message.MessageCodes;
 import org.nortis.infrastructure.template.TemplateRender;
 
 /**
@@ -37,7 +38,7 @@ public class MessageFactory {
 					receiveEvent.getTemplateParameter(), 
 					new TypeReference<Map<String, Object>>(){});
 		} catch (JsonProcessingException e) {
-			throw new UnexpectedException("MSG40001");
+			throw new UnexpectedException(MessageCodes.nortis40001(), e);
 		}
 		
 		String subject = this.templateRender.render(

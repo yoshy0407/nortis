@@ -8,6 +8,7 @@ import org.nortis.domain.authentication.Authentication;
 import org.nortis.domain.endpoint.Endpoint;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.tenant.value.TenantId;
+import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.validation.Validations;
 import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
@@ -78,8 +79,9 @@ public class Tenant extends AbstractAggregateRoot<Tenant> {
 	 * テナント名を変更します
 	 * @param tenantName テナント名
 	 * @param updateId 更新者ID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void changeTenantName(String tenantName, String updateId) {
+	public void changeTenantName(String tenantName, String updateId) throws DomainException {
 		setTenantName(tenantName);
 		setUpdateId(updateId);
 		setUpdateDt(LocalDateTime.now());
@@ -93,17 +95,19 @@ public class Tenant extends AbstractAggregateRoot<Tenant> {
 	 * @param templateText メッセージテンプレート
 	 * @param createId 作成者ID
 	 * @return エンドポイント
+	 * @throws DomainException ドメインロジックエラー
 	 */
 	public Endpoint createEndpoint(EndpointId endpointId, String endpointName, 
-			String subjectTemplate, String templateText, String createId) {
+			String subjectTemplate, String templateText, String createId) throws DomainException {
 		return Endpoint.create(endpointId, this.tenantId, endpointName, subjectTemplate, templateText, createId);
 	}
 	
 	/**
 	 * APIキーを作成します
 	 * @return 認証
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public Authentication createApiKey() {
+	public Authentication createApiKey() throws DomainException {
 		return Authentication.createFromTenant(this.tenantId);
 	}
 	
@@ -119,8 +123,9 @@ public class Tenant extends AbstractAggregateRoot<Tenant> {
 	/**
 	 * テナント名を設定します
 	 * @param tenantName テナント名
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setTenantName(String tenantName) {
+	public void setTenantName(String tenantName) throws DomainException {
 		Validations.hasText(tenantName, "テナント名");
 		Validations.maxTextLength(tenantName, 50, "テナント名");
 		this.tenantName = tenantName;
@@ -129,8 +134,9 @@ public class Tenant extends AbstractAggregateRoot<Tenant> {
 	/**
 	 * テナントIDを設定します
 	 * @param tenantId テナントID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setTenantId(TenantId tenantId) {
+	public void setTenantId(TenantId tenantId) throws DomainException {
 		Validations.notNull(tenantId, "テナント省略名");
 		this.tenantId = tenantId;
 	}
@@ -138,8 +144,9 @@ public class Tenant extends AbstractAggregateRoot<Tenant> {
 	/**
 	 * 作成者IDを設定します
 	 * @param createId 作成者ID
-	 */
-	public void setCreateId(String createId) {
+	 * @throws DomainException ドメインロジックエラー
+s	 */
+	public void setCreateId(String createId) throws DomainException {
 		Validations.hasText(createId, "作成者ID");
 		this.createId = createId;
 	}
@@ -147,8 +154,9 @@ public class Tenant extends AbstractAggregateRoot<Tenant> {
 	/**
 	 * 作成日付を設定します
 	 * @param createDt 作成日付
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void setCreateDt(LocalDateTime createDt) {
+	public void setCreateDt(LocalDateTime createDt) throws DomainException {
 		Validations.notNull(createDt, "作成者ID");
 		this.createDt = createDt;		
 	}
@@ -159,8 +167,9 @@ public class Tenant extends AbstractAggregateRoot<Tenant> {
 	 * @param tenantName テナント名
 	 * @param createId 作成者ID
 	 * @return テナント
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public static Tenant create(TenantId tenantId, String tenantName, String createId) {
+	public static Tenant create(TenantId tenantId, String tenantName, String createId) throws DomainException {
 		final Tenant entity = new Tenant();
 		entity.setTenantId(tenantId);
 		entity.setTenantName(tenantName);

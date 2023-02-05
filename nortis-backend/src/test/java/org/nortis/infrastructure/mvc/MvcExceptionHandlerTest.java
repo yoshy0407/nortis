@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.nortis.infrastructure.MessageSourceAccessor;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.StaticMessageSource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,12 +21,11 @@ class MvcExceptionHandlerTest {
 	void setup() {
 		LocaleContextHolder.setLocale(Locale.JAPAN);
 		StaticMessageSource messageSource = new StaticMessageSource();
-		MessageSourceAccessor.set(messageSource);
 		messageSource.addMessage(TestController.DOMAIN_ID, Locale.JAPAN, "domainExceptionTest");
 		messageSource.addMessage(TestController.UNEXPECTED_ID, Locale.JAPAN, "unexpectedExceptionTest");
 		
 		this.mockMvc = MockMvcBuilders.standaloneSetup(new TestController())
-				.setControllerAdvice(new MvcExceptionHandler())
+				.setControllerAdvice(new MvcExceptionHandler(messageSource))
 				.setViewResolvers(new BeanNameViewResolver())
 				.build();
 	}

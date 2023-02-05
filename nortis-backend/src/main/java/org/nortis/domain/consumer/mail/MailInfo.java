@@ -5,6 +5,8 @@ import lombok.Setter;
 import lombok.ToString;
 import org.nortis.domain.consumer.mail.value.ConsumerId;
 import org.nortis.domain.consumer.mail.value.MailAddress;
+import org.nortis.infrastructure.exception.DomainException;
+import org.nortis.infrastructure.exception.UnexpectedException;
 import org.nortis.infrastructure.validation.Validations;
 import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
@@ -65,15 +67,20 @@ public class MailInfo {
 	 * @param consumerId コンシューマID
 	 * @param orderNo 番号
 	 * @param mailAddress メールアドレス
+	 * @throws DomainException ドメインロジックエラー
 	 */
 	public MailInfo(
 			ConsumerId consumerId,
 			int orderNo,
 			MailAddress mailAddress) {
-		Validations.notNull(consumerId, "コンシューマID");
+		try {
+			Validations.notNull(consumerId, "コンシューマID");
+			Validations.notNull(consumerId, "コンシューマID");
+		} catch (DomainException e) {
+			throw UnexpectedException.convertDomainException(e);
+		}
 		this.consumerId = consumerId;
 		this.orderNo = orderNo;
-		Validations.notNull(consumerId, "コンシューマID");
 		this.mailAddress = mailAddress;		
 	}
 

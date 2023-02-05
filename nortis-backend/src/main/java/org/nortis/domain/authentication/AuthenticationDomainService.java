@@ -9,6 +9,7 @@ import org.nortis.domain.user.Suser;
 import org.nortis.domain.user.SuserRepository;
 import org.nortis.domain.user.value.UserId;
 import org.nortis.infrastructure.exception.DomainException;
+import org.nortis.infrastructure.message.MessageCodes;
 import org.nortis.infrastructure.security.user.NortisUser;
 import org.nortis.infrastructure.security.user.NortisUserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,8 +35,9 @@ public class AuthenticationDomainService {
 	 * テナント用のAPIキーを作成します
 	 * @param tenant テナント
 	 * @return APIキー
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public ApiKey createApiKeyOf(Tenant tenant) {
+	public ApiKey createApiKeyOf(Tenant tenant) throws DomainException {
 		Optional<Authentication> optAuth = this.authenticationRepository
 				.getFromTenantId(tenant.getTenantId());
 		
@@ -53,8 +55,9 @@ public class AuthenticationDomainService {
 	 * ユーザに紐づくAPIキーを作成します
 	 * @param user ユーザ
 	 * @return APIキー
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public ApiKey createApiKeyOf(Suser user) {
+	public ApiKey createApiKeyOf(Suser user) throws DomainException {
 		Optional<Authentication> optAuth = this.authenticationRepository
 				.getFromUserId(user.getUserId());
 		
@@ -127,15 +130,16 @@ public class AuthenticationDomainService {
 	 * @param userId ユーザID
 	 * @param password パスワード
 	 * @return 認証
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public Authentication login(UserId userId, String password) {
+	public Authentication login(UserId userId, String password) throws DomainException {
 		Optional<Suser> optUser = this.suserRepository.get(userId);
 		if (optUser.isEmpty()) {
-			throw new DomainException("MSG50004");
+			throw new DomainException(MessageCodes.nortis50004());
 		}
 		Suser suser = optUser.get();
 		if (!passwordEncoder.matches(password, suser.getEncodedPassword())) {
-			throw new DomainException("MSG50004");			
+			throw new DomainException(MessageCodes.nortis50004());			
 		}
 		Authentication authentication = suser.login();
 		
@@ -146,11 +150,12 @@ public class AuthenticationDomainService {
 	/**
 	 * ログアウト処理を実施します
 	 * @param userId ユーザID
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public void logout(UserId userId) {
+	public void logout(UserId userId) throws DomainException {
 		Optional<Suser> optUser = this.suserRepository.get(userId);
 		if (optUser.isEmpty()) {
-			throw new DomainException("MSG00003", "ユーザ");
+			throw new DomainException(MessageCodes.nortis00003("ユーザ"));
 		}
 		optUser.get().logout();
 		
