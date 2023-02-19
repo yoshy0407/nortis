@@ -6,6 +6,7 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.nortis.domain.authentication.AuthenticationDomainService;
 import org.nortis.domain.authentication.value.ApiKey;
+import org.nortis.domain.tenant.TenantDomainService;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.domain.user.Suser;
 import org.nortis.domain.user.SuserRepository;
@@ -25,6 +26,8 @@ public class SuserApplicationService {
 	private final SuserRepository suserRepository;
 	
 	private final AuthenticationDomainService authenticationDomainService;
+	
+	private final TenantDomainService tenantDomainService;
 	
 	/**
 	 * 管理者ユーザを登録します
@@ -69,7 +72,7 @@ public class SuserApplicationService {
 		for (String tenantId : tenantIds) {
 			tenantIdList.add(TenantId.create(tenantId));
 		}
-		Suser suser = Suser.createMember(userId, command.username(), command.password(), tenantIdList, command.userId());
+		Suser suser = Suser.createMember(userId, command.username(), command.password(), tenantIdList, command.createUserId());
 		this.suserRepository.save(suser);
 		return translator.translate(suser);
 	}
@@ -159,6 +162,9 @@ public class SuserApplicationService {
 
 		Suser suser = optSuser.get();
 		TenantId tenantId = TenantId.create(command.tenantId());
+		if (!this.tenantDomainService.existTenant(tenantId)) {
+			throw new DomainException(MessageCodes.nortis00003("テナント"));
+		}
 		suser.grantTenantAccressOf(tenantId);
 
 		this.suserRepository.update(suser);

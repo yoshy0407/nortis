@@ -42,7 +42,7 @@ class TenantDomainServiceTest {
 	}
 
 	@Test
-	void testCreateTenantError() throws DomainException {		
+	void testCreateTenantError() throws DomainException {	
 		when(this.repository.get(eq(TenantId.create("TEST"))))
 			.thenReturn(Optional.of(
 					Tenant.create(TenantId.create("TEST"), "テナント", "TEST_ID")));
@@ -52,4 +52,20 @@ class TenantDomainServiceTest {
 		}, "指定されたテナントIDはすでに使われています");
 	}
 	
+	@Test
+	void testExistsTenantTrue() throws DomainException {
+		when(this.repository.get(eq(TenantId.create("TEST"))))
+			.thenReturn(Optional.of(
+					Tenant.create(TenantId.create("TEST"), "テナント", "TEST_ID")));
+		
+		assertThat(this.domainService.existTenant(TenantId.create("TEST"))).isTrue();
+	}
+	
+	@Test
+	void testExistsTenantFalse() throws DomainException {
+		when(this.repository.get(eq(TenantId.create("TEST"))))
+			.thenReturn(Optional.empty());
+		
+		assertThat(this.domainService.existTenant(TenantId.create("TEST"))).isFalse();
+	}
 }

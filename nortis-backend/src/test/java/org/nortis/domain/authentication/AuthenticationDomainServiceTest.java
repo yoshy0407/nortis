@@ -208,7 +208,7 @@ class AuthenticationDomainServiceTest {
 		when(this.authenticationRepository.get(eq(apiKey)))
 		.thenReturn(Optional.empty());
 
-		assertThrows(AuthenticationFailureException.class, () -> {
+		assertThrows(DomainException.class, () -> {
 			this.domainService.authorizeOfApiKey(apiKey);						
 		});
 	}
@@ -234,7 +234,7 @@ class AuthenticationDomainServiceTest {
 		when(this.authenticationRepository.get(eq(auth.getApiKey())))
 			.thenReturn(Optional.ofNullable(auth));
 
-		assertThrows(AuthenticationExpiredException.class, () -> {
+		assertThrows(DomainException.class, () -> {
 			this.domainService.authorizeOfApiKey(auth.getApiKey());			
 		});
 	}

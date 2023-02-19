@@ -25,12 +25,12 @@ public class AuthenticationDomainService {
 	private final AuthenticationRepository authenticationRepository;
 
 	private final SuserRepository suserRepository;
-	
+
 	private final PasswordEncoder passwordEncoder;
 
 	/** ユーザの認証の期限 */
 	private final long expiredSecond;
-	
+
 	/**
 	 * テナント用のAPIキーを作成します
 	 * @param tenant テナント
@@ -40,17 +40,17 @@ public class AuthenticationDomainService {
 	public ApiKey createApiKeyOf(Tenant tenant) throws DomainException {
 		Optional<Authentication> optAuth = this.authenticationRepository
 				.getFromTenantId(tenant.getTenantId());
-		
+
 		optAuth.ifPresent(data -> {
 			this.authenticationRepository.remove(data);
 		});
-		
+
 		Authentication auth = tenant.createApiKey();
-		
+
 		this.authenticationRepository.save(auth);
 		return auth.getApiKey();
 	}
-	
+
 	/**
 	 * ユーザに紐づくAPIキーを作成します
 	 * @param user ユーザ
@@ -60,18 +60,18 @@ public class AuthenticationDomainService {
 	public ApiKey createApiKeyOf(Suser user) throws DomainException {
 		Optional<Authentication> optAuth = this.authenticationRepository
 				.getFromUserId(user.getUserId());
-		
+
 		optAuth.ifPresent(data -> {
 			this.authenticationRepository.remove(data);
 		});
-		
+
 		Authentication auth = user.createApiKey();
-		
+
 		this.authenticationRepository.save(auth);
 		return auth.getApiKey();
 
 	}
-	
+
 	/**
 	 * 期限切れかどうかチェックします
 	 * @param authentication 認証
@@ -86,45 +86,37 @@ public class AuthenticationDomainService {
 		}
 		return isExpired(authentication, baseDatetime);
 	}
-	
+
 	/**
 	 * 認可を実施します
 	 * @param apiKey APIキー
 	 * @return {@link NortisUserDetails}
-	 * @throws AuthenticationFailureException 認証失敗の場合
-	 * @throws AuthenticationExpiredException 期限切れの場合
+	 * @throws DomainException 認証失敗の場合
 	 */
-	public NortisUserDetails authorizeOfApiKey(ApiKey apiKey) throws AuthenticationFailureException, AuthenticationExpiredException {
+	public NortisUserDetails authorizeOfApiKey(ApiKey apiKey) throws DomainException {
 		Optional<Authentication> optAuth = this.authenticationRepository.get(apiKey);
 		if (optAuth.isEmpty()) {
-			throw new AuthenticationFailureException();
+			throw new DomainException(MessageCodes.nortis00003("APIキー"));
 		}
 		Authentication authentication = optAuth.get();
 		//テナントの場合は、期限切れ気にせずに認証を実施
 		if (authentication.getTenantId() != null) {
 			authentication.setLastAccessDatetime(LocalDateTime.now());
 			authenticationRepository.update(authentication);
-			return NortisUser.createOfTenant(authentication);
+			return NortisUser.createOfTenant(authentication, false);
 		}
 		if (authentication.getUserId() != null) {
-			if (isExpired(authentication, LocalDateTime.now())) {
-				//:TODO
-				throw new AuthenticationExpiredException();
-			} else {
-				authentication.setLastAccessDatetime(LocalDateTime.now());
-				authenticationRepository.update(authentication);
-				Optional<Suser> optUser = this.suserRepository.get(authentication.getUserId());
-				if (optUser.isEmpty()) {
-					//:TODO
-					throw new AuthenticationFailureException();					
-				}
-				return NortisUser.createOfUser(authentication, optUser.get());
-			}			
+			authentication.setLastAccessDatetime(LocalDateTime.now());
+			authenticationRepository.update(authentication);
+			Optional<Suser> optUser = this.suserRepository.get(authentication.getUserId());
+			if (optUser.isEmpty()) {
+				throw new DomainException(MessageCodes.nortis00003("ユーザ"));					
+			}
+			return NortisUser.createOfUser(authentication, optUser.get(), isExpired(authentication, LocalDateTime.now()));
 		}
-		//:TODO
-		throw new AuthenticationFailureException();
+		throw new DomainException(MessageCodes.nortis60001());
 	}
-	
+
 	/**
 	 * ログインを実施します
 	 * @param userId ユーザID
@@ -142,11 +134,11 @@ public class AuthenticationDomainService {
 			throw new DomainException(MessageCodes.nortis50004());			
 		}
 		Authentication authentication = suser.login();
-		
+
 		this.authenticationRepository.save(authentication);
 		return authentication;
 	}
-	
+
 	/**
 	 * ログアウト処理を実施します
 	 * @param userId ユーザID
@@ -158,14 +150,14 @@ public class AuthenticationDomainService {
 			throw new DomainException(MessageCodes.nortis00003("ユーザ"));
 		}
 		optUser.get().logout();
-		
+
 		Optional<Authentication> optAuth = this.authenticationRepository.getFromUserId(userId);
 		//認証がなければ、正しい状態なのでそのままに
 		optAuth.ifPresent(auth -> {
 			this.authenticationRepository.remove(auth);
 		});
 	}
-	
+
 	private boolean isExpired(Authentication authentication, LocalDateTime baseDatetime) {
 		if (authentication.getLastAccessDatetime() != null) {
 			return baseDatetime.minusSeconds(expiredSecond)
@@ -174,5 +166,5 @@ public class AuthenticationDomainService {
 			return false;
 		}
 	}
-	
+
 }

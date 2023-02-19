@@ -5,8 +5,6 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import org.nortis.domain.authentication.Authentication;
 import org.nortis.domain.authentication.AuthenticationDomainService;
-import org.nortis.domain.authentication.AuthenticationExpiredException;
-import org.nortis.domain.authentication.AuthenticationFailureException;
 import org.nortis.domain.authentication.AuthenticationRepository;
 import org.nortis.domain.authentication.value.ApiKey;
 import org.nortis.domain.user.value.UserId;
@@ -60,17 +58,10 @@ public class AuthenticationApplicationService {
 	 * APIキーによる認可を実施します
 	 * @param apiKey APIキー
 	 * @return APIキーに紐づく{@link UserDetails}
-	 * @throws AuthenticationExpiredException 期限切れの場合
-	 * @throws AuthenticationFailureException 認証失敗の場合
+	 * @throws DomainException ドメインロジックエラー
 	 */
-	public NortisUserDetails authenticateOf(String apiKey) throws AuthenticationFailureException, AuthenticationExpiredException {
-		try {
-			return this.authenticationDomainService.authorizeOfApiKey(ApiKey.create(apiKey));
-		} catch (DomainException e) {
-			//桁数とかみて認証エラーメッセージを表示するのはよくないので、
-			//このまま認証エラーとする
-			throw new AuthenticationFailureException();
-		}
+	public NortisUserDetails authenticateOf(String apiKey) throws DomainException {
+		return this.authenticationDomainService.authorizeOfApiKey(ApiKey.create(apiKey));
 	}
 	
 	/**

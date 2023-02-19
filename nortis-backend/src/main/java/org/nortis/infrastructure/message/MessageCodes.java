@@ -207,6 +207,28 @@ public class MessageCodes {
 	}
 
 	/**
+	 * NORTIS60001
+	 * @return {@link MessageCode}
+	 */
+	public static MessageCode nortis60001() {
+		return new SimpleMessageCode(
+				"NORTIS60001", 
+				"認証エラーです", 
+				new Object[] { });
+	}
+
+	/**
+	 * NORTIS60002
+	 * @return {@link MessageCode}
+	 */
+	public static MessageCode nortis60002() {
+		return new SimpleMessageCode(
+				"NORTIS60002", 
+				"APIキーが期限切れです。再認証してください", 
+				new Object[] { });
+	}
+
+	/**
 	 * NORTIS90001
 	 * @return {@link MessageCode}
 	 */

@@ -1,5 +1,8 @@
 package org.nortis.infrastructure.message;
 
+import java.util.Locale;
+import org.springframework.context.MessageSource;
+
 /**
  * メッセージコードをあらすインタフェースです
  * @author yoshiokahiroshi
@@ -24,4 +27,12 @@ public interface MessageCode {
 	 * @return デフォルトのメッセージ
 	 */
 	String getDefaultMessage();
+	
+	/**
+	 * メッセージを解決して返却します
+	 * @param messageSource {@link MessageSource}
+	 * @param locale ロケール
+	 * @return 解決したメッセージ
+	 */
+	String resolveMessage(MessageSource messageSource, Locale locale);
 }

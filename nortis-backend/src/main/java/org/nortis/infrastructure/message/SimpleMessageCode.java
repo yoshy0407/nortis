@@ -1,6 +1,8 @@
 package org.nortis.infrastructure.message;
 
+import java.util.Locale;
 import lombok.AllArgsConstructor;
+import org.springframework.context.MessageSource;
 
 /**
  * シンプルな{@link MessageCode}の実装です
@@ -41,6 +43,14 @@ public class SimpleMessageCode implements MessageCode {
 				.append("[%s]".formatted(this.messageId))
 				.append(String.format(defaultMessageFormat, args))
 				.toString();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String resolveMessage(MessageSource messageSource, Locale locale) {
+		return messageSource.getMessage(messageId, args, getDefaultMessage(), locale);
 	}
 
 }

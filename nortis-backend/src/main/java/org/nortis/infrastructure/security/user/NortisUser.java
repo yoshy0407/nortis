@@ -26,14 +26,16 @@ public class NortisUser extends User implements NortisUserDetails {
 	 * @param usernane ユーザ
 	 * @param tenantIds テナントID
 	 * @param password パスワード
+	 * @param expired 期限切れかどうか
 	 * @param authorities 権限
 	 */
 	public NortisUser(
 			String usernane, 
 			String[] tenantIds,
 			String password, 
+			boolean expired,
 			Collection<? extends GrantedAuthority> authorities) {
-		super(usernane, password, authorities);
+		super(usernane, password, true, true, !expired, true, authorities);
 		this.tenantIds = tenantIds;
 	}
 
@@ -66,15 +68,17 @@ public class NortisUser extends User implements NortisUserDetails {
 	/**
 	 * テナントの{@link NortisUser}を作成します
 	 * @param authentication 認証
+	 * @param expired 期限切れかどうか
 	 * @return {@link NortisUser}
 	 */
-	public static NortisUser createOfTenant(Authentication authentication) {
+	public static NortisUser createOfTenant(Authentication authentication, boolean expired) {
 		Set<GrantedAuthority> authorities = new HashSet<>();
 		authorities.add(new SimpleGrantedAuthority(AdminFlg.MEMBER.name()));
 		return new NortisUser(
 				authentication.getTenantId().toString(), 
 				new String[] { authentication.getTenantId().toString() },
 				authentication.getApiKey().toString(), 
+				expired,
 				authorities);
 	}
 	
@@ -82,9 +86,10 @@ public class NortisUser extends User implements NortisUserDetails {
 	 * ユーザの{@link NortisUser}を作成します
 	 * @param authentication 認証
 	 * @param suser ユーザ
+	 * @param expired 期限切れかどうか
 	 * @return {@link NortisUser}
 	 */
-	public static NortisUser createOfUser(Authentication authentication, Suser suser) {
+	public static NortisUser createOfUser(Authentication authentication, Suser suser, boolean expired) {
 		Set<GrantedAuthority> authorities = new HashSet<>();
 		authorities.add(new SimpleGrantedAuthority(suser.getAdminFlg().name()));
 		String[] tenantIds = suser.getTenantUserList().stream()
@@ -94,6 +99,7 @@ public class NortisUser extends User implements NortisUserDetails {
 				authentication.getUserId().toString(), 
 				tenantIds,
 				authentication.getApiKey().toString(), 
+				expired,
 				authorities);		
 	}
 }

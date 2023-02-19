@@ -40,6 +40,13 @@ public class TenantDomainService {
 		return Tenant.create(tenantId, tenantName, createId);
 	}
 	
-
+	/**
+	 * テナントの存在チェックを実施します
+	 * @param tenantId テナントID
+	 * @return テナントの存在確認
+	 */
+	public boolean existTenant(TenantId tenantId) {
+		return this.tenantRepository.get(tenantId).isPresent();
+	}
 
 }
