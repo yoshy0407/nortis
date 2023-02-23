@@ -69,14 +69,14 @@ class AuthenticationApplicationServiceTest {
 		assertDoesNotThrow(() -> {
 			NortisUserDetails user = this.applicationService.authenticateOf("APIKEYTENANT1");
 			
-			assertThat(user.getUsername()).isEqualTo("TEST");
+			assertThat(user.getUsername()).isEqualTo("TEST1");
 			assertThat(user.getPassword()).isEqualTo("APIKEYTENANT1");
 			assertThat(user.getAuthorities()).hasSize(1);
 			assertThat(user.getAuthorities()).anySatisfy(auth -> {
 				assertThat(auth.getAuthority()).isEqualTo(AdminFlg.MEMBER.name());
 			});
 			assertThat(user.getTenantId()).anySatisfy(id -> {
-				assertThat(id).isEqualTo("TEST");
+				assertThat(id).isEqualTo("TEST1");
 			});
 		});
 	}
@@ -86,11 +86,11 @@ class AuthenticationApplicationServiceTest {
 		assertDoesNotThrow(() -> {
 			NortisUserDetails user = this.applicationService.authenticateOf("APIKEYUSER3");
 			
-			assertThat(user.getUsername()).isEqualTo("0000000007");
+			assertThat(user.getUsername()).isEqualTo("0000000003");
 			assertThat(user.getPassword()).isEqualTo("APIKEYUSER3");
 			assertThat(user.getAuthorities()).hasSize(1);
 			assertThat(user.getAuthorities()).anySatisfy(auth -> {
-				assertThat(auth.getAuthority()).isEqualTo(AdminFlg.ADMIN.name());
+				assertThat(auth.getAuthority()).isEqualTo(AdminFlg.MEMBER.name());
 			});
 			assertThat(user.getTenantId()).isEmpty();
 		});
