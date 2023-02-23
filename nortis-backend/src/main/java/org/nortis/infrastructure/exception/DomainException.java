@@ -79,4 +79,16 @@ public class DomainException extends Exception {
 		return messageSource.getMessage(messageId, args, getMessage(), LocaleContextHolder.getLocale());
 	}
 	
+	/**
+	 * ログ出力用にフォーマットしたメッセージを解決します
+	 * @param messageSource {@link MessageSource}
+	 * @return 解決したメッセージ
+	 */
+	public String resolveLogFormatMessage(MessageSource messageSource) {
+		return new StringBuilder()
+				.append("[%s]".formatted(this.messageId))
+				.append(resolveMessage(messageSource))
+				.toString();
+	}
+	
 }

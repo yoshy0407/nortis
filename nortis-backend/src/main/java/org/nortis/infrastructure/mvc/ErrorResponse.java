@@ -7,8 +7,9 @@ import java.time.LocalDateTime;
  * @author yoshiokahiroshi
  * @version 1.0.0
  * @param timestamp タイムスタンプ
+ * @param code エラーコード
  * @param message エラーメッセージ
  */
-public record ErrorResponse(LocalDateTime timestamp, String message) {
+public record ErrorResponse(LocalDateTime timestamp, String code, String message) {
 
 }

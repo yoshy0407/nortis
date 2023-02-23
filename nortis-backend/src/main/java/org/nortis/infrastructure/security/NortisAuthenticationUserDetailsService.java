@@ -31,7 +31,7 @@ public class NortisAuthenticationUserDetailsService implements AuthenticationUse
 	@Override
 	public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
 		try {
-			return this.authenticationApplicationService.authenticateOf(token.getCredentials().toString());
+			return this.authenticationApplicationService.authenticateOf(token.getPrincipal().toString());
 		} catch (DomainException e) {
 			String message = MessageCodes.nortis60001().resolveMessage(messageSource, LocaleContextHolder.getLocale());
 			log.error(e.resolveMessage(messageSource));

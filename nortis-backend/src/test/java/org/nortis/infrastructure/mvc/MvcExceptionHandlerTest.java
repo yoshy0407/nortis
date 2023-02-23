@@ -36,6 +36,7 @@ class MvcExceptionHandlerTest {
 				.locale(Locale.JAPAN))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.code").value("domainId"))
 			.andExpect(jsonPath("$.message").value("domainExceptionTest"));
 	}
 
@@ -45,7 +46,18 @@ class MvcExceptionHandlerTest {
 				.locale(Locale.JAPAN))
 			.andExpect(status().isInternalServerError())
 			.andExpect(jsonPath("$.timestamp").exists())
-			.andExpect(jsonPath("$.message").value("unexpectedExceptionTest"));
+			.andExpect(jsonPath("$.code").value("NORTIS00500"))
+			.andExpect(jsonPath("$.message").value("想定外のエラーです"));
+	}
+	
+	@Test
+	void testException() throws Exception {
+		this.mockMvc.perform(get("/test3")
+				.locale(Locale.JAPAN))
+			.andExpect(status().isInternalServerError())
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.code").value("NORTIS00500"))
+			.andExpect(jsonPath("$.message").value("想定外のエラーです"));
 	}
 
 }

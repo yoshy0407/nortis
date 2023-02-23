@@ -21,6 +21,8 @@ public class NortisUser extends User implements NortisUserDetails {
 	
 	private final String[] tenantIds;
 	
+	private final boolean isTenant;
+	
 	/**
 	 * インスタンスを生成します
 	 * @param usernane ユーザ
@@ -28,15 +30,18 @@ public class NortisUser extends User implements NortisUserDetails {
 	 * @param password パスワード
 	 * @param expired 期限切れかどうか
 	 * @param authorities 権限
+	 * @param isTenant テナントかどうか
 	 */
 	public NortisUser(
 			String usernane, 
 			String[] tenantIds,
 			String password, 
 			boolean expired,
-			Collection<? extends GrantedAuthority> authorities) {
+			Collection<? extends GrantedAuthority> authorities,
+			boolean isTenant) {
 		super(usernane, password, true, true, !expired, true, authorities);
 		this.tenantIds = tenantIds;
+		this.isTenant = isTenant;
 	}
 
 	/**
@@ -79,7 +84,8 @@ public class NortisUser extends User implements NortisUserDetails {
 				new String[] { authentication.getTenantId().toString() },
 				authentication.getApiKey().toString(), 
 				expired,
-				authorities);
+				authorities,
+				true);
 	}
 	
 	/**
@@ -100,6 +106,24 @@ public class NortisUser extends User implements NortisUserDetails {
 				tenantIds,
 				authentication.getApiKey().toString(), 
 				expired,
-				authorities);		
+				authorities,
+				false);		
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isTenant() {
+		return this.isTenant;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isUser() {
+		return !this.isTenant;
+	}
+	
 }

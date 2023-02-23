@@ -7,6 +7,7 @@ import org.nortis.domain.tenant.TenantDomainService;
 import org.nortis.domain.tenant.TenantEntityListener;
 import org.nortis.domain.tenant.TenantRepository;
 import org.nortis.domain.tenant.TenantRepositoryImpl;
+import org.nortis.domain.user.AuthorityCheckDomainService;
 import org.nortis.domain.user.DomaSuserRepository;
 import org.nortis.domain.user.SuserRepository;
 import org.seasar.doma.jdbc.Config;
@@ -65,11 +66,18 @@ class TenantApplicationServiceTestConfig {
 	}
 	
 	@Bean
+	AuthorityCheckDomainService authorityCheckDomainService(SuserRepository suserRepository) {
+		return new AuthorityCheckDomainService(suserRepository);
+	}
+	
+	@Bean
 	TenantApplicationService tenantApplicationService(
 			TenantRepository tenantRepository, 
 			TenantDomainService tenantDomainService,
-			AuthenticationDomainService authenticationDomainService) {
-		return new TenantApplicationService(tenantRepository, tenantDomainService, authenticationDomainService);
+			AuthenticationDomainService authenticationDomainService,
+			AuthorityCheckDomainService authorityCheckDomainService) {
+		return new TenantApplicationService(tenantRepository, tenantDomainService, 
+				authenticationDomainService, authorityCheckDomainService);
 	}
 	
 }

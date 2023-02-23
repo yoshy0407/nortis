@@ -5,7 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.exception.UnexpectedException;
+import org.nortis.infrastructure.message.MessageCode;
+import org.nortis.infrastructure.message.MessageCodes;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -34,7 +37,7 @@ public class MvcExceptionHandler {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(DomainException.class)
 	public ErrorResponse handleDomainException(DomainException ex) {
-		return new ErrorResponse(LocalDateTime.now(), ex.resolveMessage(this.messageSource));
+		return new ErrorResponse(LocalDateTime.now(), ex.getMessageId(), ex.resolveMessage(this.messageSource));
 	}
 	
 	/**
@@ -46,8 +49,26 @@ public class MvcExceptionHandler {
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	@ExceptionHandler(UnexpectedException.class)
 	public ErrorResponse handleUnexpectedException(UnexpectedException ex) {
-		log.error("unexpected Error", ex);
-		return new ErrorResponse(LocalDateTime.now(), ex.resolveMesage(messageSource));
+		log.error("unexpected Error: %s".formatted(ex.resolveLogFormatMessage(messageSource)), ex);
+		return create500Response();
 	}
 	
+	/**
+	 * 上記意外の例外が投げられた際に処理してエラーレスポンスを返却します
+	 * @param ex 例外
+	 * @return エラーレスポンス
+	 */
+	@ResponseBody
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	@ExceptionHandler(Throwable.class)
+	public ErrorResponse handleException(Throwable ex) {
+		log.error("unexpected Error", ex);
+		return create500Response();
+	}
+	
+	private ErrorResponse create500Response() {
+		MessageCode code = MessageCodes.nortis00500();
+		String message = code.resolveMessage(messageSource, LocaleContextHolder.getLocale());
+		return new ErrorResponse(LocalDateTime.now(), code.getCode(), message);
+	}
 }

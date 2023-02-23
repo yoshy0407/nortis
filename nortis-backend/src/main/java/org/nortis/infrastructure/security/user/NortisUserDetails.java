@@ -15,5 +15,17 @@ public interface NortisUserDetails extends UserDetails {
 	 * @return テナントID
 	 */
 	public String[] getTenantId();
-		
+	
+	/**
+	 * テナント自身であるかどうかチェックします
+	 * @return テナント自身かどうか
+	 */
+	public boolean isTenant();
+	
+	/**
+	 * ユーザであるかどうかチェックします
+	 * @return ユーザであるかどうか
+	 */
+	public boolean isUser();
+	
 }

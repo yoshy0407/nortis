@@ -39,10 +39,7 @@ public class SimpleMessageCode implements MessageCode {
 	 */
 	@Override
 	public String getDefaultMessage() {
-		return new StringBuilder()
-				.append("[%s]".formatted(this.messageId))
-				.append(String.format(defaultMessageFormat, args))
-				.toString();
+		return String.format(defaultMessageFormat, args);
 	}
 
 	/**

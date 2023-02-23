@@ -22,4 +22,9 @@ class TestController {
 		throw new UnexpectedException("test", UNEXPECTED_ID);
 	}
 	
+	@GetMapping("/test3")
+	public void exeption() {
+		throw new RuntimeException("test exception");
+	}
+	
 }

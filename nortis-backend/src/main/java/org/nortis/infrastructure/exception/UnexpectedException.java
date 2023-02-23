@@ -65,7 +65,7 @@ public class UnexpectedException extends RuntimeException {
 	 * @param messageSource {@link MessageSource}
 	 * @return 解決したメッセージ
 	 */
-	public String resolveMesage(MessageSource messageSource) {
+	public String resolveMessage(MessageSource messageSource) {
 		return messageSource.getMessage(messageId, args, getMessage(), LocaleContextHolder.getLocale());
 	}
 
@@ -77,4 +77,17 @@ public class UnexpectedException extends RuntimeException {
 	public static UnexpectedException convertDomainException(DomainException ex) {
 		return new UnexpectedException(ex.getMessage(), ex.getMessageId(), ex, ex.getArgs());
 	}
+	
+	/**
+	 * ログ出力用にフォーマットしたメッセージを解決します
+	 * @param messageSource {@link MessageSource}
+	 * @return 解決したメッセージ
+	 */
+	public String resolveLogFormatMessage(MessageSource messageSource) {
+		return new StringBuilder()
+				.append("[%s]".formatted(this.messageId))
+				.append(resolveMessage(messageSource))
+				.toString();
+	}
+
 }

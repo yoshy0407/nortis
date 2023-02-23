@@ -31,7 +31,7 @@ class UnexpectedExceptionTest {
 
 		assertThat(ex.getMessage()).isEqualTo("message");
 		
-		assertThat(ex.resolveMesage(messageSource)).isEqualTo("test message");
+		assertThat(ex.resolveMessage(messageSource)).isEqualTo("test message");
 	}
 
 }

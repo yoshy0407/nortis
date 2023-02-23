@@ -8,7 +8,9 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,6 +26,7 @@ import org.springframework.security.web.authentication.preauth.RequestHeaderAuth
  * @author yoshiokahiroshi
  * @version 1.0.0
  */
+@EnableWebSecurity
 @Configuration
 public class SecurityConfiguration {
 
@@ -48,12 +51,18 @@ public class SecurityConfiguration {
 	}
 	
 	@Bean
+	AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+		return authenticationConfiguration.getAuthenticationManager();
+	}
+	
+	@Bean
 	SecurityFilterChain securityFilter(
 			HttpSecurity http, 
+			AuthenticationManager authenticationManager,
 			AuthenticationFailureHandler authenticationFailureHandler) throws Exception {
 		RequestHeaderAuthenticationFilter filter = new RequestHeaderAuthenticationFilter();
-		filter.setCredentialsRequestHeader("X-NORTIS-APIKEY");
-		filter.setAuthenticationManager(http.getSharedObject(AuthenticationManager.class));
+		filter.setPrincipalRequestHeader("X-NORTIS-APIKEY");
+		filter.setAuthenticationManager(authenticationManager);
 		filter.setAuthenticationFailureHandler(authenticationFailureHandler);
 		
 		return http.addFilter(filter)

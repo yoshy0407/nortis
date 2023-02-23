@@ -40,6 +40,14 @@ public class MessageCodes {
 	}
 
 	/**
+	 * NORTIS00500
+	 * @return {@link MessageCode}
+	 */
+	public static MessageCode nortis00500() {
+		return new SimpleMessageCode("NORTIS00500", "想定外のエラーです", new Object[] { });
+	}
+
+	/**
 	 * NORTIS10001
 	 * @return {@link MessageCode}
 	 */
@@ -203,6 +211,17 @@ public class MessageCodes {
 		return new SimpleMessageCode(
 				"NORTIS50004", 
 				"指定されたユーザまたはパスワードは存在しません", 
+				new Object[] { });
+	}
+
+	/**
+	 * NORTIS50005
+	 * @return {@link MessageCode}
+	 */
+	public static MessageCode nortis50005() {
+		return new SimpleMessageCode(
+				"NORTIS50005", 
+				"権限がありません", 
 				new Object[] { });
 	}
 

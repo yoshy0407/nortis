@@ -6,12 +6,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.nortis.infrastructure.message.MessageCodes;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -46,6 +48,8 @@ public class NortisAuthenticaitonFailureHandler implements AuthenticationFailure
 	private void authenticationError(HttpServletResponse response, UsernameNotFoundException ex) throws IOException {
 		ObjectNode json = createResponse(ex.getMessage());
 		response.getWriter().write(json.toString());
+		response.setContentType(MediaType.APPLICATION_JSON.toString());
+		response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
 		response.setStatus(HttpStatus.UNAUTHORIZED.value());
 	}
 
@@ -53,6 +57,8 @@ public class NortisAuthenticaitonFailureHandler implements AuthenticationFailure
 		ObjectNode json = createResponse(
 				MessageCodes.nortis60002().resolveMessage(messageSource, LocaleContextHolder.getLocale()));
 		response.getWriter().write(json.toString());
+		response.setContentType(MediaType.APPLICATION_JSON.toString());
+		response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
 		response.setStatus(HttpStatus.UNAUTHORIZED.value());		
 	}
 
@@ -60,6 +66,8 @@ public class NortisAuthenticaitonFailureHandler implements AuthenticationFailure
 		ObjectNode json = createResponse(
 				MessageCodes.nortis60001().resolveMessage(messageSource, LocaleContextHolder.getLocale()));
 		response.getWriter().write(json.toString());
+		response.setContentType(MediaType.APPLICATION_JSON.toString());
+		response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
 		response.setStatus(HttpStatus.NOT_FOUND.value());		
 	}
 

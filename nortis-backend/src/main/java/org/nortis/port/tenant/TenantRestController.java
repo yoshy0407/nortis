@@ -4,8 +4,12 @@ import lombok.AllArgsConstructor;
 import org.nortis.application.tenant.TenantApplicationService;
 import org.nortis.application.tenant.TenantNameUpdateCommand;
 import org.nortis.application.tenant.TenantRegisterCommand;
+import org.nortis.domain.authentication.value.ApiKey;
+import org.nortis.domain.tenant.Tenant;
+import org.nortis.infrastructure.application.ApplicationTranslator;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.security.user.NortisUserDetails;
+import org.nortis.port.ApiKeyResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
 
 /**
  * テナントのエンドポイントのコントローラです
@@ -34,15 +37,16 @@ public class TenantRestController {
 	/**
 	 * テナント情報を返却します
 	 * @param tenantId テナントID
-	 * @param userDetails 認証済みユーザ
+	 * @param user 認証済みユーザ
 	 * @return テナントリソース
+	 * @throws DomainException ドメインロジックエラー
 	 */
+	@ResponseStatus(HttpStatus.OK)
 	@GetMapping("{tenantId}")
 	public TenantResource get(
 			@PathVariable(name = "tenantId", required = true) String tenantId,
-			@AuthenticationPrincipal NortisUserDetails userDetails) {
-		//:TODO
-		return null;
+			@AuthenticationPrincipal NortisUserDetails user) throws DomainException {
+		return this.tenantApplicationService.getTenant(tenantId, user, translator());
 	}
 	
 	/**
@@ -52,43 +56,66 @@ public class TenantRestController {
 	 * @return 作成したテナントリソース
 	 * @throws DomainException ドメインロジックエラー
 	 */
-	@ResponseStatus(code = HttpStatus.CREATED)
+	@ResponseStatus(HttpStatus.OK)
 	@PostMapping
-	public TenantResource post(
+	public TenantResource register(
 			@RequestBody TenantRequest req, 
 			@AuthenticationPrincipal NortisUserDetails userDetails) throws DomainException {
-		TenantRegisterCommand command = new TenantRegisterCommand(req.tenantId(), req.tenantName(), userDetails.getUsername());
-		return this.tenantApplicationService.register(command, data -> {
-			return new TenantResource(data.getTenantId().toString(), data.getTenantName());
-		});
+		TenantRegisterCommand command = new TenantRegisterCommand(req.tenantId(), req.tenantName(), userDetails);
+		return this.tenantApplicationService.register(command, translator());
+	}
+	
+	/**
+	 * APIキーを作成します
+	 * @param tenantId テナントID
+	 * @param userDetails ユーザ
+	 * @return APIキーのリソース
+	 * @throws DomainException ドメインロジックエラー
+	 */
+	@ResponseStatus(HttpStatus.OK)
+	@PostMapping("{tenantId}/apiKey")
+	public ApiKeyResource createApiKey(
+			@PathVariable String tenantId,
+			@AuthenticationPrincipal NortisUserDetails userDetails) throws DomainException {
+		ApiKey apiKey = this.tenantApplicationService.createApiKey(tenantId, userDetails);
+		return new ApiKeyResource(apiKey.toString());
 	}
 	
 	/**
 	 * テナントを更新します
 	 * @param tenantId テナントID
 	 * @param req リクエストボディ
+	 * @param userDetails 認証済みのユーザ
 	 * @return 変更したテナントリソース
 	 * @throws DomainException ドメインロジックエラー
 	 */
+	@ResponseStatus(HttpStatus.OK)
 	@PatchMapping("{tenantId}")
-	public TenantResource patch(
+	public TenantResource updateName(
 			@PathVariable(name = "tenantId", required = true) String tenantId,
-			@RequestBody TenantPatchRequest req) throws DomainException {
-		TenantNameUpdateCommand command = new TenantNameUpdateCommand(tenantId, req.name(), null);
-		return this.tenantApplicationService.changeName(command, data -> {
-			return new TenantResource(data.getTenantId().toString(), data.getTenantName());
-		});
+			@RequestBody TenantPatchRequest req,
+			@AuthenticationPrincipal NortisUserDetails userDetails) throws DomainException {
+		TenantNameUpdateCommand command = new TenantNameUpdateCommand(tenantId, req.name(), userDetails);
+		return this.tenantApplicationService.changeName(command, translator());
 	}
 
 	/**
 	 * テナントを削除します
 	 * @param tenantId テナントID
+	 * @param userDetails 認証済みユーザ
 	 * @throws DomainException ドメインロジックエラー
 	 */
 	@ResponseStatus(code = HttpStatus.NO_CONTENT)
-	@DeleteMapping
-	public void delete(@PathVariable(name = "tenantId", required = true) String tenantId) throws DomainException {
-		this.tenantApplicationService.delete(tenantId, null);
+	@DeleteMapping("{tenantId}")
+	public void delete(
+			@PathVariable(name = "tenantId", required = true) String tenantId,
+			@AuthenticationPrincipal NortisUserDetails userDetails) throws DomainException {
+		this.tenantApplicationService.delete(tenantId, userDetails);
 	}
 	
+	private ApplicationTranslator<Tenant, TenantResource> translator() {
+		return data -> {
+			return new TenantResource(data.getTenantId().toString(), data.getTenantName());
+		};
+	}
 }
