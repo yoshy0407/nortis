@@ -1,59 +1,48 @@
 package org.nortis.domain.user.value;
 
+import lombok.Getter;
 import org.seasar.doma.Domain;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 /**
- * 管理者フラグ
+ * 管理者権限を表すオブジェクトです
+ * 
  * @author yoshiokahiroshi
  * @version 1.0.0
  */
+@Getter
 @Domain(valueType = String.class, accessorMethod = "getValue", factoryMethod = "resolve")
 public enum AdminFlg {
-	/**
-	 * 管理者ユーザ
-	 */
-	ADMIN("1"),
-	/**
-	 * 通常ユーザ
-	 */
-	MEMBER("0");
-	
-	private final String value;
-	
-	private AdminFlg(String value) {
-		this.value = value;
-	}
-	
-	/**
-	 * 値を返却します
-	 * @return 値
-	 */
-	public String getValue() {
-		return value;
-	}
-	
-	/**
-	 * 権限を返却します
-	 * @return 権限
-	 */
-	public GrantedAuthority getAuthority() {
-		return new SimpleGrantedAuthority(this.name());
-	}
-	
-	/**
-	 * 値に対応するログインフラグを取得します
-	 * @param value 値
-	 * @return ログインフラグ
-	 */
-	public static AdminFlg resolve(String value) {
-		for (AdminFlg loginFlg : AdminFlg.values()) {
-			if (loginFlg.getValue().equals(value)) {
-				return loginFlg;
-			}
-		}
-		throw new IllegalStateException("指定された値が存在しません。　値：" + value);
-	}
-	
+    /**
+     * 管理者ユーザ
+     */
+    ADMIN("1", "管理者ユーザ"),
+    /**
+     * 通常ユーザ
+     */
+    MEMBER("0", "通常ユーザ");
+
+    private final String value;
+
+    private final String displayName;
+
+    private AdminFlg(String value, String displayName) {
+        this.value = value;
+        this.displayName = displayName;
+    }
+
+    /**
+     * 値に対応する管理者フラグを取得します
+     * 
+     * @param value 値
+     * @return ログインフラグ
+     */
+    public static AdminFlg resolve(String value) {
+        for (AdminFlg adminFlg : AdminFlg.values()) {
+            if (adminFlg.getValue().equals(value)) {
+                return adminFlg;
+            }
+        }
+        throw new IllegalStateException("指定された値が存在しません。　値：" + value);
+    }
+
 }

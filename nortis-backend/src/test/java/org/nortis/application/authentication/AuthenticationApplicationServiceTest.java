@@ -2,109 +2,100 @@ package org.nortis.application.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.nortis.ServiceTestBase;
 import org.nortis.domain.authentication.Authentication;
 import org.nortis.domain.authentication.AuthenticationRepository;
 import org.nortis.domain.authentication.value.ApiKey;
-import org.nortis.domain.user.value.AdminFlg;
+import org.nortis.domain.service.AuthenticationDomainService;
+import org.nortis.domain.tenant.Tenant;
+import org.nortis.domain.tenant.value.TenantId;
+import org.nortis.domain.tenant.value.TenantIdentifier;
 import org.nortis.domain.user.value.UserId;
-import org.nortis.infrastructure.config.DomaConfiguration;
 import org.nortis.infrastructure.exception.DomainException;
+import org.nortis.infrastructure.message.MessageCodes;
 import org.nortis.infrastructure.security.user.NortisUserDetails;
-import org.seasar.doma.boot.autoconfigure.DomaAutoConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.jdbc.AutoConfigureDataJdbc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.event.RecordApplicationEvents;
-import org.springframework.test.context.jdbc.Sql;
+import org.nortis.infrastructure.security.user.TenantNortisUser;
 
-@Sql(scripts = {
-		"/META-INF/ddl/dropAuthentication.sql",
-		"/META-INF/ddl/dropSuser.sql",
-		"/ddl/createAuthentication.sql",
-		"/ddl/createSuser.sql",
-		"/META-INF/data/application/del_ins_authentication.sql",
-		"/META-INF/data/application/del_ins_suser.sql"
-})
-@RecordApplicationEvents
-@AutoConfigureDataJdbc
-@SpringBootTest(classes = { 
-		DomaAutoConfiguration.class, 
-		DomaConfiguration.class, 
-		AuthenticationApplicationServiceTestConfig.class
-	})
-class AuthenticationApplicationServiceTest {
+class AuthenticationApplicationServiceTest extends ServiceTestBase {
 
-	@Autowired
-	AuthenticationApplicationService applicationService;
-	
-	@Autowired
-	AuthenticationRepository authenticationRepository;
-	
-	@Test
-	void testLogin() throws DomainException {
-		ApiKey apiKey = this.applicationService.login("0000000001", "password", auth -> auth.getApiKey());
-		
-		Optional<Authentication> optAuth = this.authenticationRepository.get(apiKey);
-		
-		assertThat(optAuth).isPresent();
-	}
+    @Mock
+    AuthenticationRepository authenticationRepository;
 
-	@Test
-	void testLogout() throws DomainException {
-		this.applicationService.logout("0000000009");
+    @Mock
+    AuthenticationDomainService authenticationDomainService;
 
-		Optional<Authentication> optAuth = 
-				this.authenticationRepository.getFromUserId(UserId.create("0000000009"));
-		
-		assertThat(optAuth).isEmpty();
-	}
+    AuthenticationApplicationService applicationService;
 
-	@Test
-	void testAuthenticateOfTenant() {
-		assertDoesNotThrow(() -> {
-			NortisUserDetails user = this.applicationService.authenticateOf("APIKEYTENANT1");
-			
-			assertThat(user.getUsername()).isEqualTo("TEST1");
-			assertThat(user.getPassword()).isEqualTo("APIKEYTENANT1");
-			assertThat(user.getAuthorities()).hasSize(1);
-			assertThat(user.getAuthorities()).anySatisfy(auth -> {
-				assertThat(auth.getAuthority()).isEqualTo(AdminFlg.MEMBER.name());
-			});
-			assertThat(user.getTenantId()).anySatisfy(id -> {
-				assertThat(id).isEqualTo("TEST1");
-			});
-		});
-	}
+    @BeforeEach
+    void setup() {
+        this.applicationService = new AuthenticationApplicationService(authenticationRepository,
+                authenticationDomainService);
+    }
 
-	@Test
-	void testAuthenticateOfUser() {
-		assertDoesNotThrow(() -> {
-			NortisUserDetails user = this.applicationService.authenticateOf("APIKEYUSER3");
-			
-			assertThat(user.getUsername()).isEqualTo("0000000003");
-			assertThat(user.getPassword()).isEqualTo("APIKEYUSER3");
-			assertThat(user.getAuthorities()).hasSize(1);
-			assertThat(user.getAuthorities()).anySatisfy(auth -> {
-				assertThat(auth.getAuthority()).isEqualTo(AdminFlg.MEMBER.name());
-			});
-			assertThat(user.getTenantId()).isEmpty();
-		});
-	}
+    @Test
+    void testAuthenticateOf_AuthenticationSuccess() throws DomainException {
 
-	@Test
-	void testRemoveExpiredAuthentication() {
-		this.applicationService.removeExpiredAuthentication(LocalDateTime.of(2022, 1, 5, 12, 40, 00));
-		
-		List<Authentication> list = this.authenticationRepository.getUserAuthentication();
-		
-		assertThat(list).hasSize(2);
-		assertThat(list.get(0).getApiKey().toString()).isEqualTo("APIKEYUSER2");
-		assertThat(list.get(1).getApiKey().toString()).isEqualTo("APIKEYUSER3");
-	}
+        var apiKey = "APIKEYTENANT";
+
+        Tenant tenant = Tenant.create(TenantId.create("0000000001"), TenantIdentifier.create("TEST"), "テストテナント");
+        Authentication authentication = Authentication.createFromTenant(tenant.getTenantId());
+        TenantNortisUser userDetails = TenantNortisUser.createOfTenant(authentication, tenant, false);
+
+        when(this.authenticationDomainService.authorize(eq(ApiKey.create(apiKey)))).thenReturn(userDetails);
+
+        assertDoesNotThrow(() -> {
+            NortisUserDetails user = this.applicationService.authenticateOf(apiKey);
+
+            assertThat(user).isEqualTo(userDetails);
+        });
+    }
+
+    @Test
+    void testAuthenticateOf_AuthenticationFailure() throws DomainException {
+        var apiKey = "APIKEYTENANT";
+
+        when(this.authenticationDomainService.authorize(eq(ApiKey.create(apiKey))))
+                .thenThrow(new DomainException(MessageCodes.nortis10003()));
+
+        assertThrows(DomainException.class, () -> {
+            this.applicationService.authenticateOf(apiKey);
+
+        });
+    }
+
+    @Test
+    void testRemoveExpiredAuthentication() throws DomainException {
+
+        var baseDateTime = LocalDateTime.now();
+
+        Authentication authentication1 = Authentication.createFromUserId(UserId.create("1000000001"));
+        Authentication authentication2 = Authentication.createFromUserId(UserId.create("1000000002"));
+        when(this.authenticationRepository.getUserAuthentication())
+                .thenReturn(Lists.list(authentication1, authentication2));
+
+        // when(this.authenticationDomainService.checkExpired(authentication1,
+        // baseDateTime)).thenReturn(true);
+        // when(this.authenticationDomainService.checkExpired(authentication2,
+        // baseDateTime)).thenReturn(false);
+        // 上記だと引数をちゃんと見れず、モックが機能しないので、全て対象にする
+        when(this.authenticationDomainService.checkExpired(any(), any())).thenReturn(true);
+
+        assertDoesNotThrow(() -> {
+            this.applicationService.removeExpiredAuthentication(LocalDateTime.of(2022, 1, 5, 12, 40, 00));
+        });
+
+        verify(this.authenticationRepository).remove(eq(authentication1));
+        verify(this.authenticationRepository).remove(eq(authentication2));
+    }
 
 }

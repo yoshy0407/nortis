@@ -1,10 +1,39 @@
 CREATE TABLE IF NOT EXISTS TENANT (
 	TENANT_ID varchar(10) PRIMARY KEY,
 	TENANT_NAME varchar(50) not null,
+	TENANT_IDENTIFIER varchar(20) not null UNIQUE,
 	CREATE_ID varchar(10) not null,
 	CREATE_DT timestamp not null,
 	UPDATE_ID varchar(10),
 	UPDATE_DT timestamp,
 	VERSION bigint
+)
+;
+
+CREATE SEQUENCE IF NOT EXISTS TENANT_SEQ
+;
+
+CREATE TABLE IF NOT EXISTS TENANT_ROLE (
+	TENANT_ID varchar(10) NOT NULL,
+	ROLE_ID varchar(5) NOT NULL,
+	ROLE_NAME varchar(20) NOT NULL,
+	CREATE_ID varchar(10) not null,
+	CREATE_DT timestamp not null,
+	UPDATE_ID varchar(10),
+	UPDATE_DT timestamp,
+	VERSION bigint,
+	PRIMARY KEY(TENANT_ID, ROLE_ID)
+)
+;
+
+CREATE SEQUENCE IF NOT EXISTS TENANT_ROLE_SEQ
+;
+
+CREATE TABLE IF NOT EXISTS ROLE_OPERATION (
+	ROLE_ID varchar(5) NOT NULL,
+	OPERATION_ID varchar(5) NOT NULL,
+	CREATE_ID varchar(10) not null,
+	CREATE_DT timestamp not null,
+	PRIMARY KEY(ROLE_ID, OPERATION_ID)
 )
 ;

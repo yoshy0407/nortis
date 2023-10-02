@@ -1,67 +1,35 @@
 package org.nortis.infrastructure.config;
 
 import lombok.AllArgsConstructor;
-import org.nortis.domain.authentication.AuthenticationDomainService;
 import org.nortis.domain.authentication.AuthenticationRepository;
-import org.nortis.domain.consumer.mail.MailConsumerRepository;
-import org.nortis.domain.consumer.mail.MailSendMessageConsumer;
+import org.nortis.domain.service.AuthenticationDomainService;
+import org.nortis.domain.tenant.TenantRepository;
 import org.nortis.domain.user.SuserRepository;
-import org.nortis.infrastructure.mail.MailSendFailureHandler;
 import org.nortis.infrastructure.property.NortisMailProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * ドメインサービスに関するコンフィグクラスです
+ * 
  * @author yoshiokahiroshi
  * @version 1.0.0
  */
 @AllArgsConstructor
-@EnableConfigurationProperties({
-	NortisMailProperties.class,
-	AuthenticationProperties.class
-})
+@EnableConfigurationProperties({ NortisMailProperties.class, AuthenticationProperties.class })
 @Configuration(proxyBeanMethods = false)
 public class DomainServiceConfiguration {
 
-	/** メールに関するプロパティクラス */
-	private final NortisMailProperties nortisMailProperties;
+    /** メールに関するプロパティクラス */
+    private final AuthenticationProperties authenticationProperties;
 
-	/** メールに関するプロパティクラス */
-	private final AuthenticationProperties authenticationProperties;
+    @Bean
+    AuthenticationDomainService authenticationDomainService(AuthenticationRepository authenticationRepository,
+            TenantRepository tenantRepository, SuserRepository suserRepository, PasswordEncoder passwordEncoder) {
+        return new AuthenticationDomainService(authenticationRepository, tenantRepository, suserRepository,
+                authenticationProperties.getSessionExpireSecond());
+    }
 
-	/**
-	 * {@link MailSendMessageConsumer}のBean
-	 * @param mailConsumerRepository {@link MailConsumerDao}
-	 * @param javaMailSender {@link JavaMailSender}
-	 * @param mailSendFailureHandler {@link MailSendFailureHandler}
-	 * @return {@link MailSendMessageConsumer}
-	 */
-	@Bean
-	MailSendMessageConsumer mailSendDomainService(
-			MailConsumerRepository mailConsumerRepository,
-			JavaMailSender javaMailSender,
-			MailSendFailureHandler mailSendFailureHandler) {
-		return new MailSendMessageConsumer(
-				mailConsumerRepository, 
-				javaMailSender, 
-				mailSendFailureHandler, 
-				this.nortisMailProperties.getFromMailAddress());
-	}
-	
-	@Bean
-	AuthenticationDomainService authenticationDomainService(
-			AuthenticationRepository authenticationRepository,
-			SuserRepository suserRepository,
-			PasswordEncoder passwordEncoder) {
-		return new AuthenticationDomainService(
-				authenticationRepository, 
-				suserRepository,
-				passwordEncoder,
-				authenticationProperties.getSessionExpireSecond());
-	}
-	
 }

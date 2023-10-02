@@ -2,253 +2,336 @@ package org.nortis.application.tenant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.time.LocalDateTime;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import java.util.Optional;
-import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.nortis.ServiceTestBase;
+import org.nortis.application.tenant.model.TenantNameUpdateCommand;
+import org.nortis.application.tenant.model.TenantRegisterCommand;
 import org.nortis.domain.authentication.Authentication;
 import org.nortis.domain.authentication.AuthenticationRepository;
 import org.nortis.domain.authentication.value.ApiKey;
+import org.nortis.domain.service.AuthorityCheckDomainService;
+import org.nortis.domain.service.NumberingDomainService;
+import org.nortis.domain.service.TenantDomainService;
 import org.nortis.domain.tenant.Tenant;
 import org.nortis.domain.tenant.TenantRepository;
-import org.nortis.domain.tenant.event.TenantDeletedEvent;
 import org.nortis.domain.tenant.value.TenantId;
-import org.nortis.infrastructure.config.DomaConfiguration;
+import org.nortis.domain.tenant.value.TenantIdentifier;
+import org.nortis.infrastructure.application.ApplicationTranslator;
 import org.nortis.infrastructure.exception.DomainException;
-import org.nortis.infrastructure.security.user.NortisUser;
-import org.seasar.doma.boot.autoconfigure.DomaAutoConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.jdbc.AutoConfigureDataJdbc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.event.ApplicationEvents;
-import org.springframework.test.context.event.RecordApplicationEvents;
-import org.springframework.test.context.jdbc.Sql;
+import org.nortis.infrastructure.message.MessageCodes;
+import org.nortis.infrastructure.security.exception.NoAuthorityDomainException;
+import org.nortis.infrastructure.security.user.TenantNortisUser;
+import org.nortis.test.user.TestUsers;
 
-@Sql(scripts = {
-		"/META-INF/ddl/dropTenant.sql",
-		"/META-INF/ddl/dropSuser.sql",
-		"/META-INF/ddl/dropAuthentication.sql",
-		"/ddl/createTenant.sql",
-		"/ddl/createSuser.sql",
-		"/ddl/createAuthentication.sql",
-		"/META-INF/data/application/del_ins_tenant.sql",
-		"/META-INF/data/application/del_ins_suser.sql"
-})
-@RecordApplicationEvents
-@AutoConfigureDataJdbc
-@SpringBootTest(classes = { DomaAutoConfiguration.class, DomaConfiguration.class, TenantApplicationServiceTestConfig.class })
-class TenantApplicationServiceTest {
+class TenantApplicationServiceTest extends ServiceTestBase {
 
-	@Autowired
-	ApplicationEvents applicationEvents;
+    @Mock
+    TenantRepository tenantRepository;
 
-	@Autowired
-	TenantApplicationService tenantApplicationService;
+    @Mock
+    AuthenticationRepository authenticationRepository;
 
-	@Autowired
-	TenantRepository tenantRepository;
+    @Mock
+    NumberingDomainService numberingDomainService;
 
-	@Autowired
-	AuthenticationRepository authenticationRepository;
+    @Mock
+    AuthorityCheckDomainService authorityCheckDomainService;
 
-	@Test
-	void testGet() throws DomainException {
-		NortisUser user = new NortisUser("0000000001", new String[] {}, "password", false, Lists.newArrayList(), false);
-		
-		Tenant tenant = this.tenantApplicationService.getTenant("TEST1", user, d -> d);
+    @Mock
+    TenantDomainService tenantDomainService;
 
-		assertThat(tenant.getTenantId()).isEqualTo(TenantId.create("TEST1"));
-		assertThat(tenant.getTenantName()).isEqualTo("テストテナント１");
-		assertThat(tenant.getCreateId()).isEqualTo("TEST_ID");
-		assertThat(tenant.getCreateDt()).isNotNull();
-		assertThat(tenant.getUpdateDt()).isNull();
-		assertThat(tenant.getUpdateId()).isNull();
-		assertThat(tenant.getVersion()).isEqualTo(1L);
-	}
+    TenantApplicationService tenantApplicationService;
 
-	@Test
-	void testGetTenantNotFound() throws DomainException {
-		NortisUser user = new NortisUser("0000000001", new String[] {}, "password", false, Lists.newArrayList(), false);
+    @BeforeEach
+    void setup() {
+        this.tenantApplicationService = new TenantApplicationService(tenantRepository, authenticationRepository,
+                tenantDomainService, numberingDomainService, authorityCheckDomainService);
+    }
 
-		DomainException ex = assertThrows(DomainException.class, () -> {
-			this.tenantApplicationService.getTenant("AAAAAA", user, d -> d);
-		});
-		
-		assertThat(ex.getMessageId()).isEqualTo("NORTIS10003");
-		assertThat(ex.getMessage()).isEqualTo("指定されたIDのテナントは存在しません");
-	}
+    @Test
+    void testGet_success() throws DomainException {
+        var tenantId = TenantId.create("0000000001");
 
-	@Test
-	void testGetTenantAccessDenied() throws DomainException {
-		NortisUser user = new NortisUser("0000000002", new String[] {}, "password", false, Lists.newArrayList(), false);
+        Tenant tenant = Tenant.create(tenantId, TenantIdentifier.create("TEST"), "テストテナント");
+        Authentication authentication = Authentication.createFromTenant(tenantId);
+        TenantNortisUser user = TenantNortisUser.createOfTenant(authentication, tenant, false);
 
-		DomainException ex = assertThrows(DomainException.class, () -> {
-			this.tenantApplicationService.getTenant("TEST1", user, d -> d);
-		});
-		
-		assertThat(ex.getMessageId()).isEqualTo("NORTIS50005");
-	}
+        when(tenantRepository.getByTenantId(eq(tenantId))).thenReturn(Optional.of(tenant));
 
-	@Test
-	void testRegister() throws DomainException {
-		NortisUser user = new NortisUser("0000000005", new String[] {}, "password", false, Lists.newArrayList(), false);
+        Tenant result = this.tenantApplicationService.getTenant("0000000001", user, ApplicationTranslator.noConvert());
 
-		TenantRegisterCommand command = new TenantRegisterCommand("TENANT1", "登録テナント", user);
-		TenantId tenantId = tenantApplicationService
-				.register(command, data -> data.getTenantId());
+        assertThat(result.getTenantId()).isEqualTo(TenantId.create("0000000001"));
+        assertThat(result.getTenantIdentifier()).isEqualTo(TenantIdentifier.create("TEST"));
+        assertThat(result.getTenantName()).isEqualTo("テストテナント");
+    }
 
-		Optional<Tenant> optTenant = this.tenantRepository.get(tenantId);
-		assertThat(optTenant).isPresent();
+    @Test
+    void testGetTenant_NotFound() throws DomainException {
+        var tenantId = TenantId.create("0000000001");
 
-		Tenant tenant = optTenant.get();
-		assertThat(tenant.getTenantId()).isEqualTo(TenantId.create("TENANT1"));
-		assertThat(tenant.getTenantName()).isEqualTo("登録テナント");
-		assertThat(tenant.getCreateDt()).isBefore(LocalDateTime.now());
-		assertThat(tenant.getCreateId()).isEqualTo("0000000005");
-		assertThat(tenant.getUpdateDt()).isNull();
-		assertThat(tenant.getUpdateId()).isNull();
-		assertThat(tenant.getVersion()).isEqualTo(1L);
-	}
+        Tenant tenant = Tenant.create(tenantId, TenantIdentifier.create("TEST"), "テストテナント");
+        Authentication authentication = Authentication.createFromTenant(tenantId);
+        TenantNortisUser user = TenantNortisUser.createOfTenant(authentication, tenant, false);
 
-	@Test
-	void testRegisterAccessDenied() throws DomainException {
-		NortisUser user = new NortisUser("0000000003", new String[] {}, "password", false, Lists.newArrayList(), false);
+        when(tenantRepository.getByTenantId(eq(tenantId))).thenReturn(Optional.empty());
 
-		TenantRegisterCommand command = new TenantRegisterCommand("TENANT1", "登録テナント", user);
-		
-		DomainException ex = assertThrows(DomainException.class, () -> {
-			tenantApplicationService
-					.register(command, data -> data.getTenantId());			
-		});
+        DomainException ex = assertThrows(DomainException.class, () -> {
+            this.tenantApplicationService.getTenant("AAAAAA", user, d -> d);
+        });
 
-		assertThat(ex.getMessageId()).isEqualTo("NORTIS50005");
-	}
+        assertThat(ex.getMessageId()).isEqualTo("NORTIS10003");
+        assertThat(ex.getMessage()).isEqualTo("指定されたIDのテナントは存在しません");
+    }
 
-	@Test
-	void testCreateApiKey() throws DomainException {
-		NortisUser user = new NortisUser("0000000001", new String[] {}, "password", false, Lists.newArrayList(), false);
+    @Test
+    void testGetTenant_AccessDenied() throws DomainException {
+        var tenantId = TenantId.create("0000000001");
 
-		ApiKey apiKey = tenantApplicationService.createApiKey("TEST2", user);
+        Tenant tenant = Tenant.create(tenantId, TenantIdentifier.create("TEST"), "テストテナント");
+        Authentication authentication = Authentication.createFromTenant(tenantId);
+        TenantNortisUser user = TenantNortisUser.createOfTenant(authentication, tenant, false);
 
-		Optional<Authentication> optAuth = authenticationRepository.get(apiKey);
-		assertThat(optAuth).isPresent();
+        doThrow(new NoAuthorityDomainException(MessageCodes.nortis50005())).when(authorityCheckDomainService)
+                .checkJoinedTenantOf(eq(user), eq(tenantId));
 
-		Authentication auth = optAuth.get();
-		assertThat(auth.getApiKey()).isNotNull();
-		assertThat(auth.getTenantId()).isEqualTo(TenantId.create("TEST2"));
-		assertThat(auth.getUserId()).isNull();
-	}
+        NoAuthorityDomainException ex = assertThrows(NoAuthorityDomainException.class, () -> {
+            this.tenantApplicationService.getTenant(tenantId.toString(), user, d -> d);
+        });
 
-	@Test
-	void testCreateApiKeyAccessDenied() throws DomainException {
-		NortisUser user = new NortisUser("0000000004", new String[] {}, "password", false, Lists.newArrayList(), false);
+        assertThat(ex.getMessageId()).isEqualTo("NORTIS50005");
 
-		DomainException ex = assertThrows(DomainException.class, () -> {
-			tenantApplicationService.createApiKey("TEST2", user);			
-		});
-				
-		assertThat(ex.getMessageId()).isEqualTo("NORTIS50005");
-	}
-	
-	@Test
-	void testCreateApiKeyNotFound() throws DomainException {
-		NortisUser user = new NortisUser("0000000001", new String[] {}, "password", false, Lists.newArrayList(), false);
+        verify(tenantRepository, never()).getByTenantId(eq(tenantId));
+    }
 
-		DomainException ex = assertThrows(DomainException.class, () -> {
-			tenantApplicationService.createApiKey("AAAAAA", user);
-		});
+    @Test
+    void testRegister_Success() throws DomainException {
 
-		assertThat(ex.getMessageId()).isEqualTo("NORTIS10003");
-		assertThat(ex.getMessage()).isEqualTo("指定されたIDのテナントは存在しません");
-	}
+        var testUser = TestUsers.adminUser();
+        var tenantId = TenantId.create("0000000001");
+        var tenantIdentifer = TenantIdentifier.create("TENANT1");
+        var tenantName = "登録テナント";
 
-	@Test
-	void testChangeName() throws DomainException {
-		NortisUser user = new NortisUser("0000000001", new String[] {}, "password", false, Lists.newArrayList(), false);
+        when(numberingDomainService.createNewTenantId()).thenReturn(TenantId.create("0000000001"));
 
-		TenantNameUpdateCommand command = new TenantNameUpdateCommand("TEST2", "テストテナント", user);
-		TenantId tenantId = tenantApplicationService
-				.changeName(command, data -> data.getTenantId());
+        Tenant tenant = Tenant.create(tenantId, tenantIdentifer, tenantName);
+        when(tenantDomainService.createTenant(eq(tenantId), eq(tenantIdentifer), eq(tenantName))).thenReturn(tenant);
 
-		Optional<Tenant> optTenant = this.tenantRepository.get(tenantId);
-		assertThat(optTenant).isPresent();
+        TenantRegisterCommand command = new TenantRegisterCommand(tenantIdentifer.toString(), tenantName);
+        tenantApplicationService.register(command, testUser.getUserDetails(), ApplicationTranslator.nothing());
 
-		Tenant tenant = optTenant.get();
-		assertThat(tenant.getTenantId()).isEqualTo(TenantId.create("TEST2"));
-		assertThat(tenant.getTenantName()).isEqualTo("テストテナント");
-		assertThat(tenant.getCreateDt()).isBefore(LocalDateTime.now());
-		assertThat(tenant.getCreateId()).isEqualTo("TEST_ID");
-		assertThat(tenant.getUpdateDt()).isBefore(LocalDateTime.now());
-		assertThat(tenant.getUpdateId()).isEqualTo("0000000001");
-		assertThat(tenant.getVersion()).isEqualTo(2L);
-	}
-	
-	@Test
-	void testChangeNameAccessDenied() throws DomainException {
-		NortisUser user = new NortisUser("0000000002", new String[] {}, "password", false, Lists.newArrayList(), false);
+        verify(tenantRepository).save(any());
+    }
 
-		TenantNameUpdateCommand command = new TenantNameUpdateCommand("TEST2", "テストテナント", user);
+    @Test
+    void testRegister_CheckError() throws DomainException {
+        var testUser = TestUsers.memberUser();
 
-		DomainException ex = assertThrows(DomainException.class, () -> {
-			tenantApplicationService
-					.changeName(command, data -> data.getTenantId());			
-		});
+        TenantRegisterCommand command = new TenantRegisterCommand("TENANT1", "登録テナント");
 
-		assertThat(ex.getMessageId()).isEqualTo("NORTIS50005");
-	}
-	
-	@Test
-	void testChangeNameNotFound() throws DomainException {
-		NortisUser user = new NortisUser("0000000001", new String[] {}, "password", false, Lists.newArrayList(), false);
+        doThrow(new DomainException(MessageCodes.nortis10001())).when(tenantDomainService).beforeRegisterCheck(any(),
+                any());
 
-		DomainException ex = assertThrows(DomainException.class, () -> {
-			TenantNameUpdateCommand command = new TenantNameUpdateCommand("AAAAA", "テストテナント", user);
-			tenantApplicationService
-					.changeName(command, data -> data.getTenantId());
-		});
-		
-		assertThat(ex.getMessageId()).isEqualTo("NORTIS10003");
-		assertThat(ex.getMessage()).isEqualTo("指定されたIDのテナントは存在しません");
-	}
+        DomainException ex = assertThrows(DomainException.class, () -> {
+            tenantApplicationService.register(command, testUser.getUserDetails(), ApplicationTranslator.nothing());
+        });
 
-	@Test
-	void testDelete() throws DomainException {
-		NortisUser user = new NortisUser("0000000001", new String[] {}, "password", false, Lists.newArrayList(), false);
+        assertThat(ex.getMessageId()).isEqualTo("NORTIS10001");
+    }
 
-		tenantApplicationService.delete("TEST3", user);
+    @Test
+    void testRegister_AccessDenied() throws DomainException {
+        var testUser = TestUsers.memberUser();
 
-		Optional<Tenant> optTenant = this.tenantRepository.get(TenantId.create("TEST3"));
-		assertThat(optTenant).isEmpty();	
+        TenantRegisterCommand command = new TenantRegisterCommand("TENANT1", "登録テナント");
 
-		this.applicationEvents.stream(TenantDeletedEvent.class).forEach(event -> {
-			assertThat(event.getTenantId().toString()).isEqualTo("TEST3");
-			assertThat(event.getUpdateUserId()).isEqualTo("0000000001");
-		});
-	}
+        doThrow(new NoAuthorityDomainException(MessageCodes.nortis50005())).when(authorityCheckDomainService)
+                .checkAdminOf(eq(testUser.getUserDetails()));
 
-	@Test
-	void testDeleteAccessDenied() throws DomainException {
-		NortisUser user = new NortisUser("0000000002", new String[] {}, "password", false, Lists.newArrayList(), false);
+        NoAuthorityDomainException ex = assertThrows(NoAuthorityDomainException.class, () -> {
+            tenantApplicationService.register(command, testUser.getUserDetails(), ApplicationTranslator.nothing());
+        });
 
-		DomainException ex = assertThrows(DomainException.class, () -> {
-			tenantApplicationService.delete("TEST3", user);			
-		});
+        assertThat(ex.getMessageId()).isEqualTo("NORTIS50005");
+    }
 
-		assertThat(ex.getMessageId()).isEqualTo("NORTIS50005");
+    @Test
+    void testCreateApiKey_Success() throws DomainException {
 
-	}
+        var testUser = TestUsers.memberUser();
+        var tenantId = TenantId.create("0000000001");
+        var tenantIdentifier = TenantIdentifier.create("TEST");
 
-	@Test
-	void testDeleteNotFound() throws DomainException {
-		NortisUser user = new NortisUser("0000000001", new String[] {}, "password", false, Lists.newArrayList(), false);
+        Tenant tenant = Tenant.create(tenantId, tenantIdentifier, "テナント");
+        when(this.tenantRepository.getByTenantId(eq(TenantId.create("0000000001")))).thenReturn(Optional.of(tenant));
+        when(this.authenticationRepository.getFromTenantId(eq(tenantId))).thenReturn(Optional.empty());
 
-		DomainException ex = assertThrows(DomainException.class, () -> {
-			tenantApplicationService.delete("AAAA", user);
-		});
-		
-		assertThat(ex.getMessageId()).isEqualTo("NORTIS10003");
-		assertThat(ex.getMessage()).isEqualTo("指定されたIDのテナントは存在しません");
-	}
+        ApiKey apiKey = tenantApplicationService.createApiKey(tenantId.toString(), testUser.getUserDetails());
+
+        assertThat(apiKey).isNotNull();
+        verify(authenticationRepository, never()).remove(any());
+        verify(authenticationRepository).save(any());
+    }
+
+    @Test
+    void testCreateApiKey_ReplaceAndSuccess() throws DomainException {
+
+        var testUser = TestUsers.memberUser();
+        var tenantId = TenantId.create("0000000001");
+        var tenantIdentifier = TenantIdentifier.create("TEST");
+
+        Tenant tenant = Tenant.create(tenantId, tenantIdentifier, "テナント");
+        when(this.tenantRepository.getByTenantId(eq(TenantId.create("0000000001")))).thenReturn(Optional.of(tenant));
+        when(this.authenticationRepository.getFromTenantId(eq(tenantId)))
+                .thenReturn(Optional.of(Authentication.createFromTenant(tenantId)));
+
+        ApiKey apiKey = tenantApplicationService.createApiKey(tenantId.toString(), testUser.getUserDetails());
+
+        assertThat(apiKey).isNotNull();
+        verify(authenticationRepository).remove(any());
+        verify(authenticationRepository).save(any());
+    }
+
+    @Test
+    void testCreateApiKey_AccessDenied() throws DomainException {
+
+        var testUser = TestUsers.memberUser();
+        var tenantId = TenantId.create("0000000001");
+        var tenantIdentifier = TenantIdentifier.create("TEST");
+
+        Tenant tenant = Tenant.create(tenantId, tenantIdentifier, "テナント");
+        when(this.tenantRepository.getByTenantId(eq(TenantId.create("0000000001")))).thenReturn(Optional.of(tenant));
+        doThrow(new NoAuthorityDomainException(MessageCodes.nortis50005())).when(this.authorityCheckDomainService)
+                .checkHasCreateApiKeyOf(eq(testUser.getUserDetails()), eq(tenant));
+
+        NoAuthorityDomainException ex = assertThrows(NoAuthorityDomainException.class, () -> {
+            tenantApplicationService.createApiKey(tenantId.toString(), testUser.getUserDetails());
+        });
+
+        assertThat(ex.getMessageId()).isEqualTo("NORTIS50005");
+    }
+
+    @Test
+    void testCreateApiKey_NotFound() throws DomainException {
+        var testUser = TestUsers.memberUser();
+        var tenantId = TenantId.create("0000000001");
+
+        when(this.tenantRepository.getByTenantId(eq(tenantId))).thenReturn(Optional.empty());
+
+        DomainException ex = assertThrows(DomainException.class, () -> {
+            tenantApplicationService.createApiKey("AAAAAA", testUser.getUserDetails());
+        });
+
+        assertThat(ex.getMessageId()).isEqualTo("NORTIS10003");
+    }
+
+    @Test
+    void testChangeName_Success() throws DomainException {
+
+        var testUser = TestUsers.memberUser();
+        var tenantId = TenantId.create("0000000001");
+        var tenantIdentifier = TenantIdentifier.create("TEST");
+
+        Tenant tenant = Tenant.create(tenantId, tenantIdentifier, "テナント");
+        when(this.tenantRepository.getByTenantId(eq(TenantId.create("0000000001")))).thenReturn(Optional.of(tenant));
+
+        TenantNameUpdateCommand command = new TenantNameUpdateCommand(tenantId.toString(), "テストテナント");
+        tenantApplicationService.changeName(command, testUser.getUserDetails(), ApplicationTranslator.nothing());
+
+        verify(this.tenantRepository).update(any());
+    }
+
+    @Test
+    void testChangeName_AccessDenied() throws DomainException {
+
+        var testUser = TestUsers.memberUser();
+        var tenantId = TenantId.create("0000000001");
+        var tenantIdentifier = TenantIdentifier.create("TEST");
+
+        Tenant tenant = Tenant.create(tenantId, tenantIdentifier, "テナント");
+        when(this.tenantRepository.getByTenantId(eq(tenantId))).thenReturn(Optional.of(tenant));
+        doThrow(new NoAuthorityDomainException(MessageCodes.nortis50005())).when(this.authorityCheckDomainService)
+                .checkHasChangeTenantNameOf(eq(testUser.getUserDetails()), eq(tenant));
+
+        TenantNameUpdateCommand command = new TenantNameUpdateCommand(tenantId.toString(), "テストテナント");
+
+        DomainException ex = assertThrows(DomainException.class, () -> {
+            tenantApplicationService.changeName(command, testUser.getUserDetails(), data -> data.getTenantId());
+        });
+
+        assertThat(ex.getMessageId()).isEqualTo("NORTIS50005");
+    }
+
+    @Test
+    void testChangeName_NotFound() throws DomainException {
+
+        var testUser = TestUsers.memberUser();
+        var tenantId = TenantId.create("0000000001");
+
+        when(this.tenantRepository.getByTenantId(eq(tenantId))).thenReturn(Optional.empty());
+
+        DomainException ex = assertThrows(DomainException.class, () -> {
+            TenantNameUpdateCommand command = new TenantNameUpdateCommand(tenantId.toString(), "テストテナント");
+            tenantApplicationService.changeName(command, testUser.getUserDetails(), data -> data.getTenantId());
+        });
+
+        assertThat(ex.getMessageId()).isEqualTo("NORTIS10003");
+    }
+
+    @Test
+    void testDelete_Success() throws DomainException {
+
+        var testUser = TestUsers.adminUser();
+        var tenantId = TenantId.create("0000000001");
+        var tenantIdentifier = TenantIdentifier.create("TEST");
+
+        Tenant tenant = Tenant.create(tenantId, tenantIdentifier, "テナント");
+        when(this.tenantRepository.getByTenantId(eq(tenantId))).thenReturn(Optional.of(tenant));
+
+        tenantApplicationService.delete(tenantId.toString(), testUser.getUserDetails());
+
+        verify(tenantRepository).remove(eq(tenant));
+    }
+
+    @Test
+    void testDelete_AccessDenied() throws DomainException {
+
+        var testUser = TestUsers.adminUser();
+        var tenantId = TenantId.create("0000000001");
+        var tenantIdentifier = TenantIdentifier.create("TEST");
+
+        Tenant tenant = Tenant.create(tenantId, tenantIdentifier, "テナント");
+        when(this.tenantRepository.getByTenantId(eq(tenantId))).thenReturn(Optional.of(tenant));
+        doThrow(new NoAuthorityDomainException(MessageCodes.nortis50005())).when(authorityCheckDomainService)
+                .checkAdminOf(eq(testUser.getUserDetails()));
+
+        NoAuthorityDomainException ex = assertThrows(NoAuthorityDomainException.class, () -> {
+            tenantApplicationService.delete(tenantId.toString(), testUser.getUserDetails());
+        });
+
+        assertThat(ex.getMessageId()).isEqualTo("NORTIS50005");
+    }
+
+    @Test
+    void testDelete_NotFound() throws DomainException {
+        var testUser = TestUsers.adminUser();
+        var tenantId = TenantId.create("0000000001");
+
+        when(this.tenantRepository.getByTenantId(eq(tenantId))).thenReturn(Optional.empty());
+
+        DomainException ex = assertThrows(DomainException.class, () -> {
+            tenantApplicationService.delete(tenantId.toString(), testUser.getUserDetails());
+        });
+
+        assertThat(ex.getMessageId()).isEqualTo("NORTIS10003");
+    }
 
 }

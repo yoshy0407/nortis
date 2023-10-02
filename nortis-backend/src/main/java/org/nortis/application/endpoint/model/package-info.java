@@ -1,0 +1,1 @@
+package org.nortis.application.endpoint.model;

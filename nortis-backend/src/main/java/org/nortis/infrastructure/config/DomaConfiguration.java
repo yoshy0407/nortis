@@ -6,19 +6,21 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Domaに関するコンフィグクラスです
+ * 
  * @author yoshiokahiroshi
  * @version 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
 public class DomaConfiguration {
 
-	/**
-	 * {@link RestartClassLoaderClassHelper}のBean
-	 * @return {@link RestartClassLoaderClassHelper}のBean
-	 */
-	@Bean
-	RestartClassLoaderClassHelper classHelper() {
-		return new RestartClassLoaderClassHelper();
-	}
-	
+    /**
+     * {@link RestartClassLoaderClassHelper}のBean
+     * 
+     * @return {@link RestartClassLoaderClassHelper}のBean
+     */
+    @Bean
+    RestartClassLoaderClassHelper classHelper() {
+        return new RestartClassLoaderClassHelper();
+    }
+
 }

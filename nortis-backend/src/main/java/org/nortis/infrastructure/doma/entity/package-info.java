@@ -1,0 +1,1 @@
+package org.nortis.infrastructure.doma.entity;

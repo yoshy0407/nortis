@@ -3,15 +3,17 @@ package org.nortis.domain.endpoint;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
-
-import java.time.LocalDateTime;
-import org.apache.velocity.app.VelocityEngine;
-import org.assertj.core.util.Maps;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.apache.velocity.app.VelocityEngine;
+import org.nortis.TestBase;
+import org.nortis.domain.endpoint.value.BodyTemplate;
 import org.nortis.domain.endpoint.value.EndpointId;
-import org.nortis.domain.endpoint.value.SendMessage;
+import org.nortis.domain.endpoint.value.EndpointIdentifier;
+import org.nortis.domain.endpoint.value.SubjectTemplate;
+import org.nortis.domain.endpoint.value.TextType;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.ApplicationContextAccessor;
 import org.nortis.infrastructure.exception.DomainException;
@@ -19,125 +21,112 @@ import org.nortis.infrastructure.template.TemplateRender;
 import org.nortis.infrastructure.template.VelocityTemplateRender;
 import org.springframework.context.ApplicationContext;
 
-class EndpointTest {
+class EndpointTest extends TestBase {
 
-	@BeforeEach
-	void setup() {		
-		ApplicationContext context = Mockito.mock(ApplicationContext.class);
-		VelocityEngine ve = new VelocityEngine();
-		ve.init();
-		Mockito.when(context.getBean(eq(TemplateRender.class))).thenReturn(new VelocityTemplateRender(ve));
-		ApplicationContextAccessor.set(context);
-	}
+    @BeforeEach
+    void setup() {
+        ApplicationContext context = Mockito.mock(ApplicationContext.class);
+        VelocityEngine ve = new VelocityEngine();
+        ve.init();
+        Mockito.when(context.getBean(eq(TemplateRender.class))).thenReturn(new VelocityTemplateRender(ve));
+        ApplicationContextAccessor.set(context);
+    }
 
-	@Test
-	void testChangeEndpointName() throws DomainException {
-		Endpoint endpoint = Endpoint.create(EndpointId.create("ENDPOINT"), 
-				TenantId.create("TEST"), "Test Endpoint", "subject", "message", "TEST_ID");
-		endpoint.changeEndpointName("Endpoint", "TEST_ID");
-		
-		assertThat(endpoint.getEndpointName()).isEqualTo("Endpoint");
-		assertThat(endpoint.getUpdateId()).isEqualTo("TEST_ID");
-	}
+    @Test
+    void testChangeEndpointName() throws DomainException {
+        Endpoint endpoint = Endpoint.create(TenantId.create("TEST"), EndpointId.create("1000000001"),
+                EndpointIdentifier.create("ENDPOINT"), "Test Endpoint");
+        endpoint.changeEndpointName("Endpoint");
 
-	@Test
-	void testChangeSubjectTemplate() throws DomainException {
-		Endpoint endpoint = Endpoint.create(EndpointId.create("ENDPOINT"), 
-				TenantId.create("TEST"), "Test Endpoint", "subject", "message", "TEST_ID");
-		endpoint.changeSubjectTemplate("updated!", "TEST_ID");
-		
-		assertThat(endpoint.getSubjectTemplate()).isEqualTo("updated!");
-		assertThat(endpoint.getUpdateId()).isEqualTo("TEST_ID");
-	}
+        assertThat(endpoint.getEndpointName()).isEqualTo("Endpoint");
+    }
 
-	@Test
-	void testChangeMessageTemplate() throws DomainException {
-		Endpoint endpoint = Endpoint.create(EndpointId.create("ENDPOINT"), 
-				TenantId.create("TEST"), "Test Endpoint", "subject", "message", "TEST_ID");
-		endpoint.changeMessageTemplate("Test Message", "TEST_ID");
-		
-		assertThat(endpoint.getMessageTemplate()).isEqualTo("Test Message");
-		assertThat(endpoint.getUpdateId()).isEqualTo("TEST_ID");
-	}
+    @Test
+    void testCreateTemplate() throws DomainException {
+        Endpoint endpoint = Endpoint.create(TenantId.create("TEST"), EndpointId.create("1000000001"),
+                EndpointIdentifier.create("ENDPOINT"), "Test Endpoint");
+        endpoint.createTemplate(TextType.TEXT, SubjectTemplate.create("subject"), BodyTemplate.create("body"));
 
-	@Test
-	void testRenderMessage() throws DomainException {
-		Endpoint endpoint = 
-				Endpoint.create(EndpointId.create("ENDPOINT"), 
-						TenantId.create("TEST"), "Test Endpoint", "Test ${name}", "Hello! ${name}", "TEST_ID");
-		SendMessage message = endpoint.renderMessage(Maps.newHashMap("name", "Taro"));
-		
-		assertThat(message.getSubject()).isEqualTo("Test Taro");
-		assertThat(message.getMessage()).isEqualTo("Hello! Taro");
-	}
+        assertThat(endpoint.getMessageTemplateList()).hasSize(1);
 
-	@Test
-	void testDeleted() throws DomainException {
-		Endpoint endpoint = 
-				Endpoint.create(EndpointId.create("ENDPOINT"), 
-						TenantId.create("TEST"), "Test Endpoint", "Test ${name}", "Hello! ${name}", "TEST_ID");
-		
-		endpoint.deleted("USER_ID");
-		
-		assertThat(endpoint.getUpdateId()).isEqualTo("USER_ID");
-		assertThat(endpoint.getUpdateDt()).isBefore(LocalDateTime.now());
-	}
-	
-	@Test
-	void testCreate() throws DomainException {
-		Endpoint endpoint = Endpoint.create(EndpointId.create("ENDPOINT"), 
-				TenantId.create("TEST"), "Test Endpoint", "subject", "message", "TEST_ID");
-		
-		assertThat(endpoint.getEndpointId()).isEqualTo(EndpointId.create("ENDPOINT"));
-		assertThat(endpoint.getTenantId()).isEqualTo(TenantId.create("TEST"));
-		assertThat(endpoint.getEndpointName()).isEqualTo("Test Endpoint");
-		assertThat(endpoint.getSubjectTemplate()).isEqualTo("subject");
-		assertThat(endpoint.getMessageTemplate()).isEqualTo("message");
-		assertThat(endpoint.getCreateId()).isEqualTo("TEST_ID");
-		assertThat(endpoint.getCreateDt()).isNotNull();
-		assertThat(endpoint.getUpdateId()).isNull();
-		assertThat(endpoint.getUpdateDt()).isNull();
-		assertThat(endpoint.getVersion()).isEqualTo(1L);
-	}
+        Optional<MessageTemplate> optTemplate = endpoint.getTemplate(TextType.TEXT);
+        assertThat(optTemplate).isPresent();
+        assertThat(optTemplate.get().getEndpointId()).isEqualTo(EndpointId.create("1000000001"));
+        assertThat(optTemplate.get().getTextType()).isEqualTo(TextType.TEXT);
+        assertThat(optTemplate.get().getSubjectTemplate()).isEqualTo(SubjectTemplate.create("subject"));
+        assertThat(optTemplate.get().getBodyTemplate()).isEqualTo(BodyTemplate.create("body"));
+    }
 
-	@Test
-	void testCreateEndpointIdNull() {
-		assertThrows(DomainException.class, () -> {
-			Endpoint.create(null, TenantId.create("TEST"), "Test Endpoint", "subject", "message", "TEST_ID");			
-		}, "エンドポイントIDが未設定です");		
-	}
+    @Test
+    void testCreateTemplate_Duplicate() throws DomainException {
+        Endpoint endpoint = Endpoint.create(TenantId.create("TEST"), EndpointId.create("1000000001"),
+                EndpointIdentifier.create("ENDPOINT"), "Test Endpoint");
+        endpoint.createTemplate(TextType.TEXT, SubjectTemplate.create("subject"), BodyTemplate.create("body"));
 
-	@Test
-	void testCreateTenantIdNull() {
-		assertThrows(DomainException.class, () -> {
-			Endpoint.create(EndpointId.create("ENDPOINT"), null, "Test Endpoint", "subject", "message", "TEST_ID");			
-		}, "テナントIDが未設定です");		
-	}
+        assertThrows(DomainException.class, () -> {
+            endpoint.createTemplate(TextType.TEXT, SubjectTemplate.create("subject"), BodyTemplate.create("body"));
+        });
+    }
 
-	@Test
-	void testCreateEndpointNameNull() {
-		assertThrows(DomainException.class, () -> {
-			Endpoint.create(EndpointId.create("ENDPOINT"), 
-					TenantId.create("TEST"), null, "subject", "message", "TEST_ID");			
-		}, "エンドポイント名が未設定です");		
-	}
+    @Test
+    void deleteTemplate() throws DomainException {
+        Endpoint endpoint = Endpoint.create(TenantId.create("TEST"), EndpointId.create("1000000001"),
+                EndpointIdentifier.create("ENDPOINT"), "Test Endpoint");
+        endpoint.createTemplate(TextType.TEXT, SubjectTemplate.create("subject"), BodyTemplate.create("body"));
 
-	@Test
-	void testCreateEndpointNameEmpty() {
-		assertThrows(DomainException.class, () -> {
-			Endpoint.create(EndpointId.create("ENDPOINT"), 
-					TenantId.create("TEST"), "", "subject", "message", "TEST_ID");			
-		}, "エンドポイント名が未設定です");		
-	}
+        endpoint.deleteTemplate(TextType.TEXT);
 
-	@Test
-	void testCreateEndpointNameMaxLength() {
-		assertThrows(DomainException.class, () -> {
-			Endpoint.create(EndpointId.create("ENDPOINT"), TenantId.create("TEST"), 
-					"123456789012345678901234567890123456789012345678901", 
-					"subject", "message", "TEST_ID");			
-		}, "エンドポイント名は50文字以内である必要があります");
-	}
+        Optional<MessageTemplate> optMessageTemplate = endpoint.getTemplate(TextType.TEXT);
+        assertThat(optMessageTemplate).isEmpty();
+    }
 
-	
+    @Test
+    void testCreate() throws DomainException {
+        Endpoint endpoint = Endpoint.create(TenantId.create("1000000001"), EndpointId.create("2000000001"),
+                EndpointIdentifier.create("TEST"), "Test Endpoint");
+
+        assertThat(endpoint.getEndpointId()).isEqualTo(EndpointId.create("2000000001"));
+        assertThat(endpoint.getTenantId()).isEqualTo(TenantId.create("1000000001"));
+        assertThat(endpoint.getEndpointIdentifier()).isEqualTo(EndpointIdentifier.create("TEST"));
+        assertThat(endpoint.getEndpointName()).isEqualTo("Test Endpoint");
+    }
+
+    @Test
+    void testCreateEndpointIdNull() {
+        assertThrows(DomainException.class, () -> {
+            Endpoint.create(TenantId.create("TEST"), null, EndpointIdentifier.create("TEST"), "Test Endpoint");
+        }, "エンドポイントIDが未設定です");
+    }
+
+    @Test
+    void testCreateTenantIdNull() {
+        assertThrows(DomainException.class, () -> {
+            Endpoint.create(null, EndpointId.create("ENDPOINT"), EndpointIdentifier.create("TEST"), "Test Endpoint");
+        }, "テナントIDが未設定です");
+    }
+
+    @Test
+    void testCreateEndpointNameNull() {
+        assertThrows(DomainException.class, () -> {
+            Endpoint.create(TenantId.create("TEST"), EndpointId.create("ENDPOINT"), EndpointIdentifier.create("TEST"),
+                    null);
+        }, "エンドポイント名が未設定です");
+    }
+
+    @Test
+    void testCreateEndpointNameEmpty() {
+        assertThrows(DomainException.class, () -> {
+            Endpoint.create(TenantId.create("TEST"), EndpointId.create("ENDPOINT"), EndpointIdentifier.create("TEST"),
+                    "");
+        }, "エンドポイント名が未設定です");
+    }
+
+    @Test
+    void testCreateEndpointNameMaxLength() {
+        assertThrows(DomainException.class, () -> {
+            Endpoint.create(TenantId.create("TEST"), EndpointId.create("ENDPOINT"), EndpointIdentifier.create("TEST"),
+                    "123456789012345678901234567890123456789012345678901");
+        }, "エンドポイント名は50文字以内である必要があります");
+    }
+
 }

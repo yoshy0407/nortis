@@ -1,113 +1,293 @@
 package org.nortis.application.endpoint;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import java.util.List;
 import java.util.Optional;
+import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.nortis.ServiceTestBase;
+import org.nortis.application.endpoint.model.EndpointDeleteCommand;
+import org.nortis.application.endpoint.model.EndpointDeleteMessageTemplateCommand;
+import org.nortis.application.endpoint.model.EndpointMessageTemplateCommand;
+import org.nortis.application.endpoint.model.EndpointNameUpdateCommand;
+import org.nortis.application.endpoint.model.EndpointRegisterCommand;
 import org.nortis.domain.endpoint.Endpoint;
 import org.nortis.domain.endpoint.EndpointRepository;
-import org.nortis.domain.endpoint.event.EndpointDeletedEvent;
+import org.nortis.domain.endpoint.value.BodyTemplate;
 import org.nortis.domain.endpoint.value.EndpointId;
+import org.nortis.domain.endpoint.value.EndpointIdentifier;
+import org.nortis.domain.endpoint.value.SubjectTemplate;
+import org.nortis.domain.endpoint.value.TextType;
+import org.nortis.domain.service.AuthorityCheckDomainService;
+import org.nortis.domain.service.NumberingDomainService;
+import org.nortis.domain.tenant.Tenant;
+import org.nortis.domain.tenant.TenantRepository;
 import org.nortis.domain.tenant.value.TenantId;
-import org.nortis.infrastructure.config.DomaConfiguration;
+import org.nortis.domain.tenant.value.TenantIdentifier;
+import org.nortis.infrastructure.application.ApplicationTranslator;
 import org.nortis.infrastructure.exception.DomainException;
-import org.seasar.doma.boot.autoconfigure.DomaAutoConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.jdbc.AutoConfigureDataJdbc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.event.ApplicationEvents;
-import org.springframework.test.context.event.RecordApplicationEvents;
-import org.springframework.test.context.jdbc.Sql;
+import org.nortis.test.user.TestUsers;
 
-@Sql(scripts = {
-		"/META-INF/ddl/dropTenant.sql",
-		"/META-INF/ddl/dropEndpoint.sql",
-		"/ddl/createTenant.sql",
-		"/ddl/createEndpoint.sql",
-		"/META-INF/data/application/del_ins_tenant.sql",
-		"/META-INF/data/application/del_ins_endpoint.sql"
-})
-@RecordApplicationEvents
-@AutoConfigureDataJdbc
-@SpringBootTest(classes = { 
-		DomaAutoConfiguration.class, 
-		DomaConfiguration.class, 
-		EndpointApplicationServiceTestConfig.class
-	})
-class EndpointApplicationServiceTest {
+class EndpointApplicationServiceTest extends ServiceTestBase {
 
-	@Autowired
-	ApplicationEvents applicationEvents;
-	
-	@Autowired
-	EndpointApplicationService endpointApplicationService;
-	
-	@Autowired
-	EndpointRepository endpointRepository;
-	
-	@Test
-	void testRegisterEndpoint() throws DomainException {
-		EndpointRegisterCommand command = 
-				new EndpointRegisterCommand("TEST1", "test-point", "エンドポイント", "${name}!!", "Hello! ${name}", "TEST_ID");
-		Endpoint endpoint = endpointApplicationService.registerEndpoint(command, data -> {
-			return data;
-		});
-		
-		assertThat(endpoint.getTenantId()).isEqualTo(TenantId.create("TEST1"));
-		assertThat(endpoint.getEndpointId()).isEqualTo(EndpointId.create("test-point"));
-		assertThat(endpoint.getEndpointName()).isEqualTo("エンドポイント");
-		
-		Optional<Endpoint> opt = this.endpointRepository.get(TenantId.create("TEST1"), EndpointId.create("test-point"));
-		
-		assertThat(opt).isPresent();
-	}
+    @Mock
+    TenantRepository tenantRepository;
 
-	@Test
-	void testUpdate() throws DomainException {
-		EndpointUpdateCommand command = 
-				new EndpointUpdateCommand("TEST2", "ENDPOINT2", "TEST POINT", "件名", "本文", "TEST_ID");
-		endpointApplicationService.updateEndpoint(command, data -> {
-			return data;
-		});
+    @Mock
+    EndpointRepository endpointRepository;
 
-		Optional<Endpoint> opt = this.endpointRepository.get(TenantId.create("TEST2"), EndpointId.create("ENDPOINT2"));
-		
-		assertThat(opt).isPresent();
-		assertThat(opt.get().getEndpointName()).isEqualTo("TEST POINT");
-	}
-	
-	@Test
-	void testDelete() throws DomainException {
-		EndpointDeleteCommand command = new EndpointDeleteCommand("TEST1", "ENDPOINT1", "TEST_ID");
-		endpointApplicationService.delete(command);
+    @Mock
+    NumberingDomainService numberingDomainService;
 
-		Optional<Endpoint> opt = this.endpointRepository.get(TenantId.create("TEST1"), EndpointId.create("ENDPOINT1"));
-		
-		assertThat(opt).isEmpty();
-		
-		applicationEvents.stream(EndpointDeletedEvent.class)
-			.forEach(event -> {
-				assertThat(event.getTenantId().toString()).isEqualTo("TEST1");
-				assertThat(event.getEndpointId().toString()).isEqualTo("ENDPOINT1");
-				assertThat(event.getUpdateUserId()).isEqualTo("TEST_ID");
-			});
-	}
-	
-	@Test
-	void testDeleteFromTenantId() throws DomainException {
-		endpointApplicationService.deleteFromTenantId("TEST3", "USER_ID");
+    @Mock
+    AuthorityCheckDomainService authorityCheckDomainService;
 
-		Optional<Endpoint> opt1 = this.endpointRepository.get(TenantId.create("TEST3"), EndpointId.create("ENDPOINT3"));		
-		assertThat(opt1).isEmpty();
-		Optional<Endpoint> opt2 = this.endpointRepository.get(TenantId.create("TEST3"), EndpointId.create("ENDPOINT4"));		
-		assertThat(opt2).isEmpty();
-		
-		applicationEvents.stream(EndpointDeletedEvent.class)
-			.forEach(event -> {
-				assertThat(event.getTenantId().toString()).isEqualTo("TEST3");
-				assertThat(event.getEndpointId()).isNotNull();
-				assertThat(event.getUpdateUserId()).isEqualTo("USER_ID");
-			});
-}
+    EndpointApplicationService endpointApplicationService;
+
+    @BeforeEach
+    void setup() {
+        this.endpointApplicationService = new EndpointApplicationService(tenantRepository, endpointRepository,
+                numberingDomainService, authorityCheckDomainService);
+    }
+
+    @Test
+    void testGetTextTypes() {
+        List<TextType> textTypes = this.endpointApplicationService.getTextTypes(ApplicationTranslator.noConvert());
+        assertThat(textTypes).hasSize(TextType.values().length);
+    }
+
+    @Test
+    void testRegisterEndpoint() throws DomainException {
+
+        var testUser = TestUsers.memberUser();
+        TenantId tenantId = TenantId.create("1000000001");
+
+        when(this.numberingDomainService.createNewEndpointId()).thenReturn(EndpointId.create("2000000001"));
+
+        Tenant tenant = Tenant.create(tenantId, TenantIdentifier.create("TEST"), "テスト");
+        when(this.tenantRepository.getByTenantId(eq(tenantId))).thenReturn(Optional.of(tenant));
+
+        //@formatter:off
+        EndpointRegisterCommand command = EndpointRegisterCommand.builder()
+                .tenantId(tenantId.toString())
+                .endpointIdentifier("TEST")
+                .endpointName("エンドポイント")
+                .textType("00001")
+                .subjectTemplate("${name}!!")
+                .bodyTemplate("Hello! ${name}")
+                .build();
+        //@formatter:on
+
+        Endpoint endpoint = endpointApplicationService.registerEndpoint(command, testUser.getUserDetails(),
+                ApplicationTranslator.noConvert());
+
+        verify(this.endpointRepository).save(eq(endpoint));
+    }
+
+    @Test
+    void testUpdateEndpointName() throws DomainException {
+
+        var testUser = TestUsers.memberUser();
+        TenantId tenantId = TenantId.create("1000000001");
+        EndpointId endpointId = EndpointId.create("2000000001");
+
+        Tenant tenant = Tenant.create(tenantId, TenantIdentifier.create("TEST"), "テスト");
+        when(this.tenantRepository.getByTenantId(eq(tenantId))).thenReturn(Optional.of(tenant));
+
+        Endpoint testDataEndpoint = Endpoint.create(tenantId, endpointId, EndpointIdentifier.create("TEST"), "エンドポイント");
+        when(this.endpointRepository.get(eq(tenantId), eq(endpointId))).thenReturn(Optional.of(testDataEndpoint));
+
+        //@formatter:off
+        EndpointNameUpdateCommand command = EndpointNameUpdateCommand.builder()
+                .tenantId(tenantId.toString())
+                .endpointId(endpointId.toString())
+                .endpointName("テスト")
+                .build();
+        //@formatter:on
+
+        Endpoint endpoint = endpointApplicationService.updateEndpointName(command, testUser.getUserDetails(),
+                ApplicationTranslator.noConvert());
+
+        verify(this.endpointRepository).update(eq(endpoint));
+        assertThat(endpoint.getEndpointName()).isEqualTo("テスト");
+    }
+
+    @Test
+    void testUpdateEndpointName_NotFoundEndpoint() throws DomainException {
+
+        var testUser = TestUsers.memberUser();
+        TenantId tenantId = TenantId.create("1000000001");
+        EndpointId endpointId = EndpointId.create("2000000001");
+
+        when(this.endpointRepository.get(eq(tenantId), eq(endpointId))).thenReturn(Optional.empty());
+
+        //@formatter:off
+        EndpointNameUpdateCommand command = EndpointNameUpdateCommand.builder()
+                .tenantId(tenantId.toString())
+                .endpointId(endpointId.toString())
+                .endpointName("テスト")
+                .build();
+        //@formatter:on
+
+        assertThrows(DomainException.class, () -> {
+            endpointApplicationService.updateEndpointName(command, testUser.getUserDetails(),
+                    ApplicationTranslator.noConvert());
+        });
+    }
+
+    @Test
+    void testAddMessageTemplate() throws DomainException {
+
+        var testUser = TestUsers.memberUser();
+        TenantId tenantId = TenantId.create("1000000001");
+        EndpointId endpointId = EndpointId.create("2000000001");
+
+        Tenant tenant = Tenant.create(tenantId, TenantIdentifier.create("TEST"), "テスト");
+        when(this.tenantRepository.getByTenantId(eq(tenantId))).thenReturn(Optional.of(tenant));
+
+        Endpoint testDataEndpoint = Endpoint.create(tenantId, endpointId, EndpointIdentifier.create("TEST"), "エンドポイント");
+        when(this.endpointRepository.get(eq(tenantId), eq(endpointId))).thenReturn(Optional.of(testDataEndpoint));
+
+        //@formatter:off
+        EndpointMessageTemplateCommand command = EndpointMessageTemplateCommand.builder()
+                .tenantId(tenantId.toString())
+                .endpointId(endpointId.toString())
+                .textType("00001")
+                .subjectTemplate("subject")
+                .bodyTemplate("body")
+                .build();
+        //@formatter:on
+
+        Endpoint endpoint = endpointApplicationService.addMessageTemplate(command, testUser.getUserDetails(),
+                ApplicationTranslator.noConvert());
+
+        verify(this.endpointRepository).update(eq(endpoint));
+        assertThat(endpoint.getMessageTemplateList()).hasSize(1);
+    }
+
+    @Test
+    void testUpdateMessageTemplate() throws DomainException {
+
+        TenantId tenantId = TenantId.create("1000000001");
+        EndpointId endpointId = EndpointId.create("2000000001");
+
+        Tenant tenant = Tenant.create(tenantId, TenantIdentifier.create("TEST"), "テスト");
+        when(this.tenantRepository.getByTenantId(eq(tenantId))).thenReturn(Optional.of(tenant));
+
+        Endpoint testDataEndpoint = Endpoint.create(tenantId, endpointId, EndpointIdentifier.create("TEST"), "エンドポイント");
+        testDataEndpoint.createTemplate(TextType.TEXT, SubjectTemplate.create("test"), BodyTemplate.create("test"));
+        when(this.endpointRepository.get(eq(tenantId), eq(endpointId))).thenReturn(Optional.of(testDataEndpoint));
+
+        //@formatter:off
+        EndpointMessageTemplateCommand command = EndpointMessageTemplateCommand.builder()
+                .tenantId(tenantId.toString())
+                .endpointId(endpointId.toString())
+                .textType("00001")
+                .subjectTemplate("subject")
+                .bodyTemplate("body")
+                .build();
+        //@formatter:on
+        var testUser = TestUsers.memberUser();
+
+        Endpoint endpoint = this.endpointApplicationService.updateMessageTemplate(command, testUser.getUserDetails(),
+                ApplicationTranslator.noConvert());
+
+        verify(this.endpointRepository).update(eq(endpoint));
+        assertThat(endpoint.getMessageTemplateList()).hasSize(1);
+    }
+
+    @Test
+    void testDeleteMessageTemplate() throws DomainException {
+        TenantId tenantId = TenantId.create("1000000001");
+        EndpointId endpointId = EndpointId.create("2000000001");
+
+        Tenant tenant = Tenant.create(tenantId, TenantIdentifier.create("TEST"), "テスト");
+        when(this.tenantRepository.getByTenantId(eq(tenantId))).thenReturn(Optional.of(tenant));
+
+        Endpoint testDataEndpoint = Endpoint.create(tenantId, endpointId, EndpointIdentifier.create("TEST"), "エンドポイント");
+        testDataEndpoint.createTemplate(TextType.TEXT, SubjectTemplate.create("test"), BodyTemplate.create("test"));
+        when(this.endpointRepository.get(eq(tenantId), eq(endpointId))).thenReturn(Optional.of(testDataEndpoint));
+
+        //@formatter:off
+        EndpointDeleteMessageTemplateCommand command = EndpointDeleteMessageTemplateCommand.builder()
+                .tenantId(tenantId.toString())
+                .endpointId(endpointId.toString())
+                .textType("00001")
+                .build();
+        //@formatter:on
+        var testUser = TestUsers.memberUser();
+
+        this.endpointApplicationService.deleteMessageTemplate(command, testUser.getUserDetails());
+
+        verify(this.endpointRepository).update(eq(testDataEndpoint));
+        assertThat(testDataEndpoint.getMessageTemplateList()).hasSize(1);
+    }
+
+    @Test
+    void testDelete() throws DomainException {
+        var testUser = TestUsers.memberUser();
+        TenantId tenantId = TenantId.create("1000000001");
+        EndpointId endpointId = EndpointId.create("2000000001");
+
+        Tenant tenant = Tenant.create(tenantId, TenantIdentifier.create("TEST"), "テスト");
+        when(this.tenantRepository.getByTenantId(eq(tenantId))).thenReturn(Optional.of(tenant));
+
+        Endpoint testDataEndpoint = Endpoint.create(tenantId, endpointId, EndpointIdentifier.create("TEST"), "エンドポイント");
+        when(this.endpointRepository.get(eq(tenantId), eq(endpointId))).thenReturn(Optional.of(testDataEndpoint));
+
+        //@formatter:off
+        EndpointDeleteCommand command = EndpointDeleteCommand.builder()
+                .tenantId(tenantId.toString())
+                .endpointId(endpointId.toString())
+                .build();
+        //@formatter:on
+
+        endpointApplicationService.delete(command, testUser.getUserDetails());
+
+        verify(this.endpointRepository).remove(eq(testDataEndpoint));
+    }
+
+    @Test
+    void testDelete_NotFoundEndpoint() throws DomainException {
+        var testUser = TestUsers.memberUser();
+        TenantId tenantId = TenantId.create("1000000001");
+        EndpointId endpointId = EndpointId.create("2000000001");
+
+        when(this.endpointRepository.get(eq(tenantId), eq(endpointId))).thenReturn(Optional.empty());
+
+        //@formatter:off
+        EndpointDeleteCommand command = EndpointDeleteCommand.builder()
+                .tenantId(tenantId.toString())
+                .endpointId(endpointId.toString())
+                .build();
+        //@formatter:on
+
+        assertThrows(DomainException.class, () -> {
+            endpointApplicationService.delete(command, testUser.getUserDetails());
+        });
+    }
+
+    @Test
+    void testDeleteFromTenantId() throws DomainException {
+        var testUser = TestUsers.memberUser();
+        TenantId tenantId = TenantId.create("1000000001");
+        EndpointId endpointId1 = EndpointId.create("2000000001");
+        EndpointId endpointId2 = EndpointId.create("2000000001");
+
+        Endpoint testData1 = Endpoint.create(tenantId, endpointId1, EndpointIdentifier.create("TEST1"), "エンドポイント1");
+        Endpoint testData2 = Endpoint.create(tenantId, endpointId2, EndpointIdentifier.create("TEST2"), "エンドポイント2");
+        List<Endpoint> endpointList = Lists.list(testData1, testData2);
+        when(this.endpointRepository.getFromTenantId(eq(tenantId))).thenReturn(endpointList);
+
+        endpointApplicationService.deleteFromTenantId(tenantId.toString());
+
+        verify(this.endpointRepository).removeAll(eq(endpointList));
+    }
 
 }

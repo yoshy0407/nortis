@@ -1,233 +1,194 @@
 package org.nortis.domain.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
-import org.assertj.core.util.Lists;
+import org.assertj.core.util.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.nortis.domain.authentication.Authentication;
+import org.nortis.domain.tenant.value.RoleId;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.domain.user.value.AdminFlg;
+import org.nortis.domain.user.value.HashedPassword;
 import org.nortis.domain.user.value.LoginFlg;
+import org.nortis.domain.user.value.LoginId;
 import org.nortis.domain.user.value.UserId;
+import org.nortis.infrastructure.doma.EntityOperation;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.test.MockApplicationContextAccessor;
 
 class SuserTest {
 
-	@BeforeEach
-	void setup() {
-		MockApplicationContextAccessor accessor = new MockApplicationContextAccessor();
-		accessor.mockTestPasswordEncoder();
-	}
-	
-	@Test
-	void testChangeUsername() throws DomainException {
-		Suser suser = Suser.createMember(
-				UserId.create("0000000001"), 
-				"テストユーザ",
-				"encodedPassword",
-				Lists.list(TenantId.create("TEST1"), TenantId.create("TEST2")),
-				"TEST_ID");
+    @BeforeEach
+    void setup() {
+        MockApplicationContextAccessor accessor = new MockApplicationContextAccessor();
+        accessor.mockTestPasswordEncoder();
+    }
 
-		assertThat(suser.getUsername()).isEqualTo("テストユーザ");
-		assertThat(suser.getUpdateId()).isNull();
-		assertThat(suser.getUpdateDt()).isNull();
+    @Test
+    void testChangeUsername() throws DomainException {
+        Suser suser = Suser.create(UserId.create("0000000001"), "テストユーザ", AdminFlg.ADMIN,
+                Maps.newHashMap(TenantId.create("TEST1"), RoleId.create("00001")), LoginId.create("TEST"),
+                HashedPassword.create("password"));
 
-		suser.changeUsername("サンプルユーザ", "USER_ID");
-		assertThat(suser.getUsername()).isEqualTo("サンプルユーザ");
-		assertThat(suser.getUpdateId()).isEqualTo("USER_ID");
-		assertThat(suser.getUpdateDt()).isBefore(LocalDateTime.now());
-	}
+        assertThat(suser.getUsername()).isEqualTo("テストユーザ");
 
-	@Test
-	void testChangePassword() throws DomainException {
-		Suser suser = Suser.createMember(
-				UserId.create("0000000001"), 
-				"テストユーザ",
-				"encodedPassword",
-				Lists.list(TenantId.create("TEST1"), TenantId.create("TEST2")),
-				"TEST_ID");
+        suser.changeUsername("サンプルユーザ");
+        assertThat(suser.getUsername()).isEqualTo("サンプルユーザ");
+    }
 
-		assertThat(suser.getEncodedPassword()).isEqualTo("encodedPassword");
-		assertThat(suser.getUpdateId()).isNull();
-		assertThat(suser.getUpdateDt()).isNull();
+    @Test
+    void testChangePassword() throws DomainException {
+        Suser suser = Suser.create(UserId.create("0000000001"), "テストユーザ", AdminFlg.ADMIN,
+                Maps.newHashMap(TenantId.create("TEST1"), RoleId.create("00001")), LoginId.create("TEST"),
+                HashedPassword.create("password"));
 
-		suser.changePassword("password", "USER_ID");
-		assertThat(suser.getEncodedPassword()).isEqualTo("password");
-		assertThat(suser.getUpdateId()).isEqualTo("USER_ID");
-		assertThat(suser.getUpdateDt()).isBefore(LocalDateTime.now());
-	}
+        assertThat(suser.getHashedPassword()).isEqualTo(HashedPassword.create("password"));
 
-	@Test
-	void testResetPassword() throws DomainException {
-		Suser suser = Suser.createMember(
-				UserId.create("0000000001"), 
-				"テストユーザ",
-				"encodedPassword",
-				Lists.list(TenantId.create("TEST1"), TenantId.create("TEST2")),
-				"TEST_ID");
+        suser.changePasswordOf(HashedPassword.create("Password$123"));
 
-		assertThat(suser.getEncodedPassword()).isEqualTo("encodedPassword");
-		assertThat(suser.getUpdateId()).isNull();
-		assertThat(suser.getUpdateDt()).isNull();
+        assertThat(suser.getHashedPassword()).isEqualTo(HashedPassword.create("Password$123"));
+    }
 
-		String password = suser.resetPassword("ADMIN");
-		assertThat(password).hasSize(15);
-		assertThat(suser.getEncodedPassword()).hasSize(15);
-		assertThat(suser.getUpdateId()).isEqualTo("ADMIN");
-		assertThat(suser.getUpdateDt()).isBefore(LocalDateTime.now());
-	}
+    @Test
+    void testLogin() throws DomainException {
+        Suser suser = Suser.create(UserId.create("0000000001"), "テストユーザ", AdminFlg.ADMIN,
+                Maps.newHashMap(TenantId.create("TEST1"), RoleId.create("00001")), LoginId.create("TEST"),
+                HashedPassword.create("password"));
 
-	@Test
-	void testLogin() throws DomainException {
-		Suser suser = Suser.createMember(
-				UserId.create("0000000001"), 
-				"テストユーザ",
-				"encodedPassword",
-				Lists.list(TenantId.create("TEST1"), TenantId.create("TEST2")),
-				"TEST_ID");
+        assertThat(suser.getLoginFlg()).isEqualTo(LoginFlg.NOT_LOGIN);
 
-		assertThat(suser.getLoginFlg()).isEqualTo(LoginFlg.NOT_LOGIN);
-		assertThat(suser.getUpdateId()).isNull();
-		assertThat(suser.getUpdateDt()).isNull();
+        suser.login();
 
-		suser.login();
+        assertThat(suser.getLoginFlg()).isEqualTo(LoginFlg.LOGIN);
+    }
 
-		assertThat(suser.getLoginFlg()).isEqualTo(LoginFlg.LOGIN);
-		assertThat(suser.getUpdateId()).isEqualTo("0000000001");
-		assertThat(suser.getUpdateDt()).isBefore(LocalDateTime.now());
-	}
+    @Test
+    void testLogout() throws DomainException {
+        Suser suser = Suser.create(UserId.create("0000000001"), "テストユーザ", AdminFlg.ADMIN,
+                Maps.newHashMap(TenantId.create("TEST1"), RoleId.create("00001")), LoginId.create("TEST"),
+                HashedPassword.create("password"));
 
-	@Test
-	void testLogout() throws DomainException {
-		Suser suser = Suser.createMember(
-				UserId.create("0000000001"), 
-				"テストユーザ",
-				"encodedPassword",
-				Lists.list(TenantId.create("TEST1"), TenantId.create("TEST2")),
-				"TEST_ID");
+        suser.login();
 
-		suser.login();
+        assertThat(suser.getLoginFlg()).isEqualTo(LoginFlg.LOGIN);
 
-		assertThat(suser.getLoginFlg()).isEqualTo(LoginFlg.LOGIN);
+        suser.logout();
 
-		suser.logout();
+        assertThat(suser.getLoginFlg()).isEqualTo(LoginFlg.NOT_LOGIN);
+    }
 
-		assertThat(suser.getLoginFlg()).isEqualTo(LoginFlg.NOT_LOGIN);
-	}
+    @Test
+    void testIsJoinTenantOf() throws DomainException {
+        Suser suser = Suser.create(UserId.create("0000000001"), "テストユーザ", AdminFlg.ADMIN,
+                Maps.newHashMap(TenantId.create("TEST1"), RoleId.create("00001")), LoginId.create("TEST"),
+                HashedPassword.create("password"));
 
-	@Test
-	void testCreateApiKey() throws DomainException {
-		Suser suser = Suser.createMember(
-				UserId.create("0000000001"), 
-				"テストユーザ",
-				"encodedPassword",
-				Lists.list(TenantId.create("TEST1"), TenantId.create("TEST2")),
-				"TEST_ID");
+        // 管理者は全てアクセス
+        boolean result1 = suser.isJoinTenantOf(TenantId.create("TEST1"));
 
-		Authentication authentication = suser.createApiKey();
+        assertThat(result1).isTrue();
 
-		assertThat(authentication.getApiKey()).isNotNull();
-		assertThat(authentication.getTenantId()).isNull();
-		assertThat(authentication.getUserId()).isEqualTo(UserId.create("0000000001"));
-	}
+        Suser suser2 = Suser.create(UserId.create("0000000001"), "テストユーザ", AdminFlg.MEMBER,
+                Maps.newHashMap(TenantId.create("TEST1"), RoleId.create("00001")), LoginId.create("TEST"),
+                HashedPassword.create("password"));
 
-	@Test
-	void testGrantTenantAccressOf() throws DomainException {
-		Suser suser = Suser.createMember(
-				UserId.create("0000000001"), 
-				"テストユーザ",
-				"encodedPassword",
-				Lists.list(TenantId.create("TEST1"), TenantId.create("TEST2")),
-				"TEST_ID");
+        boolean result2 = suser2.isJoinTenantOf(TenantId.create("TEST1"));
 
-		suser.grantTenantAccressOf(TenantId.create("TEST4"));
+        assertThat(result2).isTrue();
 
-		assertThat(suser.getTenantUserList()).hasSize(3);
-		Optional<TenantUser> optTenantUser = suser.getTenantUserList().stream()
-				.filter(data -> data.getTenantId().toString().equals("TEST4"))
-				.findFirst();
-		
-		assertThat(optTenantUser).isPresent();
-		assertThat(optTenantUser.get().getUserId()).isEqualTo(UserId.create("0000000001"));
-		assertThat(optTenantUser.get().getTenantId()).isEqualTo(TenantId.create("TEST4"));
-		assertThat(optTenantUser.get().isInsert()).isTrue();
-	}
+        boolean result3 = suser2.isJoinTenantOf(TenantId.create("HOGEHOGE"));
 
-	@Test
-	void testRevokeTenantAccessOf() throws DomainException {
-		Suser suser = Suser.createMember(
-				UserId.create("0000000001"), 
-				"テストユーザ",
-				"encodedPassword",
-				Lists.list(TenantId.create("TEST1"), TenantId.create("TEST2")),
-				"TEST_ID");
+        assertThat(result3).isFalse();
 
-		suser.revokeTenantAccessOf(TenantId.create("TEST2"));
+    }
 
-		assertThat(suser.getTenantUserList()).hasSize(2);
+    @Test
+    void testGetHasRoleOf() throws DomainException {
+        Suser suser = Suser.create(UserId.create("0000000001"), "テストユーザ", AdminFlg.ADMIN,
+                Maps.newHashMap(TenantId.create("TEST1"), RoleId.create("00001")), LoginId.create("TEST"),
+                HashedPassword.create("password"));
 
-		Optional<TenantUser> optTenantUser = suser.getTenantUserList().stream()
-				.filter(data -> data.getTenantId().toString().equals("TEST2"))
-				.findFirst();
-		
-		assertThat(optTenantUser).isPresent();
-		assertThat(optTenantUser.get().isDeleted()).isTrue();
-	}
+        List<RoleId> roleIds1 = suser.getHasRoleOf(TenantId.create("TEST1"));
 
-	@Test
-	void testCreateMember() throws DomainException {
-		Suser suser = Suser.createMember(
-				UserId.create("0000000001"), 
-				"テストユーザ",
-				"encodedPassword",
-				Lists.list(TenantId.create("TEST1"), TenantId.create("TEST2")),
-				"TEST_ID");
+        assertThat(roleIds1).hasSize(1);
 
-		assertThat(suser.getUserId()).isEqualTo(UserId.create("0000000001"));
-		assertThat(suser.getUsername()).isEqualTo("テストユーザ");
-		assertThat(suser.getEncodedPassword()).isEqualTo("encodedPassword");
-		assertThat(suser.getLoginFlg()).isEqualTo(LoginFlg.NOT_LOGIN);
+        List<RoleId> roleIds2 = suser.getHasRoleOf(TenantId.create("HOGEHOGE"));
 
-		assertThat(suser.getTenantUserList()).hasSize(2);
-		TenantUser tenantUser1 = suser.getTenantUserList().get(0);
-		assertThat(tenantUser1.getUserId()).isEqualTo(UserId.create("0000000001"));
-		assertThat(tenantUser1.getTenantId()).isEqualTo(TenantId.create("TEST1"));
+        assertThat(roleIds2).isEmpty();
 
-		TenantUser tenantUser2 = suser.getTenantUserList().get(1);
-		assertThat(tenantUser2.getUserId()).isEqualTo(UserId.create("0000000001"));
-		assertThat(tenantUser2.getTenantId()).isEqualTo(TenantId.create("TEST2"));
+    }
 
-		assertThat(suser.getAdminFlg()).isEqualTo(AdminFlg.MEMBER);
-		assertThat(suser.getCreateId()).isEqualTo("TEST_ID");
-		assertThat(suser.getCreateDt()).isBefore(LocalDateTime.now());
-		assertThat(suser.getUpdateId()).isNull();
-		assertThat(suser.getUpdateDt()).isNull();
-		assertThat(suser.getVersion()).isEqualTo(1L);
-	}
+    @Test
+    void testIsAdmin() throws DomainException {
+        Suser suser1 = Suser.create(UserId.create("0000000001"), "テストユーザ", AdminFlg.ADMIN,
+                Maps.newHashMap(TenantId.create("TEST1"), RoleId.create("00001")), LoginId.create("TEST"),
+                HashedPassword.create("password"));
 
-	@Test
-	void testCreateAdmin() throws DomainException {
-		Suser suser = Suser.createAdmin(
-				UserId.create("0000000001"), 
-				"テストユーザ",
-				"encodedPassword",
-				"TEST_ID");
+        assertThat(suser1.isAdmin()).isTrue();
 
-		assertThat(suser.getUserId()).isEqualTo(UserId.create("0000000001"));
-		assertThat(suser.getUsername()).isEqualTo("テストユーザ");
-		assertThat(suser.getEncodedPassword()).isEqualTo("encodedPassword");
-		assertThat(suser.getLoginFlg()).isEqualTo(LoginFlg.NOT_LOGIN);
-		assertThat(suser.getTenantUserList()).isEmpty();
-		assertThat(suser.getAdminFlg()).isEqualTo(AdminFlg.ADMIN);
-		assertThat(suser.getCreateId()).isEqualTo("TEST_ID");
-		assertThat(suser.getCreateDt()).isBefore(LocalDateTime.now());
-		assertThat(suser.getUpdateId()).isNull();
-		assertThat(suser.getUpdateDt()).isNull();
-		assertThat(suser.getVersion()).isEqualTo(1L);
-	}
+        Suser suser2 = Suser.create(UserId.create("0000000001"), "テストユーザ", AdminFlg.MEMBER,
+                Maps.newHashMap(TenantId.create("TEST1"), RoleId.create("00001")), LoginId.create("TEST"),
+                HashedPassword.create("password"));
+
+        assertThat(suser2.isAdmin()).isFalse();
+    }
+
+    @Test
+    void testGrantTenantAccessOf() throws DomainException {
+        Suser suser = Suser.create(UserId.create("0000000001"), "テストユーザ", AdminFlg.ADMIN,
+                Maps.newHashMap(TenantId.create("TEST1"), RoleId.create("00001")), LoginId.create("TEST"),
+                HashedPassword.create("password"));
+
+        suser.grantTenantAccessOf(TenantId.create("TEST4"), RoleId.create("00002"));
+
+        assertThat(suser.getUserRoles()).hasSize(2);
+        Optional<UserRole> optTenantUser = suser.getUserRoles().stream()
+                .filter(data -> data.getTenantId().toString().equals("TEST4")).findFirst();
+
+        assertThat(optTenantUser).isPresent();
+        assertThat(optTenantUser.get().getUserId()).isEqualTo(UserId.create("0000000001"));
+        assertThat(optTenantUser.get().getTenantId()).isEqualTo(TenantId.create("TEST4"));
+        assertThat(optTenantUser.get().getRoleId()).isEqualTo(RoleId.create("00002"));
+        assertThat(optTenantUser.get().getEntityOperation()).isEqualTo(EntityOperation.INSERT);
+    }
+
+    @Test
+    void testRevokeTenantAccessOf() throws DomainException {
+        Suser suser = Suser.create(UserId.create("0000000001"), "テストユーザ", AdminFlg.ADMIN,
+                Maps.newHashMap(TenantId.create("TEST1"), RoleId.create("00001")), LoginId.create("TEST"),
+                HashedPassword.create("password"));
+
+        suser.revokeTenantAccessOf(TenantId.create("TEST1"), RoleId.create("00001"));
+
+        assertThat(suser.getUserRoles()).hasSize(1);
+
+        Optional<UserRole> optTenantUser = suser.getUserRoles().stream()
+                .filter(data -> data.getTenantId().toString().equals("TEST1")).findFirst();
+
+        assertThat(optTenantUser).isPresent();
+        assertThat(optTenantUser.get().getEntityOperation()).isEqualTo(EntityOperation.DELETE);
+    }
+
+    @Test
+    void testCreate() throws DomainException {
+        Suser suser = Suser.create(UserId.create("0000000001"), "テストユーザ", AdminFlg.ADMIN,
+                Maps.newHashMap(TenantId.create("TEST1"), RoleId.create("00001")), LoginId.create("TEST"),
+                HashedPassword.create("password"));
+
+        assertThat(suser.getUserId()).isEqualTo(UserId.create("0000000001"));
+        assertThat(suser.getUsername()).isEqualTo("テストユーザ");
+        assertThat(suser.getAdminFlg()).isEqualTo(AdminFlg.ADMIN);
+        assertThat(suser.getLoginId()).isEqualTo(LoginId.create("TEST"));
+        assertThat(suser.getHashedPassword()).isEqualTo(HashedPassword.create("password"));
+        assertThat(suser.getLoginFlg()).isEqualTo(LoginFlg.NOT_LOGIN);
+
+        assertThat(suser.getUserRoles()).hasSize(1);
+        UserRole tenantUser1 = suser.getUserRoles().get(0);
+        assertThat(tenantUser1.getUserId()).isEqualTo(UserId.create("0000000001"));
+        assertThat(tenantUser1.getTenantId()).isEqualTo(TenantId.create("TEST1"));
+        assertThat(tenantUser1.getRoleId()).isEqualTo(RoleId.create("00001"));
+
+    }
 
 }
