@@ -15,6 +15,7 @@ import org.nortis.domain.endpoint.value.SubjectTemplate;
 import org.nortis.domain.endpoint.value.TextType;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.exception.DomainException;
+import org.nortis.test.user.TestUsers;
 import org.seasar.doma.jdbc.criteria.Entityql;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -210,6 +211,8 @@ class DomaEndpointRepositoryTest extends RepositoryTestBase {
 
     @Test
     void testRemove() throws DomainException {
+        TestUsers.memberUser().setSecurityContext();
+
         TenantId tenantId = TenantId.create("1000000002");
         EndpointId endpointId = EndpointId.create("2000000003");
 
@@ -223,6 +226,8 @@ class DomaEndpointRepositoryTest extends RepositoryTestBase {
 
     @Test
     void testRemoveAll() throws DomainException {
+        TestUsers.memberUser().setSecurityContext();
+
         TenantId tenantId = TenantId.create("1000000001");
 
         List<Endpoint> endpointList = this.repository.getFromTenantId(tenantId);

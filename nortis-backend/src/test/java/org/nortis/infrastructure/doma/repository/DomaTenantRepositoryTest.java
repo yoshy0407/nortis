@@ -18,6 +18,7 @@ import org.nortis.domain.tenant.value.RoleId;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.domain.tenant.value.TenantIdentifier;
 import org.nortis.infrastructure.exception.DomainException;
+import org.nortis.test.user.TestUsers;
 import org.seasar.doma.jdbc.criteria.Entityql;
 import org.seasar.doma.jdbc.criteria.NativeSql;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -198,6 +199,8 @@ class DomaTenantRepositoryTest extends RepositoryTestBase {
     // イベントのところが悩ましい
     @Test
     void testRemove() throws DomainException {
+        TestUsers.memberUser().setSecurityContext();
+
         var tenantId = TenantId.create("0000000001");
         Optional<Tenant> optTenant = this.repository.getByTenantId(tenantId);
         this.repository.remove(optTenant.get());
