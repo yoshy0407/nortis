@@ -24,6 +24,6 @@ public class TenantDeletedEventListener extends AbstractEventListener<TenantDele
 
     @Override
     protected String getProcessName() {
-        return "テナント削除の受信処理";
+        return "テナント削除イベント";
     }
 }
