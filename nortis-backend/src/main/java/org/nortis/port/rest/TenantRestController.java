@@ -3,11 +3,13 @@ package org.nortis.port.rest;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.nortis.application.tenant.TenantApplicationService;
+import org.nortis.application.tenant.TenantQueryApplicationService;
 import org.nortis.application.tenant.model.TenantNameUpdateCommand;
 import org.nortis.application.tenant.model.TenantRegisterCommand;
 import org.nortis.domain.authentication.value.ApiKey;
 import org.nortis.domain.tenant.Tenant;
 import org.nortis.infrastructure.application.ApplicationTranslator;
+import org.nortis.infrastructure.application.Paging;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.security.user.NortisUserDetails;
 import org.nortis.port.rest.payload.TenantPatchRequest;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,6 +39,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/tenant")
 @RestController
 public class TenantRestController {
+
+    private final TenantQueryApplicationService tenantQueryApplicationService;
 
     private final TenantApplicationService tenantApplicationService;
 
@@ -51,20 +56,25 @@ public class TenantRestController {
     @GetMapping("{tenantId}")
     public TenantResource get(@PathVariable(name = "tenantId", required = true) String tenantId,
             @AuthenticationPrincipal NortisUserDetails user) throws DomainException {
-        return this.tenantApplicationService.getTenant(tenantId, user, translator());
+        return this.tenantQueryApplicationService.getTenant(tenantId, user, translator());
     }
 
     /**
-     * 全てのテナントを返却します
+     * テナントを取得します
      * 
-     * @param user 認証ユーザ
+     * @param pageNo      ページ番号
+     * @param pagePerSize １ページあたりのサイズ
+     * 
+     * @param user        認証ユーザ
      * @return テナントリソースのリスト
      * @throws DomainException ドメインロジックエラー
      */
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public List<TenantResource> getList(@AuthenticationPrincipal NortisUserDetails user) throws DomainException {
-        return this.tenantApplicationService.getAllTenant(translator(), user);
+    public List<TenantResource> getList(@RequestParam int pageNo, @RequestParam int pagePerSize,
+            @AuthenticationPrincipal NortisUserDetails user) throws DomainException {
+        Paging paging = new Paging(pageNo, pagePerSize);
+        return this.tenantQueryApplicationService.getListTenant(paging, user, translator());
     }
 
     /**
