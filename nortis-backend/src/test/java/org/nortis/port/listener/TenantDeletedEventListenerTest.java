@@ -44,7 +44,7 @@ class TenantDeletedEventListenerTest extends ListenerTestBase {
 
     @Test
     void testSubscribeError() throws DomainException {
-        Logger logger = (Logger) LoggerFactory.getLogger(TenantDeletedEventListener.class);
+        Logger logger = (Logger) LoggerFactory.getLogger(AbstractEventListener.class);
         @SuppressWarnings("unchecked")
         Appender<ILoggingEvent> mockAppender = mock(Appender.class);
 
@@ -61,7 +61,7 @@ class TenantDeletedEventListenerTest extends ListenerTestBase {
         verify(mockAppender).doAppend(eventCaptor.capture());
 
         ILoggingEvent logingEvent = eventCaptor.getValue();
-        assertThat(logingEvent.getMessage()).isEqualTo("テナント削除の受信処理に失敗しました");
+        assertThat(logingEvent.getMessage()).isEqualTo("テナント削除イベントの受信に失敗しました");
     }
 
 }

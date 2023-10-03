@@ -15,7 +15,7 @@ import org.nortis.infrastructure.security.user.SuserNortisUser;
  */
 @Getter
 @AllArgsConstructor
-public class SuserTestUser implements TestUser {
+public class SuserTestUser extends AbstractTestUser {
 
     private final Suser suser;
 

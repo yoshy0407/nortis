@@ -15,7 +15,7 @@ import org.nortis.infrastructure.security.user.TenantNortisUser;
  */
 @Getter
 @AllArgsConstructor
-public class TenantTestUser implements TestUser {
+public class TenantTestUser extends AbstractTestUser {
 
     private final Tenant tenant;
 
