@@ -1,5 +1,6 @@
 package org.nortis.infrastructure.security;
 
+import java.io.Serializable;
 import lombok.EqualsAndHashCode;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.validation.Validations;
@@ -11,7 +12,9 @@ import org.nortis.infrastructure.validation.Validations;
  * @version 1.0.0
  */
 @EqualsAndHashCode
-public class Identity {
+public class Identity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final String value;
 

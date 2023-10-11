@@ -25,6 +25,8 @@ import org.seasar.doma.Table;
 @Table(name = "CONSUMER_SUBSCRIBE")
 public class ConsumerSubscribe extends ImmutableEntity {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
     @Column(name = "CONSUMER_ID")
     private final ConsumerId consumerId;

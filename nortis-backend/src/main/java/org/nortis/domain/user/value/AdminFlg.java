@@ -31,6 +31,21 @@ public enum AdminFlg {
     }
 
     /**
+     * {@code boolean}で値を取得します
+     * 
+     * @return 値
+     */
+    public boolean booleanValue() {
+        if (this.value.equals("1")) {
+            return true;
+        }
+        if (this.value.equals("0")) {
+            return false;
+        }
+        return false;
+    }
+
+    /**
      * 値に対応する管理者フラグを取得します
      * 
      * @param value 値

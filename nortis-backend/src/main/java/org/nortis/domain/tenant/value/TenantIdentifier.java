@@ -1,5 +1,6 @@
 package org.nortis.domain.tenant.value;
 
+import java.io.Serializable;
 import lombok.EqualsAndHashCode;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.exception.UnexpectedException;
@@ -14,7 +15,9 @@ import org.seasar.doma.Domain;
  */
 @EqualsAndHashCode
 @Domain(valueType = String.class, accessorMethod = "toString", factoryMethod = "createOfDoma")
-public final class TenantIdentifier {
+public final class TenantIdentifier implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private static final String DISPLAY_NAME = "テナント識別子";
 

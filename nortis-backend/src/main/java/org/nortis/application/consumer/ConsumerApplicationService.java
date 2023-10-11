@@ -22,6 +22,7 @@ import org.nortis.domain.tenant.TenantRepository;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.annotation.ApplicationService;
 import org.nortis.infrastructure.application.ApplicationTranslator;
+import org.nortis.infrastructure.application.Paging;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.message.MessageCodes;
 import org.nortis.infrastructure.security.user.NortisUserDetails;
@@ -49,6 +50,57 @@ public class ConsumerApplicationService {
     private final ConsumerDomainService consumerDomainService;
 
     private final NumberingDomainService numberingDomainService;
+
+    /**
+     * コンシューマを取得します
+     * 
+     * @param <R>           結果
+     * @param rawTenantId   テナントID
+     * @param rawConsumerId コンシューマID
+     * @param user          認証ユーザ
+     * @param translator    変換処理
+     * @return 結果
+     * @throws DomainException ビジネスロジックエラー
+     */
+    public <R> R get(String rawTenantId, String rawConsumerId, NortisUserDetails user,
+            ApplicationTranslator<Consumer, R> translator) throws DomainException {
+
+        TenantId tenantId = TenantId.create(rawTenantId);
+        Tenant tenant = getAndCheckTenant(tenantId);
+
+        this.authorityCheckDomainService.checkHasWriteConsumer(user, tenant);
+
+        ConsumerId consumerId = ConsumerId.create(rawConsumerId);
+        Consumer consumer = getAndCheckConsumer(tenantId, consumerId);
+        return translator.translate(consumer);
+    }
+
+    /**
+     * ページングでデータを取得します
+     * 
+     * @param <R>         結果
+     * @param rawTenantId テナントID
+     * @param paging      ページング
+     * @param user        認証ユーザ
+     * @param translator  変換処理
+     * @return レスポンス
+     * @throws DomainException ビジネスロジックエラー
+     */
+    public <R> List<R> getListPaging(String rawTenantId, Paging paging, NortisUserDetails user,
+            ApplicationTranslator<Consumer, R> translator) throws DomainException {
+
+        TenantId tenantId = TenantId.create(rawTenantId);
+        Tenant tenant = getAndCheckTenant(tenantId);
+
+        this.authorityCheckDomainService.checkHasWriteConsumer(user, tenant);
+
+        List<Consumer> consumerList = this.consumerRepository.getListPaging(tenantId, paging);
+        //@formatter:off
+        return consumerList.stream()
+                .map(d -> translator.translate(d))
+                .toList();
+        //@formatter:on
+    }
 
     /**
      * メールコンシューマを登録します

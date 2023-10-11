@@ -1,8 +1,11 @@
 package org.nortis.domain.user;
 
+import java.util.List;
 import java.util.Optional;
+import org.nortis.domain.tenant.value.RoleId;
 import org.nortis.domain.user.value.LoginId;
 import org.nortis.domain.user.value.UserId;
+import org.nortis.infrastructure.application.Paging;
 
 /**
  * ユーザリポジトリインタフェースです
@@ -27,6 +30,22 @@ public interface SuserRepository {
      * @return ユーザ
      */
     Optional<Suser> getByLoginId(LoginId loginId);
+
+    /**
+     * 指定されたロールIDのロールを持つユーザを取得します
+     * 
+     * @param roleId ロールID
+     * @return 取得結果
+     */
+    List<Suser> getFromRoleId(RoleId roleId);
+
+    /**
+     * ユーザをリストで取得します
+     * 
+     * @param paging ページング
+     * @return 結果のリスト
+     */
+    List<Suser> getListPaging(Paging paging);
 
     /**
      * ユーザを保存します

@@ -3,7 +3,6 @@ package org.nortis.port.rest;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.nortis.application.tenant.TenantApplicationService;
-import org.nortis.application.tenant.TenantQueryApplicationService;
 import org.nortis.application.tenant.model.TenantNameUpdateCommand;
 import org.nortis.application.tenant.model.TenantRegisterCommand;
 import org.nortis.domain.authentication.value.ApiKey;
@@ -12,12 +11,13 @@ import org.nortis.infrastructure.application.ApplicationTranslator;
 import org.nortis.infrastructure.application.Paging;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.security.user.NortisUserDetails;
-import org.nortis.port.rest.payload.TenantPatchRequest;
-import org.nortis.port.rest.payload.TenantRequest;
+import org.nortis.port.rest.payload.TenantCreateRequest;
+import org.nortis.port.rest.payload.TenantUpdateRequest;
 import org.nortis.port.rest.resource.ApiKeyResource;
 import org.nortis.port.rest.resource.TenantResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -40,8 +40,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TenantRestController {
 
-    private final TenantQueryApplicationService tenantQueryApplicationService;
-
     private final TenantApplicationService tenantApplicationService;
 
     /**
@@ -56,7 +54,7 @@ public class TenantRestController {
     @GetMapping("{tenantId}")
     public TenantResource get(@PathVariable(name = "tenantId", required = true) String tenantId,
             @AuthenticationPrincipal NortisUserDetails user) throws DomainException {
-        return this.tenantQueryApplicationService.getTenant(tenantId, user, translator());
+        return this.tenantApplicationService.getTenant(tenantId, user, translator());
     }
 
     /**
@@ -74,7 +72,7 @@ public class TenantRestController {
     public List<TenantResource> getList(@RequestParam int pageNo, @RequestParam int pagePerSize,
             @AuthenticationPrincipal NortisUserDetails user) throws DomainException {
         Paging paging = new Paging(pageNo, pagePerSize);
-        return this.tenantQueryApplicationService.getListTenant(paging, user, translator());
+        return this.tenantApplicationService.getListTenant(paging, user, translator());
     }
 
     /**
@@ -87,9 +85,9 @@ public class TenantRestController {
      */
     @ResponseStatus(HttpStatus.OK)
     @PostMapping
-    public TenantResource register(@RequestBody TenantRequest req,
+    public TenantResource register(@RequestBody @Validated TenantCreateRequest req,
             @AuthenticationPrincipal NortisUserDetails userDetails) throws DomainException {
-        TenantRegisterCommand command = new TenantRegisterCommand(req.tenantId(), req.tenantName());
+        TenantRegisterCommand command = new TenantRegisterCommand(req.getTenantIdentifier(), req.getTenantName());
         return this.tenantApplicationService.register(command, userDetails, translator());
     }
 
@@ -120,10 +118,9 @@ public class TenantRestController {
      */
     @ResponseStatus(HttpStatus.OK)
     @PatchMapping("{tenantId}")
-    public TenantResource updateName(@PathVariable(name = "tenantId", required = true) String tenantId,
-            @RequestBody TenantPatchRequest req, @AuthenticationPrincipal NortisUserDetails userDetails)
-            throws DomainException {
-        TenantNameUpdateCommand command = new TenantNameUpdateCommand(tenantId, req.name());
+    public TenantResource updateName(@PathVariable String tenantId, @RequestBody TenantUpdateRequest req,
+            @AuthenticationPrincipal NortisUserDetails userDetails) throws DomainException {
+        TenantNameUpdateCommand command = new TenantNameUpdateCommand(tenantId, req.getTenantName());
         return this.tenantApplicationService.changeName(command, userDetails, translator());
     }
 
@@ -136,8 +133,8 @@ public class TenantRestController {
      */
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     @DeleteMapping("{tenantId}")
-    public void delete(@PathVariable(name = "tenantId", required = true) String tenantId,
-            @AuthenticationPrincipal NortisUserDetails userDetails) throws DomainException {
+    public void delete(@PathVariable String tenantId, @AuthenticationPrincipal NortisUserDetails userDetails)
+            throws DomainException {
         this.tenantApplicationService.delete(tenantId, userDetails);
     }
 

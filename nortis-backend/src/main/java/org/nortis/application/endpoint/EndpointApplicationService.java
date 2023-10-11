@@ -24,6 +24,7 @@ import org.nortis.domain.tenant.TenantRepository;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.annotation.ApplicationService;
 import org.nortis.infrastructure.application.ApplicationTranslator;
+import org.nortis.infrastructure.application.Paging;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.message.MessageCodes;
 import org.nortis.infrastructure.security.user.NortisUserDetails;
@@ -62,6 +63,59 @@ public class EndpointApplicationService {
         //@formatter:off
         return Stream.of(TextType.values())
                 .map(d -> translator.translate(d))
+                .toList();
+        //@formatter:on
+    }
+
+    /**
+     * エンドポイントを取得します
+     * 
+     * @param <R>           結果クラス
+     * @param rawTenantId   テナントID
+     * @param rawEndpointId エンドポイントID
+     * @param user          認証ユーザ
+     * @param translator    変換処理
+     * @return 結果
+     * @throws DomainException チェックエラー
+     */
+    public <R> R getEndpoint(String rawTenantId, String rawEndpointId, NortisUserDetails user,
+            ApplicationTranslator<Endpoint, R> translator) throws DomainException {
+        TenantId tenantId = TenantId.create(rawTenantId);
+        Tenant tenant = getAndcheckTenant(tenantId);
+
+        this.authorityCheckDomainService.checkHasReadEndpoint(user, tenant);
+
+        EndpointId endpointId = EndpointId.create(rawEndpointId);
+        Optional<Endpoint> optEndpoint = this.endpointRepository.get(tenantId, endpointId);
+        if (optEndpoint.isEmpty()) {
+            throw new DomainException(MessageCodes.nortis20001());
+        }
+        return translator.translate(optEndpoint.get());
+    }
+
+    /**
+     * エンドポイントの複数
+     * 
+     * @param <R>         結果
+     * @param rawTenantId テナントID
+     * @param paging      ページング
+     * @param user        認証ユーザ
+     * @param translator  変換処理
+     * @return エンドポイントリスト
+     * @throws DomainException ビジネスロジックエラー
+     */
+    public <R> List<R> getEndpointList(String rawTenantId, Paging paging, NortisUserDetails user,
+            ApplicationTranslator<Endpoint, R> translator) throws DomainException {
+        TenantId tenantId = TenantId.create(rawTenantId);
+        Tenant tenant = getAndcheckTenant(tenantId);
+
+        this.authorityCheckDomainService.checkHasReadEndpoint(user, tenant);
+
+        List<Endpoint> endpointList = this.endpointRepository.getList(tenantId, paging);
+
+        //@formatter:off
+        return endpointList.stream()
+                .map(data -> translator.translate(data))
                 .toList();
         //@formatter:on
     }

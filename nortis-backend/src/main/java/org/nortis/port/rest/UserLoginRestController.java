@@ -34,7 +34,7 @@ public class UserLoginRestController {
      * @throws DomainException ロジックエラー
      */
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping("/login")
+    @PostMapping("/user/login")
     public ApiKeyResource login(@RequestBody LoginRequest request) throws DomainException {
         return this.userLoginService.login(request.loginId(), request.password(), translator());
     }
@@ -46,7 +46,7 @@ public class UserLoginRestController {
      * @throws DomainException ロジックエラー
      */
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PostMapping("/logout")
+    @PostMapping("/user/logout")
     public void logout(@RequestBody LogoutRequest request) throws DomainException {
         this.userLoginService.logout(request.loginId());
     }

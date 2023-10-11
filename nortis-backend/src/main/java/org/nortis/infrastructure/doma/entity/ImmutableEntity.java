@@ -1,5 +1,6 @@
 package org.nortis.infrastructure.doma.entity;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import org.nortis.infrastructure.doma.EntityOperation;
@@ -16,7 +17,9 @@ import org.seasar.doma.Transient;
  */
 @Getter
 @Entity(immutable = true, metamodel = @Metamodel)
-public class ImmutableEntity {
+public class ImmutableEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Column(name = "CREATE_ID")
     private final String createId;

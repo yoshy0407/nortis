@@ -1,5 +1,6 @@
 package org.nortis.domain.user.value;
 
+import java.io.Serializable;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.exception.UnexpectedException;
@@ -13,7 +14,9 @@ import org.seasar.doma.Domain;
  * @version 1.0.0
  */
 @Domain(valueType = String.class, accessorMethod = "toString", factoryMethod = "createOfDoma")
-public class UserId extends Identity {
+public class UserId extends Identity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private UserId(String value) throws DomainException {
         super(value, "ユーザID");

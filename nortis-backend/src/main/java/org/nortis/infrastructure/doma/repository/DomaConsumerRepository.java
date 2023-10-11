@@ -14,9 +14,8 @@ import org.nortis.domain.consumer.Consumer_;
 import org.nortis.domain.consumer.value.ConsumerId;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.tenant.value.TenantId;
+import org.nortis.infrastructure.application.Paging;
 import org.seasar.doma.jdbc.criteria.Entityql;
-import org.seasar.doma.jdbc.criteria.declaration.OrderByNameDeclaration;
-import org.seasar.doma.jdbc.criteria.declaration.WhereDeclaration;
 import org.seasar.doma.jdbc.criteria.statement.EntityqlSelectStarting;
 import org.springframework.stereotype.Repository;
 
@@ -41,22 +40,37 @@ public class DomaConsumerRepository implements ConsumerRepository {
     @Override
     public Optional<Consumer> get(TenantId tenantId, ConsumerId consumerId) {
         //@formatter:off
-        return select(c -> {
-            c.eq(this.consumer.tenantId, tenantId);
-            c.eq(this.consumer.consumerId, consumerId);
-        }, order -> {})
+        return select()
+                .where(c -> {
+                    c.eq(this.consumer.tenantId, tenantId);
+                    c.eq(this.consumer.consumerId, consumerId);
+                })
                 .fetchOptional();
+        //@formatter:on
+    }
+
+    @Override
+    public List<Consumer> getListPaging(TenantId tenantId, Paging paging) {
+        //@formatter:off
+        return select()
+                .orderBy(order -> order.asc(this.consumer.consumerId))
+                .offset(paging.offset())
+                .limit(paging.limit())
+                .fetch();
         //@formatter:on
     }
 
     @Override
     public List<Consumer> getFromEndpoint(EndpointId endpointId) {
         //@formatter:off
-        return select(c -> {
-            c.eq(this.consumerSubscribe.endpointId, endpointId);
-        }, order -> {
-            order.asc(this.consumer.consumerId);
-        }).fetch();
+        return select()
+                .where(c -> {
+                    c.eq(this.consumerSubscribe.endpointId, endpointId);
+                })
+                .orderBy(order -> {
+                    order.asc(this.consumer.consumerId);
+                })
+                .fetch();
         //@formatter:on
     }
 
@@ -131,9 +145,9 @@ public class DomaConsumerRepository implements ConsumerRepository {
         }
         this.entityql.delete(this.consumerParameter, deleteParameterList).execute();
         this.entityql.update(this.consumerParameter, updateParameterList).execute();
-        this.entityql.insert(this.consumerParameter, deleteParameterList).execute();
+        this.entityql.insert(this.consumerParameter, insertParameterList).execute();
         this.entityql.delete(this.consumerSubscribe, deleteSubscribeList).execute();
-        this.entityql.insert(this.consumerSubscribe, deleteSubscribeList).execute();
+        this.entityql.insert(this.consumerSubscribe, insertSubscribeList).execute();
     }
 
     @Override
@@ -143,15 +157,14 @@ public class DomaConsumerRepository implements ConsumerRepository {
         this.entityql.delete(this.consumer, consumer).execute();
     }
 
-    private EntityqlSelectStarting<Consumer> select(java.util.function.Consumer<WhereDeclaration> where,
-            java.util.function.Consumer<OrderByNameDeclaration> orderBy) {
+    private EntityqlSelectStarting<Consumer> select() {
         return this.entityql.from(this.consumer)
                 .leftJoin(consumerParameter, on -> on.eq(this.consumer.consumerId, this.consumerParameter.consumerId))
                 .leftJoin(consumerSubscribe, on -> on.eq(this.consumer.consumerId, this.consumerSubscribe.consumerId))
-                .where(where).orderBy(orderBy)
                 .associate(this.consumer, this.consumerParameter,
                         (consumer, parameter) -> consumer.getParameters().put(parameter.getParameterName(), parameter))
                 .associate(this.consumer, this.consumerSubscribe,
                         (consumer, subscribe) -> consumer.getSubscribes().put(subscribe.getEndpointId(), subscribe));
     }
+
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.event.value.EventId;
+import org.nortis.domain.tenant.value.TenantId;
 
 /**
  * 受信イベントのリポジトリ
@@ -31,10 +32,11 @@ public interface ReceiveEventRepository {
     /**
      * 未受信の指定エンドポイントのイベントを取得します
      * 
+     * @param tenantId   テナントID
      * @param endpointId エンドポイントID
      * @return 未受信イベントのリスト
      */
-    List<ReceiveEvent> notSubscribedEndpoint(EndpointId endpointId);
+    List<ReceiveEvent> notSubscribedEndpoint(TenantId tenantId, EndpointId endpointId);
 
     /**
      * 保存します

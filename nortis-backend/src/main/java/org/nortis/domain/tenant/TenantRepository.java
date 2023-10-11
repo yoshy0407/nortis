@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.domain.tenant.value.TenantIdentifier;
+import org.nortis.infrastructure.application.Paging;
 
 /**
  * テナントのリポジトリインタフェースです
@@ -32,9 +33,11 @@ public interface TenantRepository {
     /**
      * 全てのテナントを取得する
      * 
+     * @param panging ページング
+     * 
      * @return 全てのテナント
      */
-    List<Tenant> getAllTenant();
+    List<Tenant> getTenantPaging(Paging panging);
 
     /**
      * テナントを保存します

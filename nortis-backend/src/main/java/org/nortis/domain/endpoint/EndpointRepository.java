@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.endpoint.value.EndpointIdentifier;
 import org.nortis.domain.tenant.value.TenantId;
+import org.nortis.infrastructure.application.Paging;
 
 /**
  * エンドポイントのリポジトリインタフェースです
@@ -39,6 +40,15 @@ public interface EndpointRepository {
      * @return エンドポイントのリスト
      */
     List<Endpoint> getFromTenantId(TenantId tenantId);
+
+    /**
+     * ページングでエンドポイントを取得します
+     * 
+     * @param tenantId テナントID
+     * @param paging   ページング
+     * @return リスト
+     */
+    List<Endpoint> getList(TenantId tenantId, Paging paging);
 
     /**
      * 保存します

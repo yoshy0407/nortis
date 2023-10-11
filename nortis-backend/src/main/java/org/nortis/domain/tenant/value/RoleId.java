@@ -1,5 +1,6 @@
 package org.nortis.domain.tenant.value;
 
+import java.io.Serializable;
 import lombok.EqualsAndHashCode;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.exception.UnexpectedException;
@@ -14,7 +15,9 @@ import org.seasar.doma.Domain;
  */
 @Domain(valueType = String.class, factoryMethod = "createOfDoma", accessorMethod = "toString")
 @EqualsAndHashCode
-public class RoleId {
+public class RoleId implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private static final String DISPLAY_NAME = "ロールID";
 

@@ -85,9 +85,11 @@ public class NumberingDomainService {
 
     private Long getNextVal(String sequenceName) {
         Sql<?> sql = this.config.getDialect().getSequenceNextValSql(sequenceName, 0);
-        SelectBuilder selectBuilder = SelectBuilder.newInstance(config);
-        selectBuilder.sql(sql.getFormattedSql());
-        return selectBuilder.getScalarSingleResult(Long.class);
+        //@formatter:off
+        return SelectBuilder.newInstance(config)
+            .sql(sql.getFormattedSql())
+            .getScalarSingleResult(Long.class);
+        //@formatter:on
     }
 
 }

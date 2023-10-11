@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.nortis.domain.tenant.Tenant;
 import org.nortis.domain.tenant.value.OperationId;
 import org.nortis.domain.tenant.value.TenantId;
+import org.nortis.domain.user.value.UserId;
 import org.nortis.infrastructure.annotation.DomainService;
 import org.nortis.infrastructure.message.MessageCodes;
 import org.nortis.infrastructure.security.exception.NoAuthorityDomainException;
@@ -147,6 +148,37 @@ public class AuthorityCheckDomainService {
         if (!nortisUser.hasAuthorityOf(tenant, OperationId.WRITE_CONSUMER)) {
             throw new NoAuthorityDomainException(MessageCodes.nortis50005());
         }
+    }
+
+    /**
+     * ユーザが読み取り可能かどうかチェックします
+     * 
+     * @param nortisUser ユーザ
+     * @param userId     対象のユーザID
+     * @throws NoAuthorityDomainException 認可エラー
+     */
+    public void checkAccressUser(NortisUserDetails nortisUser, UserId userId) throws NoAuthorityDomainException {
+        if (nortisUser.isUser() && nortisUser.getIdentity().equals(userId)) {
+            return;
+        }
+        if (nortisUser.isAdmin()) {
+            return;
+        }
+        throw new NoAuthorityDomainException(MessageCodes.nortis50005());
+    }
+
+    /**
+     * 同じユーザかどうかチェックします
+     * 
+     * @param nortisUser 認証ユーザ
+     * @param userId     ユーザID
+     * @throws NoAuthorityDomainException 認可エラー
+     */
+    public void checkSameUser(NortisUserDetails nortisUser, UserId userId) throws NoAuthorityDomainException {
+        if (nortisUser.isUser() && nortisUser.getIdentity().equals(userId)) {
+            return;
+        }
+        throw new NoAuthorityDomainException(MessageCodes.nortis50005());
     }
 
 }

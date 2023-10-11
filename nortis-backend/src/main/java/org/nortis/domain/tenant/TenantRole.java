@@ -1,5 +1,6 @@
 package org.nortis.domain.tenant;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -9,7 +10,6 @@ import org.nortis.domain.tenant.value.OperationId;
 import org.nortis.domain.tenant.value.RoleId;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.doma.EntityOperation;
-import org.nortis.infrastructure.doma.NortisEntityListener;
 import org.nortis.infrastructure.doma.entity.AbstractEntity;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.security.SecurityContextUtils;
@@ -29,8 +29,10 @@ import org.seasar.doma.Transient;
  */
 @Getter
 @Table(name = "TENANT_ROLE")
-@Entity(listener = NortisEntityListener.class, metamodel = @Metamodel)
-public class TenantRole extends AbstractEntity {
+@Entity(listener = TenantRoleEntityListener.class, metamodel = @Metamodel)
+public class TenantRole extends AbstractEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "TENANT_ID")

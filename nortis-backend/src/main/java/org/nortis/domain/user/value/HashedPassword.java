@@ -1,5 +1,6 @@
 package org.nortis.domain.user.value;
 
+import java.io.Serializable;
 import lombok.EqualsAndHashCode;
 import org.nortis.infrastructure.exception.DomainException;
 import org.seasar.doma.Domain;
@@ -12,7 +13,9 @@ import org.seasar.doma.Domain;
  */
 @Domain(valueType = String.class, factoryMethod = "create", accessorMethod = "toString")
 @EqualsAndHashCode
-public class HashedPassword {
+public class HashedPassword implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final String value;
 

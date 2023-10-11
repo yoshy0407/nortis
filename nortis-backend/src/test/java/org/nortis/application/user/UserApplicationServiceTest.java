@@ -85,7 +85,8 @@ class UserApplicationServiceTest extends ServiceTestBase {
         when(this.suserRepository.getByUserId(userId)).thenReturn(Optional.of(suser));
 
         SuserChangeNameCommand command = new SuserChangeNameCommand(userId.toString(), "テスト");
-        this.suserApplicationService.changeName(command, ApplicationTranslator.noConvert());
+        this.suserApplicationService.changeName(command, TestUsers.memberUser().getUserDetails(),
+                ApplicationTranslator.noConvert());
 
         verify(suserRepository).update(suser);
         assertThat(suser.getUsername()).isEqualTo("テスト");
@@ -102,7 +103,8 @@ class UserApplicationServiceTest extends ServiceTestBase {
         when(this.passwordDomainService.hashPassword(eq("password123")))
                 .thenReturn(HashedPassword.create("password123"));
 
-        this.suserApplicationService.changePassword(userId.toString(), "password123");
+        this.suserApplicationService.changePassword(userId.toString(), "password123",
+                TestUsers.memberUser().getUserDetails());
 
         verify(suserRepository).update(suser);
     }
@@ -119,7 +121,7 @@ class UserApplicationServiceTest extends ServiceTestBase {
         when(this.passwordDomainService.hashPassword(eq("password123")))
                 .thenReturn(HashedPassword.create("password123"));
 
-        this.suserApplicationService.resetPassword(userId.toString());
+        this.suserApplicationService.resetPassword(userId.toString(), TestUsers.memberUser().getUserDetails());
 
         verify(suserRepository).update(suser);
     }
@@ -134,7 +136,8 @@ class UserApplicationServiceTest extends ServiceTestBase {
 
         SuserGrantRoleCommand command = SuserGrantRoleCommand.builder().userId(userId.toString())
                 .tenantRoleList(Lists.list(new TenantRoleModel("1000000001", "00001"))).build();
-        this.suserApplicationService.grantRole(command, ApplicationTranslator.noConvert());
+        this.suserApplicationService.grantRole(command, TestUsers.memberUser().getUserDetails(),
+                ApplicationTranslator.noConvert());
 
         verify(suserRepository).update(suser);
     }
@@ -149,7 +152,8 @@ class UserApplicationServiceTest extends ServiceTestBase {
 
         SuserRevokeRoleCommand command = SuserRevokeRoleCommand.builder().userId(userId.toString())
                 .tenantRoleList(Lists.list(new TenantRoleModel("1000000001", "00001"))).build();
-        this.suserApplicationService.revokeRole(command, ApplicationTranslator.noConvert());
+        this.suserApplicationService.revokeRole(command, TestUsers.memberUser().getUserDetails(),
+                ApplicationTranslator.noConvert());
 
         verify(suserRepository).update(suser);
     }
@@ -162,7 +166,7 @@ class UserApplicationServiceTest extends ServiceTestBase {
                 HashedPassword.create("password"));
         when(this.suserRepository.getByUserId(userId)).thenReturn(Optional.of(suser));
 
-        this.suserApplicationService.deleteUserOf(userId.toString());
+        this.suserApplicationService.deleteUserOf(userId.toString(), TestUsers.memberUser().getUserDetails());
 
         verify(suserRepository).remove(suser);
     }

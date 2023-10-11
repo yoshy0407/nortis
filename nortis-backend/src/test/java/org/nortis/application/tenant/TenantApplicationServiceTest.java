@@ -8,7 +8,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import java.util.List;
 import java.util.Optional;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -26,6 +28,8 @@ import org.nortis.domain.tenant.TenantRepository;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.domain.tenant.value.TenantIdentifier;
 import org.nortis.infrastructure.application.ApplicationTranslator;
+import org.nortis.infrastructure.application.Paging;
+import org.nortis.infrastructure.exception.DataNotFoundException;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.message.MessageCodes;
 import org.nortis.infrastructure.security.exception.NoAuthorityDomainException;
@@ -54,6 +58,52 @@ class TenantApplicationServiceTest extends ServiceTestBase {
     void setup() {
         this.tenantApplicationService = new TenantApplicationService(tenantRepository, authenticationRepository,
                 tenantDomainService, numberingDomainService, authorityCheckDomainService);
+    }
+
+    @Test
+    void testGet_success() throws DomainException {
+        TenantId tenantId = TenantId.create("0000000001");
+
+        Tenant tenant = Tenant.create(tenantId, TenantIdentifier.create("TEST1"), "テストテナント1");
+        when(this.tenantRepository.getByTenantId(eq(tenantId))).thenReturn(Optional.ofNullable(tenant));
+
+        Tenant result = this.tenantApplicationService.getTenant("0000000001", TestUsers.memberUser().getUserDetails(),
+                ApplicationTranslator.noConvert());
+
+        assertThat(result.getTenantId()).isEqualTo(TenantId.create("0000000001"));
+        assertThat(result.getTenantIdentifier()).isEqualTo(TenantIdentifier.create("TEST1"));
+        assertThat(result.getTenantName()).isEqualTo("テストテナント1");
+    }
+
+    @Test
+    void testGetTenant_NotFound() throws DomainException {
+        assertThrows(DataNotFoundException.class, () -> {
+            this.tenantApplicationService.getTenant("0000000100", TestUsers.adminUser().getUserDetails(),
+                    ApplicationTranslator.nothing());
+        });
+    }
+
+    @Test
+    void testGetListTenant() throws DomainException {
+        Paging paging = new Paging(1, 5);
+
+        Tenant tenant1 = Tenant.create(TenantId.create("0000000001"), TenantIdentifier.create("TEST1"), "テストテナント1");
+        Tenant tenant2 = Tenant.create(TenantId.create("0000000002"), TenantIdentifier.create("TEST2"), "テストテナント2");
+        Tenant tenant3 = Tenant.create(TenantId.create("0000000003"), TenantIdentifier.create("TEST3"), "テストテナント3");
+        Tenant tenant4 = Tenant.create(TenantId.create("0000000004"), TenantIdentifier.create("TEST4"), "テストテナント4");
+        Tenant tenant5 = Tenant.create(TenantId.create("0000000005"), TenantIdentifier.create("TEST5"), "テストテナント5");
+        when(this.tenantRepository.getTenantPaging(eq(paging)))
+                .thenReturn(Lists.list(tenant1, tenant2, tenant3, tenant4, tenant5));
+
+        List<Tenant> list = this.tenantApplicationService.getListTenant(paging, TestUsers.memberUser().getUserDetails(),
+                ApplicationTranslator.noConvert());
+
+        assertThat(list).hasSize(5);
+        assertThat(list.get(0).getTenantId()).isEqualTo(TenantId.create("0000000001"));
+        assertThat(list.get(1).getTenantId()).isEqualTo(TenantId.create("0000000002"));
+        assertThat(list.get(2).getTenantId()).isEqualTo(TenantId.create("0000000003"));
+        assertThat(list.get(3).getTenantId()).isEqualTo(TenantId.create("0000000004"));
+        assertThat(list.get(4).getTenantId()).isEqualTo(TenantId.create("0000000005"));
     }
 
     @Test

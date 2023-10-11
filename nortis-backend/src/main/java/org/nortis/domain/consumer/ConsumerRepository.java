@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.nortis.domain.consumer.value.ConsumerId;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.tenant.value.TenantId;
+import org.nortis.infrastructure.application.Paging;
 
 /**
  * メールコンシューマのリポジトリです
@@ -22,6 +23,15 @@ public interface ConsumerRepository {
      * @return コンシューマ
      */
     Optional<Consumer> get(TenantId tenantId, ConsumerId consumerId);
+
+    /**
+     * ページングで複数県データを取得します
+     * 
+     * @param tenantId テナントID
+     * @param paging   ページング
+     * @return リスト
+     */
+    List<Consumer> getListPaging(TenantId tenantId, Paging paging);
 
     /**
      * エンドポイントIDからオブジェクトを取得します

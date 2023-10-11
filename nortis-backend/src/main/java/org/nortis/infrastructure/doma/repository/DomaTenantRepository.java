@@ -3,7 +3,6 @@ package org.nortis.infrastructure.doma.repository;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import org.nortis.domain.tenant.RoleOperation;
 import org.nortis.domain.tenant.RoleOperation_;
@@ -16,10 +15,11 @@ import org.nortis.domain.tenant.value.OperationId;
 import org.nortis.domain.tenant.value.RoleId;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.domain.tenant.value.TenantIdentifier;
+import org.nortis.infrastructure.application.Paging;
 import org.nortis.infrastructure.utils.CollectionConvertUtils;
 import org.seasar.doma.jdbc.criteria.Entityql;
 import org.seasar.doma.jdbc.criteria.NativeSql;
-import org.seasar.doma.jdbc.criteria.declaration.WhereDeclaration;
+import org.seasar.doma.jdbc.criteria.statement.EntityqlSelectStarting;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -44,22 +44,28 @@ public class DomaTenantRepository implements TenantRepository {
 
     @Override
     public Optional<Tenant> getByTenantId(TenantId tenantId) {
-        return selectInternal(c -> c.eq(tenant.tenantId, tenantId));
+        //@formatter:off
+        return select()
+                .where(c -> c.eq(tenant.tenantId, tenantId))
+                .fetchOptional();
+        //@formatter:on
     }
 
     @Override
     public Optional<Tenant> getByTenantIdentifier(TenantIdentifier tenantIdentifier) {
-        return selectInternal(c -> c.eq(tenant.tenantIdentifier, tenantIdentifier));
+        //@formatter:off
+        return select()
+                .where(c -> c.eq(tenant.tenantIdentifier, tenantIdentifier))
+                .fetchOptional();
+        //@formatter:on
     }
 
     @Override
-    public List<Tenant> getAllTenant() {
+    public List<Tenant> getTenantPaging(Paging paging) {
         //@formatter:off
-        return entityql.from(this.tenant)
-                .leftJoin(tenantRole, on -> on.eq(tenant.tenantId, tenantRole.tenantId))
-                .leftJoin(roleOperation, on -> on.eq(tenantRole.roleId, roleOperation.roleId))
-                .associate(tenantRole, roleOperation, (role, operation) -> role.getRoleOperations().put(operation.getOperationId(), operation))
-                .associate(tenant, tenantRole, (t, role) -> t.getRoles().put(role.getRoleId(), role))
+        return select()
+                .offset(paging.offset())
+                .limit(paging.limit())
                 .fetch();
         //@formatter:on
     }
@@ -151,15 +157,13 @@ public class DomaTenantRepository implements TenantRepository {
         entityql.delete(this.tenant, tenant).execute();
     }
 
-    private Optional<Tenant> selectInternal(Consumer<WhereDeclaration> condition) {
+    private EntityqlSelectStarting<Tenant> select() {
         //@formatter:off
         return entityql.from(tenant)
                 .leftJoin(tenantRole, on -> on.eq(tenant.tenantId, tenantRole.tenantId))
                 .leftJoin(roleOperation, on -> on.eq(tenantRole.roleId, roleOperation.roleId))
-                .where(condition)
                 .associate(tenantRole, roleOperation, (role, operation) -> role.getRoleOperations().put(operation.getOperationId(), operation))
-                .associate(tenant, tenantRole, (t, role) -> t.getRoles().put(role.getRoleId(), role))
-                .fetchOptional();
+                .associate(tenant, tenantRole, (t, role) -> t.getRoles().put(role.getRoleId(), role));
         //@formatter:on
     }
 

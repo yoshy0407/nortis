@@ -1,5 +1,6 @@
 package org.nortis.domain.authentication;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -28,7 +29,9 @@ import org.seasar.doma.Table;
 @Getter
 @Table(name = "AUTHENTICATION")
 @Entity(metamodel = @Metamodel, listener = NortisEntityListener.class)
-public class Authentication extends RootEntity {
+public class Authentication extends RootEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "API_KEY")

@@ -24,7 +24,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 
 @SpringBootTest(classes = TenantDeletedEventListenerTestConfig.class)
-class TenantDeletedEventListenerTest extends ListenerTestBase {
+class EndpointEventListenerTest extends ListenerTestBase {
 
     @Autowired
     ApplicationEventPublisher applicationEventPublisher;
@@ -44,7 +44,7 @@ class TenantDeletedEventListenerTest extends ListenerTestBase {
 
     @Test
     void testSubscribeError() throws DomainException {
-        Logger logger = (Logger) LoggerFactory.getLogger(AbstractEventListener.class);
+        Logger logger = (Logger) LoggerFactory.getLogger(EndpointEventListener.class);
         @SuppressWarnings("unchecked")
         Appender<ILoggingEvent> mockAppender = mock(Appender.class);
 
@@ -61,7 +61,7 @@ class TenantDeletedEventListenerTest extends ListenerTestBase {
         verify(mockAppender).doAppend(eventCaptor.capture());
 
         ILoggingEvent logingEvent = eventCaptor.getValue();
-        assertThat(logingEvent.getMessage()).isEqualTo("テナント削除イベントの受信に失敗しました");
+        assertThat(logingEvent.getMessage()).isEqualTo("エンドポイントのテナント削除イベントの受信に失敗しました");
     }
 
 }

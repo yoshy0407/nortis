@@ -1,5 +1,6 @@
 package org.nortis.domain.tenant;
 
+import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,9 @@ import org.seasar.doma.Transient;
 @Getter
 @Table(name = "TENANT")
 @Entity(listener = TenantEntityListener.class, metamodel = @Metamodel)
-public class Tenant extends RootEntity {
+public class Tenant extends RootEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * テナントID

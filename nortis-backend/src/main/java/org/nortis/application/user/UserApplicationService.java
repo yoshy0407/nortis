@@ -1,6 +1,7 @@
 package org.nortis.application.user;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,7 @@ import org.nortis.domain.user.value.HashedPassword;
 import org.nortis.domain.user.value.LoginId;
 import org.nortis.domain.user.value.UserId;
 import org.nortis.infrastructure.application.ApplicationTranslator;
+import org.nortis.infrastructure.application.Paging;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.message.MessageCodes;
 import org.nortis.infrastructure.security.user.NortisUserDetails;
@@ -47,6 +49,54 @@ public class UserApplicationService {
     private final NumberingDomainService numberingDomainService;
 
     private final TenantDomainService tenantDomainService;
+
+    /**
+     * ユーザを取得します
+     * 
+     * @param <R>        結果クラス
+     * @param rawUserId  ユーザID
+     * @param user       認証ユーザ
+     * @param translator 変換処理
+     * @return 結果
+     * @throws DomainException ビジネスロジックエラー
+     */
+    public <R> R getUser(String rawUserId, NortisUserDetails user, ApplicationTranslator<Suser, R> translator)
+            throws DomainException {
+
+        UserId userId = UserId.create(rawUserId);
+
+        this.authorityCheckDomainService.checkAccressUser(user, userId);
+
+        Optional<Suser> optUser = this.suserRepository.getByUserId(userId);
+        if (optUser.isEmpty()) {
+            throw new DomainException(MessageCodes.nortis00003("ユーザ"));
+        }
+        return translator.translate(optUser.get());
+    }
+
+    /**
+     * ページングで取得します
+     * 
+     * @param <R>        結果
+     * @param paging     ページング
+     * @param user       認証ユーザ
+     * @param translator 変換処理
+     * @return 結果のリスト
+     * @throws DomainException ビジネスロジックエラー
+     */
+    public <R> List<R> getList(Paging paging, NortisUserDetails user, ApplicationTranslator<Suser, R> translator)
+            throws DomainException {
+
+        this.authorityCheckDomainService.checkAdminOf(user);
+
+        List<Suser> userList = this.suserRepository.getListPaging(paging);
+
+        //@formatter:off
+        return userList.stream()
+                .map(data -> translator.translate(data))
+                .toList();
+        //@formatter:on
+    }
 
     /**
      * ユーザを登録します
@@ -93,13 +143,17 @@ public class UserApplicationService {
      * 
      * @param <R>        結果のクラス
      * @param command    ユーザ名変更コマンド
+     * @param user       認証ユーザ
      * @param translator 結果変換クラス
      * @return 結果
      * @throws DomainException ドメインロジックエラー
      */
-    public <R> R changeName(SuserChangeNameCommand command, ApplicationTranslator<Suser, R> translator)
-            throws DomainException {
+    public <R> R changeName(SuserChangeNameCommand command, NortisUserDetails user,
+            ApplicationTranslator<Suser, R> translator) throws DomainException {
         UserId userId = UserId.create(command.userId());
+
+        authorityCheckDomainService.checkAccressUser(user, userId);
+
         Optional<Suser> optSuser = this.suserRepository.getByUserId(userId);
         if (optSuser.isEmpty()) {
             throw new DomainException(MessageCodes.nortis00003("ユーザ"));
@@ -117,11 +171,15 @@ public class UserApplicationService {
      * 
      * @param rawUserId         ユーザID
      * @param changeRawPassword パスワード
+     * @param user              認証ユーザ
      * @throws DomainException ビジネスロジックエラー
      */
-    public void changePassword(String rawUserId, String changeRawPassword) throws DomainException {
+    public void changePassword(String rawUserId, String changeRawPassword, NortisUserDetails user)
+            throws DomainException {
 
         UserId userId = UserId.create(rawUserId);
+
+        this.authorityCheckDomainService.checkSameUser(user, userId);
 
         Optional<Suser> optSuser = suserRepository.getByUserId(userId);
 
@@ -143,12 +201,15 @@ public class UserApplicationService {
      * パスワードをリセットします
      * 
      * @param rawUserId ユーザID
+     * @param user      認証ユーザ
      * @return リセットしたパスワード
      * @throws DomainException ビジネスロジックエラー
      */
-    public String resetPassword(String rawUserId) throws DomainException {
+    public String resetPassword(String rawUserId, NortisUserDetails user) throws DomainException {
 
         UserId userId = UserId.create(rawUserId);
+
+        authorityCheckDomainService.checkAccressUser(user, userId);
 
         Optional<Suser> optSuser = suserRepository.getByUserId(userId);
 
@@ -171,12 +232,15 @@ public class UserApplicationService {
      * 
      * @param <R>        結果クラス
      * @param command    コマンド
+     * @param user       認証ユーザ
      * @param translator 変換クラス
      * @return 処理結果
      * @throws DomainException ドメインロジックエラー
      */
-    public <R> R grantRole(SuserGrantRoleCommand command, ApplicationTranslator<Suser, R> translator)
-            throws DomainException {
+    public <R> R grantRole(SuserGrantRoleCommand command, NortisUserDetails user,
+            ApplicationTranslator<Suser, R> translator) throws DomainException {
+
+        this.authorityCheckDomainService.checkAdminOf(user);
 
         UserId userId = UserId.create(command.userId());
         Optional<Suser> optSuser = this.suserRepository.getByUserId(userId);
@@ -204,12 +268,15 @@ public class UserApplicationService {
      * 
      * @param <R>        結果クラス
      * @param command    コマンド
+     * @param user       認証ユーザ
      * @param translator 変換クラス
      * @return 処理結果
      * @throws DomainException ドメインロジックエラー
      */
-    public <R> R revokeRole(SuserRevokeRoleCommand command, ApplicationTranslator<Suser, R> translator)
-            throws DomainException {
+    public <R> R revokeRole(SuserRevokeRoleCommand command, NortisUserDetails user,
+            ApplicationTranslator<Suser, R> translator) throws DomainException {
+
+        this.authorityCheckDomainService.checkAdminOf(user);
 
         UserId userId = UserId.create(command.userId());
         Optional<Suser> optSuser = this.suserRepository.getByUserId(userId);
@@ -233,12 +300,33 @@ public class UserApplicationService {
     }
 
     /**
+     * 削除されたロールIDに紐づくロールが付与されているユーザから、権限を剥奪します
+     * 
+     * @param rawRoleId ロールID
+     * @throws DomainException ビジネスロジックエラー
+     */
+    public void revokeRoleFromRoleDeleted(String rawRoleId) throws DomainException {
+        RoleId roleId = RoleId.create(rawRoleId);
+
+        List<Suser> userList = this.suserRepository.getFromRoleId(roleId);
+        for (Suser user : userList) {
+            user.revokeFromRoleId(roleId);
+            // 都度更新で良いかどうか微妙・・・
+            this.suserRepository.update(user);
+        }
+    }
+
+    /**
      * ユーザを削除します
      * 
      * @param rawUserId ユーザID
+     * @param user      認証ユーザ
      * @throws DomainException ドメインロジックエラー
      */
-    public void deleteUserOf(String rawUserId) throws DomainException {
+    public void deleteUserOf(String rawUserId, NortisUserDetails user) throws DomainException {
+
+        this.authorityCheckDomainService.checkAdminOf(user);
+
         UserId userId = UserId.create(rawUserId);
         Optional<Suser> optSuser = this.suserRepository.getByUserId(userId);
         if (optSuser.isEmpty()) {

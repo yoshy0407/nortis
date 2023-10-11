@@ -58,7 +58,8 @@ class DomaReceiveEventRepositoryTest extends RepositoryTestBase {
 
     @Test
     void testNotSubscribedEndpoint() throws DomainException {
-        List<ReceiveEvent> receiveEventList = this.repository.notSubscribedEndpoint(EndpointId.create("2000000001"));
+        List<ReceiveEvent> receiveEventList = this.repository.notSubscribedEndpoint(TenantId.create("1000000001"),
+                EndpointId.create("2000000001"));
         assertThat(receiveEventList).hasSize(2);
     }
 

@@ -1,6 +1,7 @@
 package org.nortis.infrastructure.doma.repository;
 
 import org.nortis.domain.tenant.TenantEntityListener;
+import org.nortis.domain.tenant.TenantRoleEntityListener;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +20,13 @@ public class DomaTenantRepositoryTestConfig {
         var tenantEntityListener = new TenantEntityListener();
         tenantEntityListener.setApplicationEventPublisher(applicationEventPublisher);
         return tenantEntityListener;
+    }
+
+    @Bean
+    TenantRoleEntityListener tenantRoleEntityListener(ApplicationEventPublisher applicationEventPublisher) {
+        var listener = new TenantRoleEntityListener();
+        listener.setApplicationEventPublisher(applicationEventPublisher);
+        return listener;
     }
 
 }

@@ -1,5 +1,6 @@
 package org.nortis.domain.user;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import org.nortis.domain.tenant.value.RoleId;
@@ -21,7 +22,9 @@ import org.seasar.doma.Table;
 @Getter
 @Entity(immutable = true, metamodel = @Metamodel)
 @Table(name = "USER_ROLE")
-public class UserRole extends ImmutableEntity {
+public class UserRole extends ImmutableEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "USER_ID")

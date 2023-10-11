@@ -2,7 +2,6 @@ package org.nortis.infrastructure.doma.repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import org.nortis.domain.endpoint.Endpoint;
 import org.nortis.domain.endpoint.EndpointRepository;
@@ -12,9 +11,9 @@ import org.nortis.domain.endpoint.MessageTemplate_;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.endpoint.value.EndpointIdentifier;
 import org.nortis.domain.tenant.value.TenantId;
+import org.nortis.infrastructure.application.Paging;
 import org.seasar.doma.jdbc.criteria.Entityql;
-import org.seasar.doma.jdbc.criteria.declaration.OrderByNameDeclaration;
-import org.seasar.doma.jdbc.criteria.declaration.WhereDeclaration;
+import org.seasar.doma.jdbc.criteria.statement.EntityqlSelectStarting;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -35,27 +34,52 @@ public class DomaEndpointRepository implements EndpointRepository {
 
     @Override
     public Optional<Endpoint> get(TenantId tenantId, EndpointId endpointId) {
-        return selectInternal(where -> {
-            where.eq(endpoint.tenantId, tenantId);
-            where.eq(endpoint.endpointId, endpointId);
-        });
+        //@formatter:off
+        return select()
+                .where(where -> {
+                    where.eq(endpoint.tenantId, tenantId);
+                    where.eq(endpoint.endpointId, endpointId);
+                })
+                .fetchOptional();
+        //@formatter:on
     }
 
     @Override
     public Optional<Endpoint> getByEndpointIdentifier(TenantId tenantId, EndpointIdentifier endpointIdentifier) {
-        return selectInternal(where -> {
-            where.eq(endpoint.tenantId, tenantId);
-            where.eq(endpoint.endpointIdentifier, endpointIdentifier);
-        });
+        //@formatter:off
+        return select()
+                .where(where -> {
+                    where.eq(endpoint.tenantId, tenantId);
+                    where.eq(endpoint.endpointIdentifier, endpointIdentifier);
+                })
+                .fetchOptional();
+        //@formatter:on
     }
 
     @Override
     public List<Endpoint> getFromTenantId(TenantId tenantId) {
-        return selectListInternal(where -> {
-            where.eq(endpoint.tenantId, tenantId);
-        }, orderby -> {
-            orderby.asc(this.endpoint.endpointId);
-        });
+        //@formatter:off
+        return select()
+                .where(where -> {
+                    where.eq(endpoint.tenantId, tenantId);
+                })
+                .orderBy(orderby -> {
+                    orderby.asc(this.endpoint.endpointId);
+                })
+                .fetch();
+        //@formatter:on
+    }
+
+    @Override
+    public List<Endpoint> getList(TenantId tenantId, Paging paging) {
+        //@formatter:off
+        return select()
+                .where(c -> c.eq(endpoint.tenantId, tenantId))
+                .orderBy(o -> o.asc(endpoint.endpointId))
+                .offset(paging.offset())
+                .limit(paging.limit())
+                .fetch();
+        //@formatter:on
     }
 
     @Override
@@ -98,25 +122,12 @@ public class DomaEndpointRepository implements EndpointRepository {
         entityql.delete(endpoint, endpointList).execute();
     }
 
-    private Optional<Endpoint> selectInternal(Consumer<WhereDeclaration> where) {
+    private EntityqlSelectStarting<Endpoint> select() {
         //@formatter:off
         return entityql.from(endpoint)
                 .innerJoin(messageTemplate, on -> on.eq(endpoint.endpointId, messageTemplate.endpointId))
-                .where(where)
-                .associate(endpoint, messageTemplate, (e, m) -> e.getMessageTemplateList().add(m))
-                .fetchOptional();
+                .associate(endpoint, messageTemplate, (e, m) -> e.getMessageTemplateList().add(m));
         //@formatter:on
     }
 
-    private List<Endpoint> selectListInternal(Consumer<WhereDeclaration> where,
-            Consumer<OrderByNameDeclaration> orderBy) {
-        //@formatter:off
-        return entityql.from(endpoint)
-                .innerJoin(messageTemplate, on -> on.eq(endpoint.endpointId, messageTemplate.endpointId))
-                .where(where)
-                .orderBy(orderBy)
-                .associate(endpoint, messageTemplate, (e, m) -> e.getMessageTemplateList().add(m))
-                .fetch();
-        //@formatter:on
-    }
 }

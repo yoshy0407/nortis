@@ -1,7 +1,11 @@
 package org.nortis.application.event;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
+import org.nortis.domain.endpoint.value.EndpointId;
+import org.nortis.domain.event.ReceiveEvent;
 import org.nortis.domain.event.ReceiveEventRepository;
+import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.annotation.ApplicationService;
 import org.nortis.infrastructure.exception.DomainException;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,12 +28,21 @@ public class ReceiveEventApplicationService {
     /**
      * エンドポイントに対応する受信イベントを受信済みに変更する
      * 
-     * @param tenantId   テナントID
-     * @param endpointId エンドポイントID
+     * @param rawTenantId   テナントID
+     * @param rawEndpointId エンドポイントID
      * @throws DomainException ビジネスロジックエラー
      */
-    public void subscribeByEndpoint(String tenantId, String endpointId) throws DomainException {
+    public void subscribeByEndpoint(String rawTenantId, String rawEndpointId) throws DomainException {
 
+        TenantId tenantId = TenantId.create(rawTenantId);
+        EndpointId endpointId = EndpointId.create(rawEndpointId);
+        List<ReceiveEvent> eventList = this.receiveEventRepository.notSubscribedEndpoint(tenantId, endpointId);
+
+        for (ReceiveEvent event : eventList) {
+            event.subscribe();
+        }
+
+        this.receiveEventRepository.updateAll(eventList);
     }
 
     /**

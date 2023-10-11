@@ -1,5 +1,6 @@
 package org.nortis.domain.user;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,9 @@ import org.seasar.doma.Transient;
 @Getter
 @Table(name = "SUSER")
 @Entity(metamodel = @Metamodel, listener = NortisEntityListener.class)
-public class Suser extends RootEntity {
+public class Suser extends RootEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "USER_ID")
@@ -249,6 +252,20 @@ public class Suser extends RootEntity {
             return;
         }
         result.get().setDelete();
+    }
+
+    /**
+     * ロールIDを指定して権限を取り消します
+     * 
+     * @param roleId ロールID
+     * @throws DomainException ビジネスロジック
+     */
+    public void revokeFromRoleId(RoleId roleId) throws DomainException {
+        for (UserRole userRole : this.userRoles) {
+            if (userRole.getRoleId().equals(roleId)) {
+                userRole.setDelete();
+            }
+        }
     }
 
     /**

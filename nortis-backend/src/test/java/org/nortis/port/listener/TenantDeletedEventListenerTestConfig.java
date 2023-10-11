@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 public class TenantDeletedEventListenerTestConfig {
 
     @Bean
-    TenantDeletedEventListener tenantDeletedEventListener(EndpointApplicationService endpointApplicationService) {
-        return new TenantDeletedEventListener(endpointApplicationService);
+    EndpointEventListener tenantDeletedEventListener(EndpointApplicationService endpointApplicationService) {
+        return new EndpointEventListener(endpointApplicationService);
     }
 }

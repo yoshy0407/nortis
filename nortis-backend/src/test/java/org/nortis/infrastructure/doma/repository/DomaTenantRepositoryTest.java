@@ -143,6 +143,7 @@ class DomaTenantRepositoryTest extends RepositoryTestBase {
 
     @Test
     void testUpdate() throws DomainException {
+        TestUsers.adminUser().setSecurityContext();
         var tenantId = TenantId.create("0000000001");
         var addRoleId = RoleId.create("01000");
         var delRoleId = RoleId.create("00002");

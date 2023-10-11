@@ -1,8 +1,9 @@
 package org.nortis.infrastructure.doma.repository;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
+import org.nortis.domain.tenant.value.RoleId;
 import org.nortis.domain.user.Suser;
 import org.nortis.domain.user.SuserRepository;
 import org.nortis.domain.user.Suser_;
@@ -10,8 +11,9 @@ import org.nortis.domain.user.UserRole;
 import org.nortis.domain.user.UserRole_;
 import org.nortis.domain.user.value.LoginId;
 import org.nortis.domain.user.value.UserId;
+import org.nortis.infrastructure.application.Paging;
 import org.seasar.doma.jdbc.criteria.Entityql;
-import org.seasar.doma.jdbc.criteria.declaration.WhereDeclaration;
+import org.seasar.doma.jdbc.criteria.statement.EntityqlSelectStarting;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -32,18 +34,51 @@ public class DomaSuserRepository implements SuserRepository {
 
     @Override
     public Optional<Suser> getByUserId(UserId userId) {
-        return selectInternal(c -> c.eq(this.suser.userId, userId));
+        //@formatter:off
+        return select()
+                .where(c -> c.eq(this.suser.userId, userId))
+                .fetchOptional();
+        //@formatter:on
     }
 
     @Override
     public Optional<Suser> getByLoginId(LoginId loginId) {
-        return selectInternal(c -> c.eq(this.suser.loginId, loginId));
+        //@formatter:off
+        return select()
+                .where(c -> c.eq(this.suser.loginId, loginId))
+                .fetchOptional();
+        //@formatter:on
     }
 
     @Override
     public void save(Suser suser) {
         entityql.insert(this.suser, suser).execute();
         entityql.insert(this.userRole, suser.getUserRoles()).execute();
+    }
+
+    @Override
+    public List<Suser> getFromRoleId(RoleId roleId) {
+        //@formatter:off
+        return select()
+                .where(c -> c.eq(this.userRole.roleId, roleId))
+                .orderBy(orderBy -> orderBy.asc(this.suser.userId))
+                .fetch();
+        //@formatter:on
+    }
+
+    @Override
+    public List<Suser> getListPaging(Paging paging) {
+        //@formatter:off
+        return this.entityql.from(this.suser)
+                .leftJoin(this.userRole, on ->  on.eq(this.suser.userId, this.userRole.userId))
+                .associate(this.suser, this.userRole, (e1, e2) -> {
+                    e1.getUserRoles().add(e2);
+                })
+                .offset(paging.offset())
+                .limit(paging.limit())
+                .orderBy(o -> o.asc(this.suser.updateId))
+                .fetch();
+        //@formatter:on                
     }
 
     @Override
@@ -65,17 +100,16 @@ public class DomaSuserRepository implements SuserRepository {
         entityql.delete(this.suser, suser).execute();
     }
 
-    private Optional<Suser> selectInternal(Consumer<WhereDeclaration> condition) {
+    private EntityqlSelectStarting<Suser> select() {
         //@formatter:off
         return entityql
                 .from(this.suser)
                 .leftJoin(this.userRole, on ->  on.eq(this.suser.userId, this.userRole.userId))
-                .where(condition)                
                 .associate(this.suser, this.userRole, (e1, e2) -> {
                     e1.getUserRoles().add(e2);
-                })
-                .fetchOptional();
+                });
         //@formatter:on
 
     }
+
 }

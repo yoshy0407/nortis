@@ -1,5 +1,6 @@
 package org.nortis.domain.tenant;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import org.nortis.domain.tenant.value.OperationId;
@@ -20,7 +21,9 @@ import org.seasar.doma.Table;
 @Table(name = "ROLE_OPERATION")
 @Getter
 @Entity(immutable = true, metamodel = @Metamodel)
-public class RoleOperation extends ImmutableEntity {
+public class RoleOperation extends ImmutableEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "ROLE_ID")

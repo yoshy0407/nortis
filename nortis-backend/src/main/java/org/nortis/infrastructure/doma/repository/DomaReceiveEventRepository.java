@@ -2,7 +2,6 @@ package org.nortis.infrastructure.doma.repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.event.ReceiveEvent;
@@ -12,9 +11,9 @@ import org.nortis.domain.event.SendMessage;
 import org.nortis.domain.event.SendMessage_;
 import org.nortis.domain.event.value.EventId;
 import org.nortis.domain.event.value.Subscribed;
+import org.nortis.domain.tenant.value.TenantId;
 import org.seasar.doma.jdbc.criteria.Entityql;
-import org.seasar.doma.jdbc.criteria.declaration.OrderByNameDeclaration;
-import org.seasar.doma.jdbc.criteria.declaration.WhereDeclaration;
+import org.seasar.doma.jdbc.criteria.statement.EntityqlSelectStarting;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -46,18 +45,28 @@ public class DomaReceiveEventRepository implements ReceiveEventRepository {
 
     @Override
     public List<ReceiveEvent> notSubscribed() {
-        return selectListInternal(c -> c.eq(this.receiveEvent.subscribed, Subscribed.FALSE),
-                orderBy -> orderBy.asc(this.receiveEvent.eventId));
+        //@formatter:off
+        return select()
+                .where(c -> c.eq(this.receiveEvent.subscribed, Subscribed.FALSE))
+                .orderBy(orderBy -> orderBy.asc(this.receiveEvent.eventId))
+                .fetch();
+        //@formatter:on
     }
 
     @Override
-    public List<ReceiveEvent> notSubscribedEndpoint(EndpointId endpointId) {
-        return selectListInternal(c -> {
-            c.eq(this.receiveEvent.subscribed, Subscribed.FALSE);
-            c.eq(this.receiveEvent.endpointId, endpointId);
-        }, orderBy -> {
-            orderBy.asc(this.receiveEvent.eventId);
-        });
+    public List<ReceiveEvent> notSubscribedEndpoint(TenantId tenantId, EndpointId endpointId) {
+        //@formatter:off
+        return select()
+                .where(c -> {
+                    c.eq(this.receiveEvent.subscribed, Subscribed.FALSE);
+                    c.eq(this.receiveEvent.tenantId, tenantId);
+                    c.eq(this.receiveEvent.endpointId, endpointId);
+                })
+                .orderBy(orderBy -> {
+                    orderBy.asc(this.receiveEvent.eventId);
+                })
+                .fetch();
+        //@formatter:on
     }
 
     @Override
@@ -109,14 +118,11 @@ public class DomaReceiveEventRepository implements ReceiveEventRepository {
         this.entityql.delete(this.receiveEvent, receiveEvent).execute();
     }
 
-    private List<ReceiveEvent> selectListInternal(Consumer<WhereDeclaration> condition,
-            Consumer<OrderByNameDeclaration> orderBy) {
+    private EntityqlSelectStarting<ReceiveEvent> select() {
         //@formatter:off
         return this.entityql.from(this.receiveEvent)
                 .innerJoin(this.sendMessage, on -> on.eq(this.receiveEvent.eventId, this.sendMessage.eventId))
-                .where(condition)
-                .associate(this.receiveEvent, this.sendMessage, (r, s) -> r.getSendMessageList().add(s))
-                .fetch();
+                .associate(this.receiveEvent, this.sendMessage, (r, s) -> r.getSendMessageList().add(s));
         //@formatter:on
     }
 

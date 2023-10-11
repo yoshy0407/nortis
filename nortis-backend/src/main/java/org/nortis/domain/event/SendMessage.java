@@ -25,6 +25,8 @@ import org.seasar.doma.Table;
 @Entity(immutable = true, metamodel = @Metamodel)
 public class SendMessage extends ImmutableEntity {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
     @Column(name = "EVENT_ID")
     private final EventId eventId;
