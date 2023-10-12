@@ -117,7 +117,7 @@ class AuthenticationRepositoryTest extends RepositoryTestBase {
         Optional<Authentication> optAuth = this.repository.getFromUserId(userId);
         Authentication authentication = optAuth.get();
 
-        LocalDateTime lastAccessDate = LocalDateTime.now();
+        LocalDateTime lastAccessDate = LocalDateTime.of(2023, 1, 4, 12, 34);
         authentication.setLastAccessDatetime(lastAccessDate);
 
         this.repository.update(authentication);
