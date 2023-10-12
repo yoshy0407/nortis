@@ -26,7 +26,11 @@ jobs:
           key: ${{ runner.os }}-maven
           restore-keys: ${{ runner.os }}-maven
 
-      - name: build
+      - name: build nortis-api
+        working-directory: ./nortis-api
+        run: mvn clean verify
+
+      - name: build nortis-backend
         working-directory: ./nortis-backend
         run: mvn clean verify
 
