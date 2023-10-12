@@ -23,7 +23,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 //@formatter:off
 @Sql(scripts = {
-    "/META-INF/ddl/dropSUser.sql",
+    "/META-INF/ddl/dropSuser.sql",
     "/ddl/createSuser.sql",
     "/META-INF/data/domain/del_ins_suser.sql"
 })
