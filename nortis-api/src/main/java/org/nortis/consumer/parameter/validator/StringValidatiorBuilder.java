@@ -17,7 +17,7 @@ public class StringValidatiorBuilder extends AbstractValidatorBuilder<StringVali
      * @return ビルダー
      */
     public StringValidatiorBuilder notBlank(String errorMessage) {
-        add(s -> s != null && s != "", errorMessage);
+        add(s -> s != null && !s.equals(""), errorMessage);
         return this;
     }
 

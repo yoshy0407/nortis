@@ -25,12 +25,12 @@ public class LocalDateConverter implements Converter<LocalDate> {
 
     @Override
     public LocalDate deserialize(String value) {
-        return LocalDate.parse(value, formatter);
+        return value != null ? LocalDate.parse(value, formatter) : null;
     }
 
     @Override
     public String serialize(LocalDate value) {
-        return value.format(formatter);
+        return value != null ? value.format(formatter) : null;
     }
 
 }

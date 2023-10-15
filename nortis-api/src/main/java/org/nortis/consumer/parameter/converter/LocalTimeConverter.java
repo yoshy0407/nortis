@@ -25,12 +25,12 @@ public class LocalTimeConverter implements Converter<LocalTime> {
 
     @Override
     public LocalTime deserialize(String value) {
-        return LocalTime.parse(value, formatter);
+        return value != null ? LocalTime.parse(value, formatter) : null;
     }
 
     @Override
     public String serialize(LocalTime value) {
-        return value.format(formatter);
+        return value != null ? value.format(formatter) : null;
     }
 
 }

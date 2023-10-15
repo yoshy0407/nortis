@@ -26,12 +26,12 @@ public class ZonedDateTimeConverter implements Converter<ZonedDateTime> {
 
     @Override
     public ZonedDateTime deserialize(String value) {
-        return ZonedDateTime.parse(value, formatter);
+        return value != null ? ZonedDateTime.parse(value, formatter) : null;
     }
 
     @Override
     public String serialize(ZonedDateTime value) {
-        return value.format(formatter);
+        return value != null ? value.format(formatter) : null;
     }
 
 }

@@ -1,5 +1,7 @@
 package org.nortis.consumer.model;
 
+import org.nortis.consumer.ApiMessageCode;
+
 /**
  * コンシューマのタイプを表すオブジェクトです
  * 
@@ -7,6 +9,11 @@ package org.nortis.consumer.model;
  * @version 1.0.0
  */
 public class ConsumerType {
+
+    /**
+     * 桁数
+     */
+    private static final int LENGTH = 20;
 
     private final String code;
 
@@ -19,8 +26,9 @@ public class ConsumerType {
      * @param displayName 画面の表示名
      */
     public ConsumerType(String code, String displayName) {
-        if (code.length() > 20) {
-            throw new IllegalArgumentException("コンシューマタイプのコード値は20文字以内で設定する必要があります");
+        if (code.length() > LENGTH) {
+            // :TODO このエラーでいいかどうか
+            throw new IllegalArgumentException(ApiMessageCode.NORTISAPI100001.getMessage(LENGTH));
         }
         this.code = code;
         this.displayName = displayName;

@@ -51,8 +51,8 @@ public class StandardParameterDefinition<T> extends AbstractParameterDefinition<
     @Override
     public ValidationResult validate(String value) {
         if (isRequire()) {
-            if (value == null) {
-                return ValidationResult.failure("$sが未設定です".formatted(getDisplayName()));
+            if (value == null || value.equals("")) {
+                return ValidationResult.failure(String.format("%sが未設定です", getDisplayName()));
             }
         }
         return this.validator.validate(value);
