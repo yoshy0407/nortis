@@ -71,7 +71,7 @@ public class EndpointRestController {
      * @return 取得結果
      * @throws DomainException ビジネスロジックエラー
      */
-    @GetMapping
+    @GetMapping("/endpoint")
     public List<EndpointResource> getList(@PathVariable String tenantId, @RequestParam int pageNo,
             @RequestParam int pagePerSize, @AuthenticationPrincipal NortisUserDetails userDetails)
             throws DomainException {
@@ -117,7 +117,7 @@ public class EndpointRestController {
      * @throws DomainException ビジネスロジックエラー
      */
     @ResponseStatus(HttpStatus.OK)
-    @PatchMapping("{endpointId}/name")
+    @PatchMapping("/endpoint/{endpointId}/name")
     public EndpointResource updateEndpointName(@PathVariable String tenantId, @PathVariable String endpointId,
             @RequestBody @Validated EndpointNameUpdateRequest request,
             @AuthenticationPrincipal NortisUserDetails userDetails) throws DomainException {
@@ -138,7 +138,7 @@ public class EndpointRestController {
      * @throws DomainException ビジネスロジックエラー
      */
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping("{endpointId}/message-template")
+    @PostMapping("/endpoint/{endpointId}/message-template")
     public EndpointResource addMessageTemplate(@PathVariable String tenantId, @PathVariable String endpointId,
             @PathVariable String textType, @RequestBody @Validated EndpointMessageTemplateRequest request,
             @AuthenticationPrincipal NortisUserDetails userDetails) throws DomainException {
@@ -166,7 +166,7 @@ public class EndpointRestController {
      * @throws DomainException ビジネスロジックエラー
      */
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping("{endpointId}/message-template")
+    @PutMapping("/endpoint/{endpointId}/message-template")
     public EndpointResource updateMessageTemplate(@PathVariable String tenantId, @PathVariable String endpointId,
             @PathVariable String textType, @RequestBody @Validated EndpointMessageTemplateRequest request,
             @AuthenticationPrincipal NortisUserDetails userDetails) throws DomainException {
@@ -192,7 +192,7 @@ public class EndpointRestController {
      * @throws DomainException ビジネスロジックエラー
      */
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("{endpointId}/message-template/{textType}")
+    @DeleteMapping("/endpoint/{endpointId}/message-template/{textType}")
     public void deleteMessageTemplate(@PathVariable String tenantId, @PathVariable String endpointId,
             @PathVariable String textType, @AuthenticationPrincipal NortisUserDetails userDetails)
             throws DomainException {
@@ -210,7 +210,7 @@ public class EndpointRestController {
      * @throws DomainException ビジネスロジックエラー
      */
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("{endpointId}")
+    @DeleteMapping("/endpoint/{endpointId}")
     public void delete(@PathVariable String tenantId, @PathVariable String endpointId,
             @AuthenticationPrincipal NortisUserDetails userDetails) throws DomainException {
         EndpointDeleteCommand command = new EndpointDeleteCommand(tenantId, endpointId);

@@ -23,6 +23,7 @@ import org.nortis.domain.user.value.AdminFlg;
 import org.nortis.domain.user.value.HashedPassword;
 import org.nortis.domain.user.value.LoginId;
 import org.nortis.domain.user.value.UserId;
+import org.nortis.infrastructure.annotation.ApplicationService;
 import org.nortis.infrastructure.application.ApplicationTranslator;
 import org.nortis.infrastructure.application.Paging;
 import org.nortis.infrastructure.exception.DomainException;
@@ -36,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author yoshiokahiroshi
  * @version 1.0.0
  */
+@ApplicationService
 @Transactional(rollbackFor = Exception.class)
 @AllArgsConstructor
 public class UserApplicationService {

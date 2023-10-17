@@ -4,3 +4,6 @@ spring:
     url: jdbc:postgresql://localhost:5432/nortis
     username: nortisadmin
     password: Admin$123
+ 
+  mail:
+    host: localhost:1025
