@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+  <RECEIVE_EVENT
+      EVENT_ID="FC3785B1-E9E4-4BCA-8812-9053468D0A46"
+      TENANT_ID="TEST3"
+      ENDPOINT_ID="ENDPOINT3"
+      SUBSCRIBED="1"
+      TEMPLATE_PARAMETER='{ "name": "John" }'
+  />
+  <RECEIVE_EVENT
+      EVENT_ID="6C30BE58-0E06-4FF2-ADBF-85F8A7A7BF8E"
+      TENANT_ID="TEST3"
+      ENDPOINT_ID="ENDPOINT3"
+      SUBSCRIBED="1"
+      TEMPLATE_PARAMETER='{ "name": "John" }'
+  />
+</dataset>

@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  postgresql:
+    image: postgres:16-alpine
+    container_name: nortis-postgresql
+    environment:
+      POSTGRES_USER: nortisadmin
+      POSTGRES_PASSWORD: Admin$123
+      POSTGRES_DB: nortis
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+volumes:
+  postgresql_data:

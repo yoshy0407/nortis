@@ -1,0 +1,80 @@
+name: "build backend"
+
+on:
+  push:
+    paths:
+      - "nortis-api"
+      - "nortis-backend"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout sources
+        uses: actions/checkout@v3
+
+      - name: Setup OpenJDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: 21
+          distribution: liberica
+
+      - name: cache maven local repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven
+          restore-keys: ${{ runner.os }}-maven
+
+      - name: build nortis-api
+        working-directory: ./nortis-api
+        run: mvn clean install
+
+      - name: build nortis-backend
+        working-directory: ./nortis-backend
+        run: mvn clean verify
+
+      - name: Test Reports
+        uses: mikepenz/action-junit-report@v2
+        if: always()
+        with:
+          report_paths: "**/target/surefire-reports/TEST-*.xml"
+
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: jacoco-report
+          path: nortis-backend/target/site/jacoco
+
+      - uses: jwgmeligmeyling/spotbugs-github-action@master
+        if: always()
+        with:
+          name: spotbugs-report
+          path: "**/spotbugsXml.xml"
+
+      - uses: jwgmeligmeyling/checkstyle-github-action@master
+        if: always()
+        with:
+          name: checkstyle-report
+          path: "**/checkstyle-result.xml"
+
+      - name: prepare package
+        run: mkdir staging && cp nortis-backend/target/*.jar staging
+        if: success()
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Package
+          path: staging
+
+      - name: notification failure
+        if: success()
+        working-directory: tools
+        run: bash ./sendMessage.sh ${{ secrets.LINE_ACCESS_TOKEN }} success ${{github.repository}} ${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}
+
+      - name: notification failure
+        if: failure()
+        working-directory: tools
+        run: bash ./sendMessage.sh ${{ secrets.LINE_ACCESS_TOKEN }} failure ${{github.repository}} ${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}
