@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.util.Maps;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nortis.domain.tenant.value.RoleId;
 import org.nortis.domain.tenant.value.TenantId;
@@ -15,15 +14,8 @@ import org.nortis.domain.user.value.LoginId;
 import org.nortis.domain.user.value.UserId;
 import org.nortis.infrastructure.doma.EntityOperation;
 import org.nortis.infrastructure.exception.DomainException;
-import org.nortis.test.MockApplicationContextAccessor;
 
 class SuserTest {
-
-    @BeforeEach
-    void setup() {
-        MockApplicationContextAccessor accessor = new MockApplicationContextAccessor();
-        accessor.mockTestPasswordEncoder();
-    }
 
     @Test
     void testChangeUsername() throws DomainException {

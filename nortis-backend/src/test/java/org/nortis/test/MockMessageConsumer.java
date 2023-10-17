@@ -54,4 +54,9 @@ public class MockMessageConsumer implements MessageConsumer {
         this.parameter = parameter;
     }
 
+    @Override
+    public String consumerName() {
+        return "mockConsumer";
+    }
+
 }

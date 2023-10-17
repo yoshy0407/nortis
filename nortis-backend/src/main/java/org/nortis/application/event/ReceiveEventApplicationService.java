@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.event.ReceiveEvent;
 import org.nortis.domain.event.ReceiveEventRepository;
+import org.nortis.domain.service.ConsumerDomainService;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.annotation.ApplicationService;
 import org.nortis.infrastructure.exception.DomainException;
@@ -17,11 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
  * @version 1.0.0
  */
 @AllArgsConstructor
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @ApplicationService
 public class ReceiveEventApplicationService {
 
     private final ReceiveEventRepository receiveEventRepository;
+
+    private final ConsumerDomainService consumerDomainService;
 
     // :TODO イベントを見れるようにする
 
@@ -47,9 +50,15 @@ public class ReceiveEventApplicationService {
 
     /**
      * 受信イベントの消費処理を実行します
+     * 
+     * @throws DomainException ビジネスロジックエラー
      */
-    public void consume() {
+    public void consume() throws DomainException {
+        List<ReceiveEvent> eventList = this.receiveEventRepository.notSubscribed();
 
+        for (ReceiveEvent event : eventList) {
+            this.consumerDomainService.consumeEvent(event);
+        }
     }
 
 }

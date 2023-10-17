@@ -1,9 +1,12 @@
 package org.nortis.port.scheduler;
 
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.nortis.application.event.ReceiveEventApplicationService;
+import org.nortis.infrastructure.message.MessageCodes;
+import org.springframework.context.MessageSource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +23,8 @@ public class EventConsumeScheduler {
 
     private final ReceiveEventApplicationService receiveEventApplicationService;
 
+    private final MessageSource messageSource;
+
     /**
      * イベントの受信処理を実行します
      */
@@ -28,7 +33,7 @@ public class EventConsumeScheduler {
         try {
             this.receiveEventApplicationService.consume();
         } catch (Exception ex) {
-            log.error("ログインの有効期限切れの処理に失敗しました", ex);
+            log.error(MessageCodes.nortis40001().resolveMessage(messageSource, Locale.getDefault()), ex);
         }
     }
 

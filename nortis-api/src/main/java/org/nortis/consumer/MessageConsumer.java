@@ -14,6 +14,13 @@ import org.nortis.consumer.parameter.ParameterDefinition;
 public interface MessageConsumer {
 
     /**
+     * メッセージコンシューマ名
+     * 
+     * @return メッセージコンシューマ名
+     */
+    String consumerName();
+
+    /**
      * コンシューマのタイプを返却します
      * 
      * @return コンシューマのタイプ

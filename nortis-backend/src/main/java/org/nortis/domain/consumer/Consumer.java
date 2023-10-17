@@ -4,17 +4,22 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.ToString;
 import org.nortis.consumer.ConsumerParameters;
+import org.nortis.consumer.model.Message;
 import org.nortis.domain.consumer.value.ConsumerId;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.endpoint.value.TextType;
+import org.nortis.domain.event.ReceiveEvent;
+import org.nortis.domain.event.SendMessage;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.doma.NortisEntityListener;
 import org.nortis.infrastructure.doma.entity.RootEntity;
 import org.nortis.infrastructure.exception.DomainException;
+import org.nortis.infrastructure.message.MessageCodes;
 import org.nortis.infrastructure.security.SecurityContextUtils;
 import org.nortis.infrastructure.validation.Validations;
 import org.seasar.doma.Column;
@@ -189,6 +194,35 @@ public class Consumer extends RootEntity {
             return;
         }
         consumerSubscribe.setDelete();
+    }
+
+    /**
+     * 受信イベントを消費します
+     * 
+     * @param receiveEvent 受信イベント
+     * @return 送信対象のメッセージ
+     * @throws DomainException ビジネスロジックエラー
+     */
+    public Message consumeForSend(ReceiveEvent receiveEvent) throws DomainException {
+        Optional<SendMessage> optSendMessage = receiveEvent.getMessage(this.textType);
+
+        if (optSendMessage.isEmpty()) {
+            throw new DomainException(MessageCodes.nortis40003(this.consumerId.toString()));
+        }
+        SendMessage sendMessage = optSendMessage.get();
+        return new Message(this.textType.getMessageTextType(), sendMessage.getSubject(), sendMessage.getBody());
+    }
+
+    /**
+     * {@link ConsumerParameters}を返却します
+     * 
+     * @return {@link ConsumerParameters}
+     */
+    public ConsumerParameters getConsumerParameters() {
+        Map<String, String> map = this.parameters.entrySet().stream().collect(
+                Collectors.toUnmodifiableMap(entry -> entry.getKey(), entry -> entry.getValue().getParameterValue()));
+
+        return new ConsumerParameters(map);
     }
 
     /**

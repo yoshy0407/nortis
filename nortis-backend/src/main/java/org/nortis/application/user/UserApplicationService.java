@@ -28,6 +28,7 @@ import org.nortis.infrastructure.application.Paging;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.message.MessageCodes;
 import org.nortis.infrastructure.security.user.NortisUserDetails;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * ユーザのアプリケーションサービスです
@@ -35,6 +36,7 @@ import org.nortis.infrastructure.security.user.NortisUserDetails;
  * @author yoshiokahiroshi
  * @version 1.0.0
  */
+@Transactional(rollbackFor = Exception.class)
 @AllArgsConstructor
 public class UserApplicationService {
 

@@ -19,6 +19,8 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * メールを送信するドメインサービスです
@@ -28,6 +30,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class MailSendMessageConsumer implements MessageConsumer {
+
+    /**
+     * コンシューマ名
+     */
+    public static final String CONSUMER_NAME = "MailConsumer";
 
     /**
      * 表示名
@@ -63,6 +70,11 @@ public class MailSendMessageConsumer implements MessageConsumer {
         this.parameterList.add(toMailAddresses);
     }
 
+    @Override
+    public String consumerName() {
+        return CONSUMER_NAME;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -86,10 +98,18 @@ public class MailSendMessageConsumer implements MessageConsumer {
     public void consume(Message message, ConsumerParameters parameter) throws ConsumerFailureException {
 
         List<String> sendMailAddressList = parameter.getParameter(this.toMailAddresses);
+        if (CollectionUtils.isEmpty(sendMailAddressList)) {
+            throw new ConsumerFailureException("送信先メールアドレスが未設定です");
+        }
+
+        String fromMailAddress = parameter.getParameter(this.fromMailAddress);
+        if (!StringUtils.hasLength(fromMailAddress)) {
+            throw new ConsumerFailureException("送信元メールアドレスが未設定です");
+        }
 
         List<MimeMessage> messages = new ArrayList<>();
         for (String sendMailAddress : sendMailAddressList) {
-            messages.add(createMessage(message, parameter, sendMailAddress));
+            messages.add(createMessage(message, parameter, sendMailAddress, fromMailAddress));
         }
 
         try {
@@ -99,12 +119,12 @@ public class MailSendMessageConsumer implements MessageConsumer {
         }
     }
 
-    private MimeMessage createMessage(Message message, ConsumerParameters parameter, String sendMailAddress)
-            throws ConsumerFailureException {
+    private MimeMessage createMessage(Message message, ConsumerParameters parameter, String sendMailAddress,
+            String fromMailAddress) throws ConsumerFailureException {
         MimeMessage mimeMessage = this.javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
-            helper.setFrom(parameter.getParameter(this.fromMailAddress));
+            helper.setFrom(fromMailAddress);
             helper.setTo(sendMailAddress);
             helper.setSubject(message.getSubject());
             helper.setText(message.getMessageBody(), message.getTextType().equals(MessageTextType.HTML));

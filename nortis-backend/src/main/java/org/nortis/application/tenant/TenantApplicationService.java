@@ -22,6 +22,7 @@ import org.nortis.infrastructure.exception.DataNotFoundException;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.message.MessageCodes;
 import org.nortis.infrastructure.security.user.NortisUserDetails;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * テナントのアプリケーションサービスです
@@ -29,6 +30,7 @@ import org.nortis.infrastructure.security.user.NortisUserDetails;
  * @author yoshiokahiroshi
  * @version 1.0.0
  */
+@Transactional(rollbackFor = Exception.class)
 @AllArgsConstructor
 @ApplicationService
 public class TenantApplicationService {

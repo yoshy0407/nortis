@@ -11,6 +11,7 @@ import org.nortis.infrastructure.annotation.ApplicationService;
 import org.nortis.infrastructure.exception.DomainException;
 import org.nortis.infrastructure.security.user.NortisUserDetails;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 認証に関するアプリケーションサービスです
@@ -19,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @version 1.0.0
  */
 @AllArgsConstructor
+@Transactional(rollbackFor = Exception.class)
 @ApplicationService
 public class AuthenticationApplicationService {
 

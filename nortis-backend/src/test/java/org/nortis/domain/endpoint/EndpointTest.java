@@ -2,12 +2,8 @@ package org.nortis.domain.endpoint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.eq;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.apache.velocity.app.VelocityEngine;
 import org.nortis.TestBase;
 import org.nortis.domain.endpoint.value.BodyTemplate;
 import org.nortis.domain.endpoint.value.EndpointId;
@@ -15,22 +11,9 @@ import org.nortis.domain.endpoint.value.EndpointIdentifier;
 import org.nortis.domain.endpoint.value.SubjectTemplate;
 import org.nortis.domain.endpoint.value.TextType;
 import org.nortis.domain.tenant.value.TenantId;
-import org.nortis.infrastructure.ApplicationContextAccessor;
 import org.nortis.infrastructure.exception.DomainException;
-import org.nortis.infrastructure.template.TemplateRender;
-import org.nortis.infrastructure.template.VelocityTemplateRender;
-import org.springframework.context.ApplicationContext;
 
 class EndpointTest extends TestBase {
-
-    @BeforeEach
-    void setup() {
-        ApplicationContext context = Mockito.mock(ApplicationContext.class);
-        VelocityEngine ve = new VelocityEngine();
-        ve.init();
-        Mockito.when(context.getBean(eq(TemplateRender.class))).thenReturn(new VelocityTemplateRender(ve));
-        ApplicationContextAccessor.set(context);
-    }
 
     @Test
     void testChangeEndpointName() throws DomainException {

@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @version 1.0.0
  */
 @AllArgsConstructor
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @ApplicationService
 public class EndpointReceiveApplicationService {
 

@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author yoshiokahiroshi
  * @version 1.0.0
  */
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @AllArgsConstructor
 @ApplicationService
 public class TenantRoleApplicationService {

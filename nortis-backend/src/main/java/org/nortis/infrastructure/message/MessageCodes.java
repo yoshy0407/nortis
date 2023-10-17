@@ -68,6 +68,7 @@ public class MessageCodes {
      * @param result   結果
      * @return {@link MessageCode}
      */
+    @Deprecated
     public static MessageCode nortis10002(String tenantId, String result) {
         return new SimpleMessageCode("NORTIS10002", "同じテナントIDのレコードが複数あります。テナントID: %s, 検索結果: %s",
                 new Object[] { tenantId, result });
@@ -191,7 +192,7 @@ public class MessageCodes {
      * @return {@link MessageCode}
      */
     public static MessageCode nortis40001() {
-        return new SimpleMessageCode("NORTIS40001", "JSONのフォーマットが不正です", new Object[] {});
+        return new SimpleMessageCode("NORTIS40001", "受信イベントの消費処理に失敗しました", new Object[] {});
     }
 
     /**
@@ -201,6 +202,17 @@ public class MessageCodes {
      */
     public static MessageCode nortis40002() {
         return new SimpleMessageCode("NORTIS40002", "JSONへの変換に失敗しました", new Object[] {});
+    }
+
+    /**
+     * NORTIS40003
+     * 
+     * @param consumerId コンシューマID
+     * @return {@link MessageCode}
+     */
+    public static MessageCode nortis40003(String consumerId) {
+        return new SimpleMessageCode("NORTIS40003", "コンシューマで対象のテキストタイプのメッセージが存在しません。コンシューマID: %s",
+                new Object[] { consumerId });
     }
 
     /**
@@ -281,6 +293,15 @@ public class MessageCodes {
      */
     public static MessageCode nortis60002() {
         return new SimpleMessageCode("NORTIS60002", "APIキーが期限切れです。再認証してください", new Object[] {});
+    }
+
+    /**
+     * NORTIS60003
+     * 
+     * @return {@link MessageCode}
+     */
+    public static MessageCode nortis60003() {
+        return new SimpleMessageCode("NORTIS60003", "ログインの有効期限切れの処理に失敗しました", new Object[] {});
     }
 
     /**

@@ -1,23 +1,14 @@
 package org.nortis.domain.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nortis.domain.endpoint.value.EndpointId;
 import org.nortis.domain.event.value.Subscribed;
 import org.nortis.domain.tenant.value.TenantId;
 import org.nortis.infrastructure.exception.DomainException;
-import org.nortis.test.MockApplicationContextAccessor;
 
 class ReceiveEventTest {
-
-    @BeforeEach
-    void setup() {
-        MockApplicationContextAccessor mockAccessor = new MockApplicationContextAccessor();
-        mockAccessor.mockGetObjectMapper(new ObjectMapper());
-    }
 
     @Test
     void testSubscribed() throws DomainException {
