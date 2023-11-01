@@ -23,6 +23,7 @@ import org.nortis.domain.user.Suser;
 import org.nortis.domain.user.SuserRepository;
 import org.nortis.domain.user.value.AdminFlg;
 import org.nortis.domain.user.value.HashedPassword;
+import org.nortis.domain.user.value.LoginFlg;
 import org.nortis.domain.user.value.LoginId;
 import org.nortis.domain.user.value.UserId;
 import org.nortis.infrastructure.application.ApplicationTranslator;
@@ -123,6 +124,8 @@ class UserLoginServiceTest extends ServiceTestBase {
             this.service.logout("test");
         });
 
+        assertThat(suser.getLoginFlg()).isEqualTo(LoginFlg.NOT_LOGIN);
+
         verify(this.suserRepository).update(eq(suser));
         verify(this.authenticationRepository).remove(eq(authentication));
     }
@@ -142,6 +145,8 @@ class UserLoginServiceTest extends ServiceTestBase {
         assertDoesNotThrow(() -> {
             this.service.logout("test");
         });
+
+        assertThat(suser.getLoginFlg()).isEqualTo(LoginFlg.NOT_LOGIN);
 
         verify(this.suserRepository).update(eq(suser));
         verify(this.authenticationRepository, never()).remove(any());
