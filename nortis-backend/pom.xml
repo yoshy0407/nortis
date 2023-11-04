@@ -152,6 +152,12 @@
 			<version>2.7.3</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>net.jqwik</groupId>
+			<artifactId>jqwik</artifactId>
+			<version>1.8.1</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
@@ -269,7 +275,7 @@
 					<effort>Default</effort>
 					<threshold>Default</threshold>
 					<failOnError>true</failOnError>
-					<trace>true</trace>
+					<trace>false</trace>
 					<xmlOutput>true</xmlOutput>
 					<excludeFilterFile>config/spotbugs/exclude.xml</excludeFilterFile>
 				</configuration>
@@ -287,6 +293,16 @@
 				<groupId>org.pitest</groupId>
 				<artifactId>pitest-maven</artifactId>
 				<version>1.15.2</version>
+				<configuration>
+					<excludedClasses>
+						<param>org.nortis.domain.**._*</param>
+						<param>org.nortis.domain.**.*_</param>
+						<param>org.nortis.domain.**.*RepositoryImpl</param>
+						<param>org.nortis.infrastructure.doma.entity.**._*</param>
+						<param>org.nortis.infrastructure.doma.entity.**.*_</param>
+					</excludedClasses>
+					<threads>5</threads>
+				</configuration>
 				<dependencies>
 					<dependency>
 						<groupId>org.pitest</groupId>
