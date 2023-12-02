@@ -78,11 +78,11 @@ public class UserLoginService {
             throw new DomainException(MessageCodes.nortis00003("ユーザ"));
         }
 
-        Suser login = optSuser.get();
-        login.logout();
-        this.suserRepository.update(login);
+        Suser user = optSuser.get();
+        user.logout();
+        this.suserRepository.update(user);
 
-        Optional<Authentication> optAuth = this.authenticationRepository.getFromUserId(login.getUserId());
+        Optional<Authentication> optAuth = this.authenticationRepository.getFromUserId(user.getUserId());
         // 認証がなければ、正しい状態なのでそのままに
         optAuth.ifPresent(auth -> {
             this.authenticationRepository.remove(auth);

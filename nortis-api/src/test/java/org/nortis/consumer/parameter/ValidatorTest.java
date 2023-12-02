@@ -2,6 +2,8 @@ package org.nortis.consumer.parameter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
 
 class ValidatorTest {
 
@@ -12,4 +14,10 @@ class ValidatorTest {
         assertThat(result.isSuccess()).isTrue();
     }
 
+    @Property
+    void testNoCheck_PropertyConstant(@ForAll String value) {
+        var result = Validator.noCheck().validate(value);
+
+        assertThat(result.isSuccess()).isTrue();
+    }
 }

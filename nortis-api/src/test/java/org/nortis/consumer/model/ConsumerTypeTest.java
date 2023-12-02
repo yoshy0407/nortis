@@ -26,4 +26,24 @@ class ConsumerTypeTest {
         assertThat(consumerType.getDisplayName()).isEqualTo("メール");
     }
 
+    @Test
+    void testHashCode() {
+        var consumertype1 = new ConsumerType("MAIL", "メール");
+        var consumertype2 = new ConsumerType("MAIL", "メール");
+        var consumertype3 = new ConsumerType("VALUE", "メール");
+
+        assertThat(consumertype1.hashCode()).isEqualTo(consumertype2.hashCode());
+        assertThat(consumertype1.hashCode()).isNotEqualTo(consumertype3.hashCode());
+    }
+
+    @Test
+    void testEquals() {
+        var consumertype1 = new ConsumerType("MAIL", "メール");
+        var consumertype2 = new ConsumerType("MAIL", "メール");
+        var consumertype3 = new ConsumerType("VALUE", "メール");
+
+        assertThat(consumertype1.equals(consumertype2)).isTrue();
+        assertThat(consumertype1.equals(consumertype3)).isFalse();
+    }
+
 }
