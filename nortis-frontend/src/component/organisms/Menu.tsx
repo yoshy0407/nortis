@@ -1,4 +1,4 @@
-import { CSSObject, Divider, MenuList, Theme, useTheme, styled, IconButton } from "@mui/material";
+import { CSSObject, Divider, MenuList, Theme, useTheme, styled, IconButton, ListItem } from "@mui/material";
 import MuiDrawer from '@mui/material/Drawer';
 import TenantMenuItem from "../molecules/menu/TenantMenuItem";
 import EndpointMenuItem from "../molecules/menu/EndpointMenuItem";
@@ -9,43 +9,53 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 
 
-const drawerWidth = 240;
-
-export interface MenuProp {
+export interface MenuProps {
     open: boolean;
+    menuWidth: number;
     onClickMenuClose: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const openedMixin = (theme: Theme): CSSObject => ({
-    width: drawerWidth,
-    transition: theme.transitions.create('width', {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.enteringScreen,
-    }),
-    overflowX: 'hidden',
-});
+function openedMixin(theme: Theme, width: number): CSSObject {
+    return {
+        width,
+        transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+        overflowX: 'hidden',
+    }
+}
 
-const closedMixin = (theme: Theme): CSSObject => ({
-    transition: theme.transitions.create('width', {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-    }),
-    overflowX: 'hidden',
-    width: `calc(${theme.spacing(7)} + 1px)`,
-    [theme.breakpoints.up('sm')]: {
-        width: `calc(${theme.spacing(8)} + 1px)`,
-    },
-});
+function closedMixin(theme: Theme): CSSObject {
+    return {
+        transition: theme.transitions.create(
+            'width',
+            {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+            }
+        ),
+        overflowX: 'hidden',
+        width: `calc(${theme.spacing(7)} + 1px)`,
+        [theme.breakpoints.up('sm')]: {
+            width: `calc(${theme.spacing(8)} + 1px)`,
+        },
+    }
+}
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-    ({ theme, open }) => ({
-        width: drawerWidth,
+interface DrawerProps {
+    menuWidth: number;
+}
+
+const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })<DrawerProps>(
+    ({ theme, open, menuWidth }) => ({
+        width: menuWidth,
         flexShrink: 0,
         whiteSpace: 'nowrap',
         boxSizing: 'border-box',
         ...(open && {
-            ...openedMixin(theme),
-            '& .MuiDrawer-paper': openedMixin(theme),
+            ...openedMixin(theme, menuWidth),
+            '& .MuiDrawer-paper': openedMixin(theme, menuWidth),
         }),
         ...(!open && {
             ...closedMixin(theme),
@@ -63,16 +73,15 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     ...theme.mixins.toolbar,
 }));
 
-export default function Menu(prop: MenuProp) {
+export default function Menu(props: MenuProps) {
     const theme = useTheme();
-    const mini = () => !prop.open;
+    const mini = () => !props.open;
 
     return (
-        <Drawer variant="permanent" anchor="left" open={prop.open}>
+        <Drawer variant="permanent" anchor="left" open={props.open} menuWidth={props.menuWidth} >
             <MenuList>
-                //TODO
                 <DrawerHeader>
-                    <IconButton onClick={prop.onClickMenuClose}>
+                    <IconButton onClick={props.onClickMenuClose}>
                         {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
                     </IconButton>
                 </DrawerHeader>

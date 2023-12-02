@@ -1,5 +1,5 @@
 import ConsumerIcon from "../../atoms/menu/ConsumerIcon";
-import MenuItem from "../../common/MenuItem";
+import MenuItem from "../../atoms/common/MenuItem";
 
 export interface ConsumerMenuItemProp {
     /**

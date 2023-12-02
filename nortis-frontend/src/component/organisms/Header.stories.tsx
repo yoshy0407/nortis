@@ -13,4 +13,26 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Normal: Story = {};
+export const MenuOpen: Story = {
+    args: {
+        menuWidth: 240,
+        withLogin: false,
+        menuOpen: true
+    }
+};
+
+export const MenuClose: Story = {
+    args: {
+        menuWidth: 240,
+        withLogin: false,
+        menuOpen: false
+    }
+};
+
+export const LoginMenu: Story = {
+    args: {
+        menuWidth: 240,
+        withLogin: true,
+        menuOpen: false
+    }
+};

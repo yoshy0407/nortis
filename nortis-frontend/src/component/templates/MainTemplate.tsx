@@ -1,31 +1,52 @@
 import Box from '@mui/material/Box'
 import Header from '../organisms/Header'
-import { useState } from 'react'
+import { ReactNode, useState } from 'react'
 import Typography from '@mui/material/Typography';
 import Menu from '../organisms/Menu';
+import { CssBaseline, ThemeProvider } from '@mui/material';
+import { theme } from '../theme';
 
-export default function MainTemplate() {
+const menuWidth = 240;
+
+export interface MainTemplateProps {
+    /**
+     * 子構造
+     */
+    children: ReactNode;
+}
+
+const MainTemplate: React.FC<MainTemplateProps> = (props: MainTemplateProps) => {
 
     const [menuOpen, setMenuOpen] = useState(false);
 
     return (
-        <Box sx={{ display: 'flex' }}>
-            <Header onClickMenu={(e) => setMenuOpen(!menuOpen)} />
-            <Menu open={menuOpen} />
-            <Typography paragraph>
-                Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper
-                eget nulla facilisi etiam dignissim diam. Pulvinar elementum integer enim
-                neque volutpat ac tincidunt. Ornare suspendisse sed nisi lacus sed viverra
-                tellus. Purus sit amet volutpat consequat mauris. Elementum eu facilisis
-                sed odio morbi. Euismod lacinia at quis risus sed vulputate odio. Morbi
-                tincidunt ornare massa eget egestas purus viverra accumsan in. In hendrerit
-                gravida rutrum quisque non tellus orci ac. Pellentesque nec nam aliquam sem
-                et tortor. Habitant morbi tristique senectus et. Adipiscing elit duis
-                tristique sollicitudin nibh sit. Ornare aenean euismod elementum nisi quis
-                eleifend. Commodo viverra maecenas accumsan lacus vel facilisis. Nulla
-                posuere sollicitudin aliquam ultrices sagittis orci a.
-            </Typography>
-        </Box>
-
+        <ThemeProvider theme={theme} >
+            <Box sx={{ display: 'flex' }}>
+                <CssBaseline />
+                <Header
+                    menuWidth={240}
+                    menuOpen={menuOpen}
+                    withLogin={true}
+                    onClickMenu={(e) => setMenuOpen(!menuOpen)}
+                />
+                <Menu
+                    menuWidth={menuWidth}
+                    open={menuOpen}
+                    onClickMenuClose={e => setMenuOpen(false)}
+                />
+                <Box
+                    component="main"
+                    sx={{
+                        flexGrow: 1,
+                        p: 3,
+                        marginTop: 8
+                    }}
+                >
+                    {props.children}
+                </Box>
+            </Box>
+        </ThemeProvider>
     )
 }
+
+export default MainTemplate;

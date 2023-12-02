@@ -1,21 +1,20 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import Menu from './Menu';
+import PasswordChangeCard from './PasswordChangeCard';
 
 const meta = {
-    title: 'organisms/Menu',
-    component: Menu,
+    title: 'molecules/PasswordChangeCard',
+    component: PasswordChangeCard,
     tags: ['autodocs'],
     parameters: {
         layout: 'fullscreen',
     },
-} satisfies Meta<typeof Menu>;
+} satisfies Meta<typeof PasswordChangeCard>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Normal: Story = {
     args: {
-        menuWidth: 240,
-        open: true
+        onCancel: () => { }
     }
 };

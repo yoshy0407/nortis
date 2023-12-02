@@ -1,21 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import Menu from './Menu';
+import LoginPanel from './LoginPanel';
 
 const meta = {
-    title: 'organisms/Menu',
-    component: Menu,
+    title: 'molecules/LoginPanel',
+    component: LoginPanel,
     tags: ['autodocs'],
     parameters: {
         layout: 'fullscreen',
     },
-} satisfies Meta<typeof Menu>;
+} satisfies Meta<typeof LoginPanel>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Normal: Story = {
-    args: {
-        menuWidth: 240,
-        open: true
-    }
 };

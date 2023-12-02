@@ -1,5 +1,5 @@
 import EndpointIcon from "../../atoms/menu/EndpointIcon";
-import MenuItem from "../../common/MenuItem";
+import MenuItem from "../../atoms/common/MenuItem";
 
 export interface EndpointMenuProp {
     /**

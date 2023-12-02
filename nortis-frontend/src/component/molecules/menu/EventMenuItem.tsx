@@ -1,5 +1,5 @@
 import EventIcon from "../../atoms/menu/EventIcon";
-import MenuItem from "../../common/MenuItem";
+import MenuItem from "../../atoms/common/MenuItem";
 
 export interface EventMenuProp {
     /**

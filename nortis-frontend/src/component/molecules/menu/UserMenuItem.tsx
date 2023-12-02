@@ -1,5 +1,5 @@
-import UserIcon from "../../atoms/menu/UserIcon";
-import MenuItem from "../../common/MenuItem";
+import UsersIcon from "../../atoms/menu/UsersIcon";
+import MenuItem from "../../atoms/common/MenuItem";
 
 export interface UserMenuProp {
     /**
@@ -11,7 +11,7 @@ export interface UserMenuProp {
 export default function UserMenuItem(prop: UserMenuProp) {
     return (
         <MenuItem uri="/users" mini={prop.mini} text="Users">
-            <UserIcon placement="right-start" />
+            <UsersIcon placement="right-start" />
         </MenuItem>
     )
 }

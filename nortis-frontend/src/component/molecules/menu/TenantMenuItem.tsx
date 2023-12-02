@@ -1,5 +1,5 @@
 import TenantIcon from "../../atoms/menu/TenantIcon";
-import MenuItem from "../../common/MenuItem";
+import MenuItem from "../../atoms/common/MenuItem";
 
 export interface TenantMenuProp {
     /**
