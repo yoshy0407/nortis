@@ -20,6 +20,7 @@
 		<jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
 		<spotbugs.version>4.7.3</spotbugs.version>
 		<pmd.version>6.52.0</pmd.version>
+		<cucumber.version>7.14.1</cucumber.version>
 	</properties>
 	<dependencies>
 		<!-- common -->
@@ -158,6 +159,31 @@
 			<version>1.8.1</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- integration test -->
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-java</artifactId>
+			<version>${cucumber.z}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+		   <groupId>io.cucumber</groupId>
+		   <artifactId>cucumber-junit-platform-engine</artifactId>
+		   <version>${cucumber.version}</version>
+		   <scope>test</scope>
+		</dependency>
+		<dependency>
+		   <groupId>org.junit.platform</groupId>
+		   <artifactId>junit-platform-suite</artifactId>
+		   <scope>test</scope>
+		</dependency>
+		<dependency>
+		   <groupId>io.cucumber</groupId>
+		   <artifactId>cucumber-spring</artifactId>
+		   <version>7.14.0</version>
+		   <scope>test</scope>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
@@ -199,6 +225,40 @@
 					<!-- ↓これがないとスタックトレースが出ない -->
 					<trimStackTrace>false</trimStackTrace>
 				</configuration>
+				<executions>
+					<execution>
+						<id>default-test</id>
+						<phase>test</phase>
+						<configuration>
+							<excludedGroups>integration</excludedGroups>
+						</configuration>
+					</execution>
+					<execution>
+						<id>integaration</id>
+						<phase>integration</phase>
+						<configuration>
+							<groups>integration</groups>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+			    <groupId>com.trivago.rta</groupId>
+			    <artifactId>cluecumber-maven</artifactId>
+			    <version>3.1.0</version>
+			    <executions>
+			        <execution>
+			            <id>report</id>
+			            <phase>post-integration-test</phase>
+			            <goals>
+			                <goal>reporting</goal>
+			            </goals>
+			        </execution>
+			    </executions>
+			    <configuration>
+			        <sourceJsonReportDirectory>${project.build.directory}/cucumber-report</sourceJsonReportDirectory>
+			        <generatedHtmlReportDirectory>${project.build.directory}/generated-report</generatedHtmlReportDirectory>
+			    </configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -347,6 +407,7 @@
 					</reportSet>
 				</reportSets>
 			</plugin>
+			
 		</plugins>
 	</reporting>
 </project>
